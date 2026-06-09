@@ -16,4 +16,9 @@ export class AdminController {
       ...(await this.adminService.getOverview())
     };
   }
+
+  @Get("course-map")
+  async getCourseMap() {
+    return this.adminService.getCourseMap();
+  }
 }

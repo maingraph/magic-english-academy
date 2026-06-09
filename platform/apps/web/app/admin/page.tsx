@@ -1,4 +1,5 @@
 import { AppShell } from "../../components/AppShell";
+import { AdminCoursePanel } from "../../components/AdminCoursePanel";
 import { AdminOverviewPanel } from "../../components/AdminOverviewPanel";
 
 const adminAreas = [
@@ -44,6 +45,26 @@ export default function AdminPage() {
           </section>
 
           <AdminOverviewPanel />
+          <AdminCoursePanel />
+
+          <section className="admin-workspace-grid" aria-label="Следующие разделы админки">
+            <article className="soft-card">
+              <span className="admin-kicker">Статьи</span>
+              <h2>Материалы и SEO</h2>
+              <p>
+                Следующий экран: список статей, статусы публикации, быстрый
+                переход к редактору и привязка к словарику.
+              </p>
+            </article>
+            <article className="soft-card">
+              <span className="admin-kicker">Пользователи</span>
+              <h2>Прогресс и риски</h2>
+              <p>
+                Следующий экран: роли, доступы, прогресс, домашка и базовые
+                сигналы подозрительной активности.
+              </p>
+            </article>
+          </section>
         </div>
       </main>
     </AppShell>

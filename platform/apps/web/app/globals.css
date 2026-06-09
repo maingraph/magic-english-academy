@@ -619,6 +619,148 @@ hr {
   color: var(--accent);
 }
 
+.admin-course-panel,
+.admin-workspace-grid {
+  margin-top: 32px;
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-kicker {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.admin-total-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(82px, 1fr));
+  gap: 10px;
+  min-width: 300px;
+}
+
+.admin-total-strip span {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-total-strip strong {
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.course-map-list {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-level-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.4fr) minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.admin-level-main {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.admin-level-main h3 {
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.admin-level-main p,
+.admin-module-title span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 46px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(45deg, var(--accent), var(--accent-light));
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.admin-module-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-module-row {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.admin-module-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-lesson-preview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+  list-style: none;
+}
+
+.admin-lesson-preview li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.admin-lesson-preview li span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.admin-workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
 .api-status.warning {
   border-color: rgba(254, 183, 51, 0.45);
   background: #fff9ed;
@@ -765,8 +907,22 @@ hr {
   }
 
   .dashboard-grid,
-  .admin-grid {
+  .admin-grid,
+  .admin-workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-section-header,
+  .admin-level-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-section-header {
+    display: grid;
+  }
+
+  .admin-total-strip {
+    min-width: 0;
   }
 }
 
@@ -832,5 +988,15 @@ hr {
     justify-content: center;
     margin-top: 10px;
     margin-left: 0;
+  }
+
+  .admin-total-strip,
+  .admin-lesson-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-module-title {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
