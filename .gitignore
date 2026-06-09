@@ -1,0 +1,24 @@
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Local Codex/dev artifacts
+.codex-audit/
+platform/.codex-progress.md
+platform/.codex-screenshots/
+
+# Node/Next build output
+node_modules/
+platform/node_modules/
+platform/apps/*/node_modules/
+platform/apps/web/.next/
+platform/apps/web/out/
+platform/apps/api/dist/
+platform/packages/*/dist/
+
+# Local environment
+.env
+.env.*
+platform/.env
+platform/.env.*
+!platform/.env.example

@@ -1,0 +1,285 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+  OWNER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INVITED
+}
+
+enum LessonBlockType {
+  RICH_TEXT
+  EXAMPLE
+  MEDIA
+  TASK
+  DICTIONARY_TERM
+}
+
+enum TaskType {
+  MULTIPLE_CHOICE
+  FILL_BLANK
+  MATCHING
+  WRITING
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  passwordHash       String?
+  role               UserRole            @default(STUDENT)
+  status             UserStatus          @default(ACTIVE)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  profile            Profile?
+  enrollments        Enrollment[]
+  lessonProgress     LessonProgress[]
+  taskAttempts       TaskAttempt[]
+  homeworkSubmissions HomeworkSubmission[]
+  activityEvents     ActivityEvent[]
+  userAchievements   UserAchievement[]
+  certificates        Certificate[]
+  dictionaryTerms     UserDictionaryTerm[]
+  assistantSessions   AssistantSession[]
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  displayName String
+  avatarUrl   String?
+  locale      String  @default("ru")
+  timezone    String  @default("Europe/Warsaw")
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  description String?
+  levels      CourseLevel[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model CourseLevel {
+  id          String       @id @default(cuid())
+  courseId    String
+  code        String
+  title       String
+  orderIndex  Int
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  modules     Module[]
+  enrollments Enrollment[]
+
+  @@unique([courseId, code])
+}
+
+model Module {
+  id          String      @id @default(cuid())
+  levelId     String
+  title       String
+  orderIndex  Int
+  level       CourseLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String           @id @default(cuid())
+  moduleId    String
+  slug        String           @unique
+  title       String
+  summary     String?
+  orderIndex  Int
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  blocks      LessonBlock[]
+  progress    LessonProgress[]
+  tasks       Task[]
+  dictionaryTerms LessonDictionaryTerm[]
+}
+
+model LessonBlock {
+  id          String          @id @default(cuid())
+  lessonId    String
+  type        LessonBlockType
+  orderIndex  Int
+  content     Json
+  lesson      Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id          String        @id @default(cuid())
+  lessonId    String
+  type        TaskType
+  prompt      Json
+  points      Int           @default(1)
+  orderIndex  Int
+  lesson      Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  options     TaskOption[]
+  attempts    TaskAttempt[]
+}
+
+model TaskOption {
+  id        String  @id @default(cuid())
+  taskId    String
+  value     String
+  isCorrect Boolean @default(false)
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id        String      @id @default(cuid())
+  userId    String
+  levelId   String
+  startsAt  DateTime    @default(now())
+  endsAt    DateTime?
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     CourseLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, levelId])
+}
+
+model LessonProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  lessonId    String
+  status      ProgressStatus @default(NOT_STARTED)
+  completedAt DateTime?
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model TaskAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  taskId      String
+  answer      Json
+  isCorrect   Boolean
+  pointsEarned Int    @default(0)
+  feedback    String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model HomeworkSubmission {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  content   Json
+  score     Int?
+  feedback  String?
+  createdAt DateTime @default(now())
+  reviewedAt DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  title       String
+  description String
+  rule        Json
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  courseLevel String
+  fileUrl     String?
+  issuedAt    DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DictionaryTerm {
+  id          String                 @id @default(cuid())
+  term        String
+  translation String?
+  definition  String?
+  examples    Json?
+  lessons     LessonDictionaryTerm[]
+  users       UserDictionaryTerm[]
+}
+
+model LessonDictionaryTerm {
+  lessonId String
+  termId   String
+  lesson   Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  term     DictionaryTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, termId])
+}
+
+model UserDictionaryTerm {
+  userId String
+  termId String
+  savedAt DateTime @default(now())
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  term   DictionaryTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@id([userId, termId])
+}
+
+model ActivityEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  metadata  Json?
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model AssistantSession {
+  id        String             @id @default(cuid())
+  userId    String
+  lessonId  String?
+  createdAt DateTime           @default(now())
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AssistantMessage[]
+}
+
+model AssistantMessage {
+  id        String           @id @default(cuid())
+  sessionId String
+  role      String
+  content   String
+  tokenCount Int             @default(0)
+  createdAt DateTime         @default(now())
+  session   AssistantSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}

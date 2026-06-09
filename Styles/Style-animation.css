@@ -1,0 +1,43 @@
+/* Анимированные эмодзи над заголовком */
+.floating-emojis {
+    display: flex;
+    justify-content: left;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+}
+
+.floating-emoji {
+    font-size: 3.5rem; /* Увеличил размер */
+    animation: float 6s ease-in-out infinite;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-block;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.floating-emoji:hover {
+    transform: scale(1.15);
+    text-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Улучшенная анимация */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-25px) rotate(5deg);
+    }
+    50% {
+        transform: translateY(-15px) rotate(-5deg);
+    }
+    75% {
+        transform: translateY(-35px) rotate(3deg);
+    }
+}
+
+/* Индивидуальные задержки */
+.floating-emoji:nth-child(1) { animation-delay: 0s; }    /* Флаг */
+.floating-emoji:nth-child(2) { animation-delay: 0.5s; }  /* Огонь */
+.floating-emoji:nth-child(3) { animation-delay: 1s; }    /* Звезда */

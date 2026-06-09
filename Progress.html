@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой прогресс - Magic English Academy</title>
+
+    <link rel="stylesheet" href="Styles/Style.css">
+    <link rel="stylesheet" href="Styles/Normalize.css">
+    <link rel="stylesheet" href="Styles/Progress.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+
+    <nav class="top-menu">
+        <div class="menu-container">
+            <div class="menu-content">
+                <a href="Main-Page.html" class="logo">MAG<span style="color:#2C2C2C">IC ENGLISH</span></a>
+                
+                <button class="burger" id="burger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <div class="nav-links" id="navLinks">
+                    <a href="Main-Page.html">Общая информация</a>
+                    <a href="Instruction.html">Методики</a>
+                    <a href="Plan.html">План</a>
+                    <!-- <a href="Progress.html" class="active">Мой прогресс</a> -->
+                    <a href="Gift.html" class="gift-link festive">Забрать подарок
+                        <span class="gift-emoji">🎁</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="header" id="header">
+        <div class="container">
+            <img src="Images/banner-online-school.jpg" alt="banner" class="banner">
+            <hr>
+        </div>
+    </header>
+
+    <main class="main" id="main">
+        <div class="container">
+            <section class="main-info" id="main-info">
+                <div class="information-about-course">
+                    <p class="text">
+                        <p class="block-1">
+                            <span class="bold-font title">МОЙ ПРОГРЕСС</span>
+                        </p>
+
+                        <p class="block-2">
+                            <span class="text">Система автоматически отслеживает ваш прогресс на основе завершенных тем в чек-листах.</span>
+                        </p>
+
+                        <!-- Общий прогресс -->
+                        <div class="progress-section">
+                            <h3 class="section-title">Общий прогресс</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="overall-progress"></div>
+                            </div>
+                            <p class="progress-percent" id="progress-text">0%</p>
+                        </div>
+
+                        <!-- Прогресс по уровням -->
+                        <div class="progress-section">
+                            <h3 class="section-title">Прогресс по уровням</h3>
+                            
+                            <div class="level-row">
+                                <span class="level-label">A1</span>
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" id="a1-progress"></div>
+                                </div>
+                                <span class="level-percent" id="a1-percent">0%</span>
+                            </div>
+                            
+                            <div class="level-row">
+                                <span class="level-label">A2</span>
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" id="a2-progress"></div>
+                                </div>
+                                <span class="level-percent" id="a2-percent">0%</span>
+                            </div>
+                            
+                            <div class="level-row">
+                                <span class="level-label">B1</span>
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" id="b1-progress"></div>
+                                </div>
+                                <span class="level-percent" id="b1-percent">0%</span>
+                            </div>
+                            
+                            <div class="level-row">
+                                <span class="level-label">B2</span>
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" id="b2-progress"></div>
+                                </div>
+                                <span class="level-percent" id="b2-percent">0%</span>
+                            </div>
+                            
+                            <div class="level-row">
+                                <span class="level-label">C1</span>
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" id="c1-progress"></div>
+                                </div>
+                                <span class="level-percent" id="c1-percent">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Статистика -->
+                        <div class="progress-section">
+                            <h3 class="section-title">Статистика</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-number" id="total-topics">0</span>
+                                    <span class="stat-label">всего тем</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="completed-topics">0</span>
+                                    <span class="stat-label">завершено</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="remaining-topics">0</span>
+                                    <span class="stat-label">осталось</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Мотивационное сообщение -->
+                        <div class="motivation-section">
+                            <p id="motivation-text">Начните изучать темы, чтобы увидеть ваш прогресс!</p>
+                        </div>
+                    </p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer" id="footer">
+        <div class="container">
+            <hr>
+            <nav class="nav_menu">
+                <ul>
+                    <!-- <li><a href="#" target="_blank" class="indet-min">Оферта</a></li>
+                    <li><a href="#" target="_blank">Политика конфиденциальности</a></li> -->
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="Scripts/Burger.js" defer></script>
+    <script src="Scripts/Progress.js" defer></script>
+    <div class="menu-overlay" id="menuOverlay"></div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic English - Вход</title>
+    <link rel="stylesheet" href="Styles/Register.css">
+
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"> -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <!-- Тематические эмодзи -->
+    <!-- <div class="floating-emoji">🇺🇸</div>
+    <div class="floating-emoji">🇬🇧</div>
+    <div class="floating-emoji">📚</div>
+    <div class="floating-emoji">✏️</div>
+    <div class="floating-emoji">🎓</div>
+    <div class="floating-emoji">🗽</div>
+    <div class="floating-emoji">📖</div>
+    <div class="floating-emoji">🎤</div> -->
+
+    <!-- Анимированные картинки США -->
+    <!-- <div class="floating-image" style="top: 10%; left: 10%;">
+        <img src="images/logo.png" alt="USA Flag" class="usa-image">
+    </div> -->
+    <!-- <div class="floating-image" style="top: 10%; right: 10%;">
+        <img src="images/logo.png" alt="Statue of Liberty" class="usa-image">
+    </div>
+    <div class="floating-image" style="bottom: 10%; left: 15%;">
+        <img src="images/logo.png" alt="White House" class="usa-image">
+    </div>
+    <div class="floating-image" style="bottom: 10%; right: 15%;">
+        <img src="images/logo.png" alt="Golden Gate" class="usa-image">
+    </div>
+    <div class="floating-image" style="top: 50%; left: 5%; transform: translateY(-50%);">
+        <img src="images/logo.png" alt="US Capital" class="usa-image">
+    </div>
+    <div class="floating-image" style="top: 50%; right: 5%; transform: translateY(-50%);">
+        <img src="images/logo.png" alt="Liberty Bell" class="usa-image">
+    </div> -->
+    
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="logo">Magic English</div>
+            
+            <form class="login-form">
+                <h2>Вход в аккаунт</h2>
+                
+                <!-- Блок для сообщения об ошибке -->
+                <div id="error-message" class="error-message" style="display: none;"></div>
+                
+                <div class="input-group">
+                    <label for="username">Логин</label>
+                    <input type="text" id="username" placeholder="Введите ваш логин" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введите ваш пароль" required>
+                </div>
+                
+                <button type="submit" class="btn">Войти</button>
+                
+                <div class="register-link">
+                    Нет аккаунта? <a href="https://magic-english-plan.tilda.ws/" target="_blank">Купить доступ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="Scripts/Register.js" defer></script>
+    <script src="Scripts/ImagesAnimation.js" defer></script>
+</body>
+</html>
