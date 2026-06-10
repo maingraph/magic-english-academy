@@ -39,6 +39,86 @@ export class CoursesService {
     return level;
   }
 
+  async getLevelLessons(code: string) {
+    const level = await this.prisma.courseLevel.findFirst({
+      where: { code: { equals: code, mode: "insensitive" } },
+      include: {
+        modules: {
+          orderBy: { orderIndex: "asc" },
+          include: {
+            lessons: {
+              orderBy: { orderIndex: "asc" },
+              select: {
+                slug: true,
+                title: true,
+                summary: true,
+                orderIndex: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!level) {
+      throw new NotFoundException(`Course level ${code} not found`);
+    }
+
+    return {
+      code: level.code,
+      title: level.title,
+      lessonCount: level.modules.reduce(
+        (sum, module) => sum + module.lessons.length,
+        0
+      ),
+      modules: level.modules.map((module) => ({
+        title: module.title,
+        orderIndex: module.orderIndex,
+        lessons: module.lessons
+      }))
+    };
+  }
+
+  async getLesson(slug: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug },
+      include: {
+        module: {
+          include: {
+            level: true
+          }
+        },
+        blocks: {
+          orderBy: { orderIndex: "asc" }
+        }
+      }
+    });
+
+    if (!lesson) {
+      throw new NotFoundException(`Lesson ${slug} not found`);
+    }
+
+    return {
+      slug: lesson.slug,
+      title: lesson.title,
+      summary: lesson.summary,
+      orderIndex: lesson.orderIndex,
+      level: {
+        code: lesson.module.level.code,
+        title: lesson.module.level.title
+      },
+      module: {
+        title: lesson.module.title,
+        orderIndex: lesson.module.orderIndex
+      },
+      blocks: lesson.blocks.map((block) => ({
+        type: block.type,
+        orderIndex: block.orderIndex,
+        content: block.content
+      }))
+    };
+  }
+
   private async getDatabaseLevels() {
     try {
       const levels = await this.prisma.courseLevel.findMany({

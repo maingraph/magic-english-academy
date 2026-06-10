@@ -17,4 +17,16 @@ export class CoursesController {
   async getLevel(@Param("code") code: string) {
     return this.coursesService.getLevel(code);
   }
+
+  @Public()
+  @Get("levels/:code/lessons")
+  async getLevelLessons(@Param("code") code: string) {
+    return this.coursesService.getLevelLessons(code);
+  }
+
+  @Public()
+  @Get("lessons/:slug")
+  async getLesson(@Param("slug") slug: string) {
+    return this.coursesService.getLesson(slug);
+  }
 }

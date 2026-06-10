@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import { AppShell } from "../../../components/AppShell";
 import { ChecklistPreview } from "../../../components/ChecklistPreview";
 import { MagicButton } from "../../../components/MagicButton";
-import { getCourseLevel, getFallbackLevels } from "../../../lib/courses";
+import {
+  getCourseLevel,
+  getCourseLevelLessons,
+  getFallbackLevels
+} from "../../../lib/courses";
 
 export function generateStaticParams() {
   return getFallbackLevels().map((level) => ({ level: level.code.toLowerCase() }));
@@ -17,10 +21,20 @@ type LevelPageProps = {
 export default async function LevelPage({ params }: LevelPageProps) {
   const { level } = await params;
   const data = await getCourseLevel(level);
+  const lessonData = await getCourseLevelLessons(level);
 
   if (!data) {
     notFound();
   }
+
+  const lessonItems = lessonData?.modules.flatMap((module) =>
+    module.lessons.map((lesson) => ({
+      title: lesson.title,
+      meta: `${module.title} · ${String(lesson.orderIndex).padStart(2, "0")}`,
+      href: `/courses/${data.code.toLowerCase()}/lessons/${lesson.slug}`,
+      completed: data.code === "A1" && lesson.orderIndex === 1
+    }))
+  );
 
   return (
     <AppShell>
@@ -41,9 +55,9 @@ export default async function LevelPage({ params }: LevelPageProps) {
           </section>
 
           <section className="soft-card">
-            <h2>Темы уровня</h2>
+            <h2>Уроки уровня</h2>
             <ChecklistPreview
-              items={data.sampleTopics.map((topic, index) => ({
+              items={lessonItems ?? data.sampleTopics.map((topic, index) => ({
                 title: topic,
                 completed: data.code === "A1" && index === 0
               }))}
