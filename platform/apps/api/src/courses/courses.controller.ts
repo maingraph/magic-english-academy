@@ -1,5 +1,7 @@
 import { Controller, Get, Inject, Param } from "@nestjs/common";
+import { CurrentUser } from "../auth/current-user.decorator";
 import { Public } from "../auth/public.decorator";
+import type { ApiSessionUser } from "../auth/auth.types";
 import { CoursesService } from "./courses.service";
 
 @Controller("courses")
@@ -20,13 +22,19 @@ export class CoursesController {
 
   @Public()
   @Get("levels/:code/lessons")
-  async getLevelLessons(@Param("code") code: string) {
-    return this.coursesService.getLevelLessons(code);
+  async getLevelLessons(
+    @CurrentUser() user: ApiSessionUser,
+    @Param("code") code: string
+  ) {
+    return this.coursesService.getLevelLessons(code, user.id);
   }
 
   @Public()
   @Get("lessons/:slug")
-  async getLesson(@Param("slug") slug: string) {
-    return this.coursesService.getLesson(slug);
+  async getLesson(
+    @CurrentUser() user: ApiSessionUser,
+    @Param("slug") slug: string
+  ) {
+    return this.coursesService.getLesson(slug, user.id);
   }
 }

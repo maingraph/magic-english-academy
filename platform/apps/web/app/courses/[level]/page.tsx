@@ -30,9 +30,15 @@ export default async function LevelPage({ params }: LevelPageProps) {
   const lessonItems = lessonData?.modules.flatMap((module) =>
     module.lessons.map((lesson) => ({
       title: lesson.title,
-      meta: `${module.title} · ${String(lesson.orderIndex).padStart(2, "0")}`,
+      meta: `${module.title} · ${String(lesson.orderIndex).padStart(2, "0")} · ${
+        lesson.status === "COMPLETED"
+          ? "готово"
+          : lesson.status === "IN_PROGRESS"
+            ? "в процессе"
+            : "не начато"
+      }`,
       href: `/courses/${data.code.toLowerCase()}/lessons/${lesson.slug}`,
-      completed: data.code === "A1" && lesson.orderIndex === 1
+      completed: lesson.status === "COMPLETED"
     }))
   );
 

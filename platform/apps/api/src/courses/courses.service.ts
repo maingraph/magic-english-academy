@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { ProgressStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { courseLevels } from "./course-seed";
 
@@ -39,7 +40,7 @@ export class CoursesService {
     return level;
   }
 
-  async getLevelLessons(code: string) {
+  async getLevelLessons(code: string, userId: string) {
     const level = await this.prisma.courseLevel.findFirst({
       where: { code: { equals: code, mode: "insensitive" } },
       include: {
@@ -52,7 +53,11 @@ export class CoursesService {
                 slug: true,
                 title: true,
                 summary: true,
-                orderIndex: true
+                orderIndex: true,
+                progress: {
+                  where: { userId },
+                  select: { status: true }
+                }
               }
             }
           }
@@ -74,12 +79,18 @@ export class CoursesService {
       modules: level.modules.map((module) => ({
         title: module.title,
         orderIndex: module.orderIndex,
-        lessons: module.lessons
+        lessons: module.lessons.map((lesson) => ({
+          slug: lesson.slug,
+          title: lesson.title,
+          summary: lesson.summary,
+          orderIndex: lesson.orderIndex,
+          status: lesson.progress[0]?.status ?? ProgressStatus.NOT_STARTED
+        }))
       }))
     };
   }
 
-  async getLesson(slug: string) {
+  async getLesson(slug: string, userId: string) {
     const lesson = await this.prisma.lesson.findUnique({
       where: { slug },
       include: {
@@ -90,6 +101,14 @@ export class CoursesService {
         },
         blocks: {
           orderBy: { orderIndex: "asc" }
+        },
+        progress: {
+          where: { userId },
+          select: {
+            status: true,
+            completedAt: true,
+            updatedAt: true
+          }
         }
       }
     });
@@ -115,7 +134,12 @@ export class CoursesService {
         type: block.type,
         orderIndex: block.orderIndex,
         content: block.content
-      }))
+      })),
+      progress: {
+        status: lesson.progress[0]?.status ?? ProgressStatus.NOT_STARTED,
+        completedAt: lesson.progress[0]?.completedAt ?? null,
+        updatedAt: lesson.progress[0]?.updatedAt ?? null
+      }
     };
   }
 

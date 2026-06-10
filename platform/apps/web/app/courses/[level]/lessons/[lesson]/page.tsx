@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "../../../../../components/AppShell";
 import { LessonBlockRenderer } from "../../../../../components/LessonBlockRenderer";
+import { LessonProgressPanel } from "../../../../../components/LessonProgressPanel";
 import { MagicButton } from "../../../../../components/MagicButton";
 import { getNativeLesson } from "../../../../../lib/courses";
 
@@ -48,12 +49,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
             <aside className="lesson-sidebar">
               <div className="soft-card">
-                <span className="admin-kicker">Статус</span>
-                <h2>Native урок</h2>
-                <p>
-                  Материал уже открыт на сайте. Следующий шаг: сохранять
-                  прогресс, ответы и домашку.
-                </p>
+                <LessonProgressPanel
+                  initialStatus={data.progress.status}
+                  slug={data.slug}
+                />
               </div>
             </aside>
           </div>

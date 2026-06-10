@@ -18,6 +18,7 @@ export type CourseLevelLessons = {
       title: string;
       summary: string | null;
       orderIndex: number;
+      status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
     }>;
   }>;
 };
@@ -40,6 +41,11 @@ export type NativeLesson = {
     orderIndex: number;
     content: unknown;
   }>;
+  progress: {
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    completedAt: string | null;
+    updatedAt: string | null;
+  };
 };
 
 type CourseInventory = {
@@ -160,7 +166,7 @@ export async function getCourseLevel(code: string): Promise<CourseLevel | null> 
 export async function getCourseLevelLessons(code: string): Promise<CourseLevelLessons | null> {
   try {
     const response = await fetch(`${apiBaseUrl}/courses/levels/${code}/lessons`, {
-      next: { revalidate: 30 }
+      cache: "no-store"
     });
 
     if (!response.ok) {
@@ -176,7 +182,7 @@ export async function getCourseLevelLessons(code: string): Promise<CourseLevelLe
 export async function getNativeLesson(slug: string): Promise<NativeLesson | null> {
   try {
     const response = await fetch(`${apiBaseUrl}/courses/lessons/${slug}`, {
-      next: { revalidate: 30 }
+      cache: "no-store"
     });
 
     if (!response.ok) {
