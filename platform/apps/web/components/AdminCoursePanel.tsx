@@ -20,6 +20,12 @@ type AdminCourseMap = {
           summary: string | null;
           orderIndex: number;
         }>;
+        lessons: Array<{
+          slug: string;
+          title: string;
+          summary: string | null;
+          orderIndex: number;
+        }>;
       }>;
     }>;
   } | null;
@@ -32,7 +38,13 @@ type AdminCourseMap = {
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
-export function AdminCoursePanel() {
+export function AdminCoursePanel({
+  onSelectLesson,
+  selectedSlug
+}: {
+  onSelectLesson: (slug: string) => void;
+  selectedSlug: string | null;
+}) {
   const [courseMap, setCourseMap] = useState<AdminCourseMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
@@ -132,10 +144,16 @@ export function AdminCoursePanel() {
                     <span>{module.lessonCount} уроков</span>
                   </div>
                   <ol className="admin-lesson-preview">
-                    {module.previewLessons.map((lesson) => (
+                    {module.lessons.map((lesson) => (
                       <li key={lesson.slug}>
                         <span>{String(lesson.orderIndex).padStart(2, "0")}</span>
-                        {lesson.title}
+                        <button
+                          className={lesson.slug === selectedSlug ? "selected" : ""}
+                          type="button"
+                          onClick={() => onSelectLesson(lesson.slug)}
+                        >
+                          {lesson.title}
+                        </button>
                       </li>
                     ))}
                   </ol>

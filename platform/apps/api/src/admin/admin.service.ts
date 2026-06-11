@@ -1,6 +1,15 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { LessonBlockType, Prisma } from "@prisma/client";
 import { CoursesService } from "../courses/courses.service";
 import { PrismaService } from "../prisma/prisma.service";
+
+const lessonBlockTypes = Object.values(LessonBlockType);
+
+export type AdminUpdateLessonPayload = {
+  title?: unknown;
+  summary?: unknown;
+  blocks?: unknown;
+};
 
 @Injectable()
 export class AdminService {
@@ -99,6 +108,7 @@ export class AdminService {
         title: module.title,
         orderIndex: module.orderIndex,
         lessonCount: module.lessons.length,
+        lessons: module.lessons,
         previewLessons: module.lessons.slice(0, 6)
       }))
     }));
@@ -118,5 +128,167 @@ export class AdminService {
         lessons: levels.reduce((sum, level) => sum + level.lessonCount, 0)
       }
     };
+  }
+
+  async getLessonForEdit(slug: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug },
+      include: {
+        module: {
+          include: {
+            level: true
+          }
+        },
+        blocks: {
+          orderBy: { orderIndex: "asc" }
+        }
+      }
+    });
+
+    if (!lesson) {
+      throw new NotFoundException(`Lesson ${slug} not found`);
+    }
+
+    return {
+      id: lesson.id,
+      slug: lesson.slug,
+      title: lesson.title,
+      summary: lesson.summary,
+      orderIndex: lesson.orderIndex,
+      level: {
+        code: lesson.module.level.code,
+        title: lesson.module.level.title
+      },
+      module: {
+        title: lesson.module.title,
+        orderIndex: lesson.module.orderIndex
+      },
+      blocks: lesson.blocks.map((block) => ({
+        id: block.id,
+        type: block.type,
+        orderIndex: block.orderIndex,
+        content: block.content
+      }))
+    };
+  }
+
+  async updateLesson(slug: string, payload: AdminUpdateLessonPayload) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug },
+      select: { id: true }
+    });
+
+    if (!lesson) {
+      throw new NotFoundException(`Lesson ${slug} not found`);
+    }
+
+    const title = this.parseTitle(payload.title);
+    const summary = this.parseSummary(payload.summary);
+    const blocks = this.parseBlocks(payload.blocks);
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.lesson.update({
+        where: { id: lesson.id },
+        data: {
+          title,
+          summary
+        }
+      });
+
+      if (blocks) {
+        await transaction.lessonBlock.deleteMany({
+          where: { lessonId: lesson.id }
+        });
+
+        await transaction.lessonBlock.createMany({
+          data: blocks.map((block, index) => ({
+            lessonId: lesson.id,
+            type: block.type,
+            orderIndex: index + 1,
+            content: block.content
+          }))
+        });
+      }
+    });
+
+    return this.getLessonForEdit(slug);
+  }
+
+  private parseTitle(value: unknown) {
+    if (typeof value !== "string") {
+      throw new BadRequestException("title must be a string");
+    }
+
+    const title = value.trim();
+
+    if (!title || title.length > 180) {
+      throw new BadRequestException("title must be between 1 and 180 characters");
+    }
+
+    return title;
+  }
+
+  private parseSummary(value: unknown) {
+    if (value === null || value === undefined) {
+      return null;
+    }
+
+    if (typeof value !== "string") {
+      throw new BadRequestException("summary must be a string or null");
+    }
+
+    const summary = value.trim();
+
+    return summary.length > 0 ? summary : null;
+  }
+
+  private parseBlocks(value: unknown) {
+    if (value === undefined) {
+      return null;
+    }
+
+    if (!Array.isArray(value)) {
+      throw new BadRequestException("blocks must be an array");
+    }
+
+    if (value.length === 0 || value.length > 20) {
+      throw new BadRequestException("blocks must contain 1 to 20 items");
+    }
+
+    return value.map((rawBlock, index) => {
+      if (!this.isRecord(rawBlock)) {
+        throw new BadRequestException(`blocks[${index}] must be an object`);
+      }
+
+      if (!lessonBlockTypes.includes(rawBlock.type as LessonBlockType)) {
+        throw new BadRequestException(`blocks[${index}].type is invalid`);
+      }
+
+      if (!this.isJsonObject(rawBlock.content)) {
+        throw new BadRequestException(`blocks[${index}].content must be a JSON object`);
+      }
+
+      return {
+        type: rawBlock.type as LessonBlockType,
+        content: rawBlock.content as Prisma.InputJsonObject
+      };
+    });
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+  }
+
+  private isJsonObject(value: unknown): value is Prisma.InputJsonObject {
+    if (!this.isRecord(value)) {
+      return false;
+    }
+
+    try {
+      JSON.stringify(value);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

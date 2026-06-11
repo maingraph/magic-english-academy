@@ -630,7 +630,8 @@ hr {
 }
 
 .admin-course-panel,
-.admin-workspace-grid {
+.admin-workspace-grid,
+.admin-lesson-editor {
   margin-top: 32px;
 }
 
@@ -763,6 +764,163 @@ hr {
 .admin-lesson-preview li span {
   color: var(--accent);
   font-weight: 800;
+}
+
+.admin-lesson-preview button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.admin-lesson-preview button:hover,
+.admin-lesson-preview button.selected {
+  color: var(--accent);
+}
+
+.admin-lesson-editor {
+  border-color: rgba(254, 183, 51, 0.35);
+}
+
+.editor-status {
+  display: grid;
+  gap: 4px;
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.editor-status strong {
+  color: var(--text);
+  font-size: 18px;
+}
+
+.editor-status span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.editor-status.saved strong {
+  color: var(--success);
+}
+
+.editor-status.error strong {
+  color: var(--danger);
+}
+
+.lesson-editor-form {
+  display: grid;
+  gap: 18px;
+}
+
+.editor-field {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-field span,
+.editor-block-toolbar span {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.editor-field input,
+.editor-field textarea,
+.editor-block-head select {
+  width: 100%;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.editor-field input,
+.editor-block-head select {
+  min-height: 46px;
+  padding: 0 14px;
+}
+
+.editor-field textarea {
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.editor-field textarea[spellcheck="false"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+}
+
+.editor-block-toolbar,
+.editor-actions,
+.editor-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.editor-block-toolbar button,
+.editor-actions button,
+.editor-block-head button,
+.editor-preview-link {
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.editor-block-toolbar button,
+.editor-actions button {
+  background: var(--dark);
+  color: #ffffff;
+}
+
+.editor-block-head button,
+.editor-preview-link {
+  border: 1px solid #e3e3e3;
+  background: #ffffff;
+  color: var(--text);
+}
+
+.editor-actions button:disabled,
+.editor-block-head button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.editor-block-list {
+  display: grid;
+  gap: 14px;
+}
+
+.editor-block-row {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.editor-block-head strong {
+  color: var(--accent);
+}
+
+.editor-block-head select {
+  max-width: 230px;
 }
 
 .admin-workspace-grid {
@@ -1117,16 +1275,23 @@ hr {
   }
 
   .admin-section-header,
-  .admin-level-row {
+  .admin-level-row,
+  .editor-block-head {
     grid-template-columns: 1fr;
   }
 
-  .admin-section-header {
+  .admin-section-header,
+  .editor-block-head {
     display: grid;
   }
 
-  .admin-total-strip {
+  .admin-total-strip,
+  .editor-status {
     min-width: 0;
+  }
+
+  .editor-block-head select {
+    max-width: none;
   }
 
   .lesson-layout {
@@ -1210,5 +1375,18 @@ hr {
   .admin-module-title {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .editor-block-toolbar,
+  .editor-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .editor-block-toolbar button,
+  .editor-actions button,
+  .editor-preview-link {
+    width: 100%;
+    text-align: center;
   }
 }

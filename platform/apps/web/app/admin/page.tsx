@@ -1,5 +1,5 @@
 import { AppShell } from "../../components/AppShell";
-import { AdminCoursePanel } from "../../components/AdminCoursePanel";
+import { AdminCourseWorkspace } from "../../components/AdminCourseWorkspace";
 import { AdminOverviewPanel } from "../../components/AdminOverviewPanel";
 
 const adminAreas = [
@@ -45,7 +45,7 @@ export default function AdminPage() {
           </section>
 
           <AdminOverviewPanel />
-          <AdminCoursePanel />
+          <AdminCourseWorkspace />
 
           <section className="admin-workspace-grid" aria-label="Следующие разделы админки">
             <article className="soft-card">
