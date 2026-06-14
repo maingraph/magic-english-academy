@@ -31,11 +31,7 @@ export function AdminOverviewPanel() {
     async function loadOverview() {
       try {
         const response = await fetch(`${apiBaseUrl}/admin/overview`, {
-          headers: {
-            "x-user-role": "admin",
-            "x-user-email": "admin@magic.local",
-            "x-user-name": "Admin"
-          },
+          credentials: "include",
           signal: controller.signal
         });
 

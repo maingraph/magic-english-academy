@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AppShell } from "../../../../../components/AppShell";
+import { AuthGate } from "../../../../../components/AuthGate";
 import { LessonBlockRenderer } from "../../../../../components/LessonBlockRenderer";
 import { LessonProgressPanel } from "../../../../../components/LessonProgressPanel";
 import { MagicButton } from "../../../../../components/MagicButton";
@@ -49,10 +50,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
             <aside className="lesson-sidebar">
               <div className="soft-card">
-                <LessonProgressPanel
-                  initialStatus={data.progress.status}
-                  slug={data.slug}
-                />
+                <AuthGate>
+                  <LessonProgressPanel
+                    initialStatus={data.progress.status}
+                    slug={data.slug}
+                  />
+                </AuthGate>
               </div>
             </aside>
           </div>

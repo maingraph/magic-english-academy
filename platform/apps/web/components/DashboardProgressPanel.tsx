@@ -55,11 +55,7 @@ export function DashboardProgressPanel() {
     async function loadSummary() {
       try {
         const response = await fetch(`${apiBaseUrl}/progress/summary`, {
-          headers: {
-            "x-user-role": "student",
-            "x-user-email": "student@magic.local",
-            "x-user-name": "Magic Student"
-          },
+          credentials: "include",
           signal: controller.signal
         });
 

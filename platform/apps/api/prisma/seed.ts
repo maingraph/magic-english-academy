@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../src/auth/password";
 import { courseLevels } from "../src/courses/course-seed";
 
 const prisma = new PrismaClient();
@@ -56,6 +57,81 @@ function buildLessonBlocks(levelCode: string, lessonIndex: number) {
 }
 
 async function main() {
+  await prisma.user.upsert({
+    where: { email: "student@magic.local" },
+    create: {
+      email: "student@magic.local",
+      passwordHash: await hashPassword("MagicStudent123!"),
+      role: "STUDENT",
+      profile: {
+        create: {
+          displayName: "Magic Student"
+        }
+      }
+    },
+    update: {
+      passwordHash: await hashPassword("MagicStudent123!"),
+      role: "STUDENT",
+      status: "ACTIVE",
+      profile: {
+        upsert: {
+          create: {
+            displayName: "Magic Student"
+          },
+          update: {
+            displayName: "Magic Student"
+          }
+        }
+      }
+    }
+  });
+
+  await prisma.user.upsert({
+    where: { email: "admin@magic.local" },
+    create: {
+      email: "admin@magic.local",
+      passwordHash: await hashPassword("MagicAdmin123!"),
+      role: "ADMIN",
+      profile: {
+        create: {
+          displayName: "Admin"
+        }
+      }
+    },
+    update: {
+      passwordHash: await hashPassword("MagicAdmin123!"),
+      role: "ADMIN",
+      status: "ACTIVE",
+      profile: {
+        upsert: {
+          create: {
+            displayName: "Admin"
+          },
+          update: {
+            displayName: "Admin"
+          }
+        }
+      }
+    }
+  });
+
+  await prisma.dictionaryTerm.upsert({
+    where: { id: "seed-to-be" },
+    create: {
+      id: "seed-to-be",
+      term: "to be",
+      translation: "быть, являться",
+      definition: "Глагол для описания человека, состояния или места.",
+      examples: ["I am a student.", "She is happy."]
+    },
+    update: {
+      term: "to be",
+      translation: "быть, являться",
+      definition: "Глагол для описания человека, состояния или места.",
+      examples: ["I am a student.", "She is happy."]
+    }
+  });
+
   const course = await prisma.course.upsert({
     where: { slug: "magic-english-main" },
     create: {

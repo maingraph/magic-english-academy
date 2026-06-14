@@ -1,6 +1,9 @@
 import { AppShell } from "../../components/AppShell";
+import { AdminArticlePanel } from "../../components/AdminArticlePanel";
 import { AdminCourseWorkspace } from "../../components/AdminCourseWorkspace";
+import { AdminDictionaryPanel } from "../../components/AdminDictionaryPanel";
 import { AdminOverviewPanel } from "../../components/AdminOverviewPanel";
+import { AuthGate } from "../../components/AuthGate";
 
 const adminAreas = [
   {
@@ -44,27 +47,12 @@ export default function AdminPage() {
             ))}
           </section>
 
-          <AdminOverviewPanel />
-          <AdminCourseWorkspace />
-
-          <section className="admin-workspace-grid" aria-label="Следующие разделы админки">
-            <article className="soft-card">
-              <span className="admin-kicker">Статьи</span>
-              <h2>Материалы и SEO</h2>
-              <p>
-                Следующий экран: список статей, статусы публикации, быстрый
-                переход к редактору и привязка к словарику.
-              </p>
-            </article>
-            <article className="soft-card">
-              <span className="admin-kicker">Пользователи</span>
-              <h2>Прогресс и риски</h2>
-              <p>
-                Следующий экран: роли, доступы, прогресс, домашка и базовые
-                сигналы подозрительной активности.
-              </p>
-            </article>
-          </section>
+          <AuthGate role="admin">
+            <AdminOverviewPanel />
+            <AdminCourseWorkspace />
+            <AdminDictionaryPanel />
+            <AdminArticlePanel />
+          </AuthGate>
         </div>
       </main>
     </AppShell>

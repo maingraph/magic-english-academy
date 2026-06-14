@@ -40,7 +40,7 @@ export class CoursesService {
     return level;
   }
 
-  async getLevelLessons(code: string, userId: string) {
+  async getLevelLessons(code: string, userId?: string) {
     const level = await this.prisma.courseLevel.findFirst({
       where: { code: { equals: code, mode: "insensitive" } },
       include: {
@@ -55,7 +55,7 @@ export class CoursesService {
                 summary: true,
                 orderIndex: true,
                 progress: {
-                  where: { userId },
+                  where: { userId: userId ?? "__anonymous__" },
                   select: { status: true }
                 }
               }
@@ -90,7 +90,7 @@ export class CoursesService {
     };
   }
 
-  async getLesson(slug: string, userId: string) {
+  async getLesson(slug: string, userId?: string) {
     const lesson = await this.prisma.lesson.findUnique({
       where: { slug },
       include: {
@@ -103,7 +103,7 @@ export class CoursesService {
           orderBy: { orderIndex: "asc" }
         },
         progress: {
-          where: { userId },
+          where: { userId: userId ?? "__anonymous__" },
           select: {
             status: true,
             completedAt: true,

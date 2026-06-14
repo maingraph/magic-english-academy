@@ -55,6 +55,38 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     );
   }
 
+  if (block.type === "DICTIONARY_TERM") {
+    const examples = getStringArray(content, "examples");
+
+    return (
+      <section className="lesson-block dictionary-block">
+        <span className="admin-kicker">Словарь</span>
+        <h2>{getString(content, "term") || "Термин"}</h2>
+        <strong>{getString(content, "translation")}</strong>
+        <p>{getString(content, "definition")}</p>
+        {examples.length > 0 ? (
+          <ul>
+            {examples.map((example) => (
+              <li key={example}>{example}</li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
+    );
+  }
+
+  if (block.type === "MEDIA") {
+    return (
+      <section className="lesson-block media-block">
+        <h2>{getString(content, "title") || "Материал"}</h2>
+        <p>{getString(content, "caption")}</p>
+        <a href={getString(content, "url")} rel="noreferrer" target="_blank">
+          Открыть материал
+        </a>
+      </section>
+    );
+  }
+
   return (
     <section className="lesson-block">
       <h2>{getString(content, "heading") || "Материал урока"}</h2>

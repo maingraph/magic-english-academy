@@ -213,6 +213,33 @@ hr {
   font-size: 1.2em;
 }
 
+.auth-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.auth-nav span {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.auth-nav button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #eeeeee;
+  border-radius: 20px;
+  background: #ffffff;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
 .burger {
   display: none;
   cursor: pointer;
@@ -860,9 +887,39 @@ hr {
   font-size: 13px;
 }
 
+.migration-box,
+.dictionary-form,
+.dictionary-results {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.migration-box h3 {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 20px;
+}
+
+.migration-box textarea {
+  width: 100%;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
 .editor-block-toolbar,
 .editor-actions,
-.editor-block-head {
+.editor-block-head,
+.migration-actions,
+.dictionary-search {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -871,6 +928,9 @@ hr {
 
 .editor-block-toolbar button,
 .editor-actions button,
+.migration-actions button,
+.dictionary-form button,
+.dictionary-search button,
 .editor-block-head button,
 .editor-preview-link {
   min-height: 42px;
@@ -883,7 +943,10 @@ hr {
 }
 
 .editor-block-toolbar button,
-.editor-actions button {
+.editor-actions button,
+.migration-actions button,
+.dictionary-form button,
+.dictionary-search button {
   background: var(--dark);
   color: #ffffff;
 }
@@ -896,6 +959,8 @@ hr {
 }
 
 .editor-actions button:disabled,
+.migration-actions button:disabled,
+.dictionary-form button:disabled,
 .editor-block-head button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
@@ -921,6 +986,78 @@ hr {
 
 .editor-block-head select {
   max-width: 230px;
+}
+
+.admin-dictionary-panel,
+.admin-article-panel {
+  margin-top: 20px;
+}
+
+.dictionary-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+  gap: 18px;
+}
+
+.dictionary-search input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--text);
+  font: inherit;
+}
+
+.dictionary-list,
+.article-queue {
+  display: grid;
+  gap: 12px;
+}
+
+.dictionary-term-card,
+.article-queue-item {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.dictionary-term-card h3,
+.article-queue-item h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.dictionary-term-card strong,
+.article-queue-item strong {
+  color: var(--accent);
+}
+
+.dictionary-term-card p,
+.dictionary-term-card ul,
+.article-queue-item span {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.article-queue-item {
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.dictionary-block strong {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.media-block a {
+  color: var(--accent);
+  font-weight: 800;
 }
 
 .admin-workspace-grid {
@@ -1211,6 +1348,33 @@ hr {
   gap: 18px;
 }
 
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 4px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.auth-tabs button {
+  min-height: 40px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.auth-tabs button.active {
+  background: #ffffff;
+  color: var(--accent);
+  box-shadow: var(--shadow-soft);
+}
+
 .auth-form label {
   display: grid;
   gap: 8px;
@@ -1230,6 +1394,34 @@ hr {
 .auth-form input:focus {
   border-color: var(--accent);
   outline: none;
+}
+
+.auth-submit {
+  min-height: 50px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, var(--accent), var(--accent-light));
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.auth-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-message {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.auth-message.error {
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .auth-note {
@@ -1268,9 +1460,19 @@ hr {
     transform: translateX(0);
   }
 
+  .auth-nav {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .auth-nav span {
+    max-width: none;
+  }
+
   .dashboard-grid,
   .admin-grid,
-  .admin-workspace-grid {
+  .admin-workspace-grid,
+  .dictionary-layout {
     grid-template-columns: 1fr;
   }
 
@@ -1378,13 +1580,20 @@ hr {
   }
 
   .editor-block-toolbar,
-  .editor-actions {
+  .editor-actions,
+  .migration-actions,
+  .dictionary-search,
+  .article-queue-item {
     align-items: stretch;
     flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .editor-block-toolbar button,
   .editor-actions button,
+  .migration-actions button,
+  .dictionary-form button,
+  .dictionary-search button,
   .editor-preview-link {
     width: 100%;
     text-align: center;

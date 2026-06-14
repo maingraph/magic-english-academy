@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { AuthStatus } from "./AuthStatus";
 
 const navItems = [
   { href: "/", label: "Общая информация" },
@@ -53,13 +54,7 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                className="gift-link festive"
-                href="/login"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Войти <span className="gift-emoji">→</span>
-              </Link>
+              <AuthStatus onNavigate={() => setIsMenuOpen(false)} />
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { AppShell } from "../../components/AppShell";
+import { AuthGate } from "../../components/AuthGate";
 import { DashboardProgressPanel } from "../../components/DashboardProgressPanel";
 
 export default function DashboardPage() {
@@ -14,7 +15,9 @@ export default function DashboardPage() {
             </p>
           </section>
 
-          <DashboardProgressPanel />
+          <AuthGate>
+            <DashboardProgressPanel />
+          </AuthGate>
         </div>
       </main>
     </AppShell>

@@ -54,11 +54,7 @@ export function AdminCoursePanel({
     async function loadCourseMap() {
       try {
         const response = await fetch(`${apiBaseUrl}/admin/course-map`, {
-          headers: {
-            "x-user-role": "admin",
-            "x-user-email": "admin@magic.local",
-            "x-user-name": "Admin"
-          },
+          credentials: "include",
           signal: controller.signal
         });
 

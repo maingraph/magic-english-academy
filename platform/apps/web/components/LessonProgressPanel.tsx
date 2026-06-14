@@ -40,11 +40,7 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
       try {
         const response = await fetch(`${apiBaseUrl}/progress/lessons/${slug}/start`, {
           method: "POST",
-          headers: {
-            "x-user-role": "student",
-            "x-user-email": "student@magic.local",
-            "x-user-name": "Magic Student"
-          },
+          credentials: "include",
           signal: controller.signal
         });
 
@@ -71,11 +67,7 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
     try {
       const response = await fetch(`${apiBaseUrl}/progress/lessons/${slug}/complete`, {
         method: "POST",
-        headers: {
-          "x-user-role": "student",
-          "x-user-email": "student@magic.local",
-          "x-user-name": "Magic Student"
-        }
+        credentials: "include"
       });
 
       if (!response.ok) {

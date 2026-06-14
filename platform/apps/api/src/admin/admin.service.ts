@@ -11,6 +11,13 @@ export type AdminUpdateLessonPayload = {
   blocks?: unknown;
 };
 
+export type AdminCreateDictionaryTermPayload = {
+  term?: unknown;
+  translation?: unknown;
+  definition?: unknown;
+  examples?: unknown;
+};
+
 @Injectable()
 export class AdminService {
   constructor(
@@ -130,6 +137,59 @@ export class AdminService {
     };
   }
 
+  async getDictionary(query?: string) {
+    const search = typeof query === "string" ? query.trim() : "";
+
+    const terms = await this.prisma.dictionaryTerm.findMany({
+      where: search
+        ? {
+            OR: [
+              { term: { contains: search, mode: "insensitive" } },
+              { translation: { contains: search, mode: "insensitive" } },
+              { definition: { contains: search, mode: "insensitive" } }
+            ]
+          }
+        : undefined,
+      orderBy: { term: "asc" },
+      take: 80
+    });
+
+    return {
+      total: terms.length,
+      terms: terms.map((term) => ({
+        id: term.id,
+        term: term.term,
+        translation: term.translation,
+        definition: term.definition,
+        examples: term.examples
+      }))
+    };
+  }
+
+  async createDictionaryTerm(payload: AdminCreateDictionaryTermPayload) {
+    const term = this.parseRequiredString(payload.term, "term", 120);
+    const translation = this.parseOptionalString(payload.translation, "translation", 180);
+    const definition = this.parseOptionalString(payload.definition, "definition", 600);
+    const examples = this.parseStringList(payload.examples, "examples", 8);
+
+    const savedTerm = await this.prisma.dictionaryTerm.create({
+      data: {
+        term,
+        translation,
+        definition,
+        examples: examples.length > 0 ? examples : Prisma.JsonNull
+      }
+    });
+
+    return {
+      id: savedTerm.id,
+      term: savedTerm.term,
+      translation: savedTerm.translation,
+      definition: savedTerm.definition,
+      examples: savedTerm.examples
+    };
+  }
+
   async getLessonForEdit(slug: string) {
     const lesson = await this.prisma.lesson.findUnique({
       where: { slug },
@@ -226,6 +286,60 @@ export class AdminService {
     }
 
     return title;
+  }
+
+  private parseRequiredString(value: unknown, field: string, maxLength: number) {
+    if (typeof value !== "string") {
+      throw new BadRequestException(`${field} must be a string`);
+    }
+
+    const text = value.trim();
+
+    if (!text || text.length > maxLength) {
+      throw new BadRequestException(`${field} must be between 1 and ${maxLength} characters`);
+    }
+
+    return text;
+  }
+
+  private parseOptionalString(value: unknown, field: string, maxLength: number) {
+    if (value === null || value === undefined) {
+      return null;
+    }
+
+    if (typeof value !== "string") {
+      throw new BadRequestException(`${field} must be a string or null`);
+    }
+
+    const text = value.trim();
+
+    if (text.length > maxLength) {
+      throw new BadRequestException(`${field} must be ${maxLength} characters or less`);
+    }
+
+    return text.length > 0 ? text : null;
+  }
+
+  private parseStringList(value: unknown, field: string, maxItems: number) {
+    if (value === null || value === undefined) {
+      return [];
+    }
+
+    if (!Array.isArray(value)) {
+      throw new BadRequestException(`${field} must be an array`);
+    }
+
+    if (value.length > maxItems) {
+      throw new BadRequestException(`${field} must contain ${maxItems} items or fewer`);
+    }
+
+    return value.map((item, index) => {
+      if (typeof item !== "string") {
+        throw new BadRequestException(`${field}[${index}] must be a string`);
+      }
+
+      return item.trim();
+    }).filter(Boolean);
   }
 
   private parseSummary(value: unknown) {

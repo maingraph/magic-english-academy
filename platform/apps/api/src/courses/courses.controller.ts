@@ -23,18 +23,18 @@ export class CoursesController {
   @Public()
   @Get("levels/:code/lessons")
   async getLevelLessons(
-    @CurrentUser() user: ApiSessionUser,
+    @CurrentUser() user: ApiSessionUser | undefined,
     @Param("code") code: string
   ) {
-    return this.coursesService.getLevelLessons(code, user.id);
+    return this.coursesService.getLevelLessons(code, user?.id);
   }
 
   @Public()
   @Get("lessons/:slug")
   async getLesson(
-    @CurrentUser() user: ApiSessionUser,
+    @CurrentUser() user: ApiSessionUser | undefined,
     @Param("slug") slug: string
   ) {
-    return this.coursesService.getLesson(slug, user.id);
+    return this.coursesService.getLesson(slug, user?.id);
   }
 }

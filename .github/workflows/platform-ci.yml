@@ -26,5 +26,6 @@ jobs:
           cache: npm
           cache-dependency-path: platform/package-lock.json
       - run: npm ci
+      - run: npm run db:generate
       - run: npm run typecheck
       - run: npm run build
