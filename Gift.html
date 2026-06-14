@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic English Academy</title>
+
+    <link rel="stylesheet" href="Styles/Style.css">
+    <link rel="stylesheet" href="Styles/Normalize.css">
+    <link rel="stylesheet" href="Styles/Gift.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <nav class="top-menu">
+        <div class="menu-container">
+            <div class="menu-content">
+                <a href="Main-Page.html" class="logo">MAG<span style="color:#2C2C2C">IC ENGLISH</span></a>
+                
+                <button class="burger" id="burger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <div class="nav-links" id="navLinks">
+                    <a href="Main-Page.html">Общая информация</a>
+                    <a href="Instruction.html">Методики</a>
+                    <a href="Plan.html">План</a>
+                    <!-- <a href="Progress.html" class="active">Мой прогресс</a> -->
+                    <a href="Gift.html" class="gift-link festive">Забрать подарок
+                        <span class="gift-emoji">🎁</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="header" id="header">
+        <div class="container">
+            <!-- <img src="Images/banner-2.jpg" alt="banner" class="banner"> -->
+            <img src="Images/banner-online-school.jpg" alt="banner" class="banner">
+            <hr>
+        </div>
+    </header>
+
+        <main class="main" id="main">
+        <div class="container">
+            <h1 class="gifts-title">Ваши подарки и специальные предложения</h1>
+            
+            <section class="gifts-section">
+                <div class="gifts-container">
+                    <!-- Карточка 1 -->
+                    <div class="gift-card" data-modal="modal1">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school-2.jpg" alt="40 сайтов для изучения английского" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">50 сайтов для изучения английского</h3>
+                            <p class="gift-description">Подборка лучших ресурсов для самостоятельного изучения языка всех уровней</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Карточка 2 -->
+                    <!-- <div class="gift-card" data-modal="modal2">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school-2.jpg" alt="Скидка на курс" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Скидка 30% на Speaking Club</h3>
+                            <p class="gift-description">Специальное предложение для наших студентов</p>
+                        </div>
+                    </div> -->
+                    
+                    <!-- Карточка 3 -->
+                    <div class="gift-card" data-modal="modal3">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school-2.jpg" alt="Чек-лист грамматики" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Чек-лист грамматики</h3>
+                            <p class="gift-description">Все правила от A1 до C1 в одном файле</p>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 4 -->
+                    <div class="gift-card" data-modal="modal4">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school-2.jpg" alt="Телеграм-сообщество" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Закрытое сообщество в Telegram!</h3>
+                            <p class="gift-description">Закрытое сообщество для единомышленников</p>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 4 -->
+                    <!-- <div class="gift-card" data-modal="modal3">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school.jpg" alt="Чек-лист грамматики" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Чек-лист грамматики</h3>
+                            <p class="gift-description">Все правила от A1 до C2 в одном файле</p>
+                        </div>
+                    </div> -->
+
+                    <!-- Карточка 5 -->
+                    <!-- <div class="gift-card" data-modal="modal3">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school.jpg" alt="Чек-лист грамматики" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Чек-лист грамматики</h3>
+                            <p class="gift-description">Все правила от A1 до C2 в одном файле</p>
+                        </div>
+                    </div> -->
+                    
+                    <!-- Карточка 6 -->
+                    <!-- <div class="gift-card" data-modal="modal3">
+                        <div class="gift-image-container">
+                            <img src="images/banner-online-school.jpg" alt="Чек-лист грамматики" class="gift-image">
+                        </div>
+                        <div class="gift-info">
+                            <h3 class="gift-title">Чек-лист грамматики</h3>
+                            <p class="gift-description">Все правила от A1 до C2 в одном файле</p>
+                        </div>
+                    </div> -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Модальные окна -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="images/banner-online-school-2.jpg" alt="40 сайтов для изучения английского" class="modal-image">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-title">50 сайтов для изучения английского</h3>
+                <p class="modal-description">
+                    В этой подборке вы найдете 50 лучших сайтов для изучения английского языка, которые помогут вам в освоении всех аспектов языка.
+                </p>
+                <a href="https://drive.google.com/file/d/1Ydy_JWy2R0i3KNcaDp70rOAxwfd3LJrH/view?usp=sharing" class="download-link" target="_blank">Скачать подборку</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div id="modal2" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="images/banner-online-school-2.jpg" alt="Скидка на курс" class="modal-image">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-title">Скидка 30% на Speaking Club</h3>
+                <p class="modal-description">
+                    Специальное предложение для наших студентов! Получите скидку 30% на курс "Разговорный английский".
+                </p>
+                <a href="#" class="download-link" target="_blank">Перейти к курсу</a>
+            </div>
+        </div>
+    </div> -->
+
+    <div id="modal4" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="images/banner-online-school-2.jpg" alt="Телеграм-сообщество" class="modal-image">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-title">Закрытое сообщество в Telegram!</h3>
+                <p class="modal-description">
+                    Закрытое сообщество для единомышленников.
+                </p>
+                <a href="https://t.me/+o6g30K2ahPhmYTAy" class="download-link" target="_blank">Перейти в беседу</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal3" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="images/banner-online-school-2.jpg" alt="Чек-лист грамматики" class="modal-image">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 class="modal-title">Чек-лист грамматики</h3>
+                <p class="modal-description">
+                    Исчерпывающий чек-лист всех грамматических правил английского языка от уровня A1 до C1.
+                </p>
+                <a href="https://drive.google.com/drive/folders/1R_qrKbTMDHzwfYJ66rlnSgoLOxc9_oYL?usp=sharing" class="download-link" target="_blank">Скачать чек-лист</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer" id="footer">
+        <div class="container">
+            <hr>
+            <nav class="nav_menu">
+                <ul>
+                    <!-- <li><a href="#" target="_blank" class="indet-min">Оферта</a></li>
+                    <li><a href="#" target="_blank">Политика конфиденциальности</a></li> -->
+                    <!-- <li><a href="#">link</a></li> -->
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="Scripts/Burger.js" defer></script>
+    <script src="Scripts/Test.js" defer></script>
+    <script src="Scripts/Gift.js" defer></script>
+    <div class="menu-overlay" id="menuOverlay"></div>
+</body>
+</html>

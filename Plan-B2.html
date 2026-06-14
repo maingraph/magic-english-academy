@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic English Academy - Level B2</title>
+
+    <link rel="stylesheet" href="Styles/Style.css">
+    <link rel="stylesheet" href="Styles/Normalize.css">
+    <link rel="stylesheet" href="Styles/Modal.css">
+    <link rel="stylesheet" href="Styles/Course-style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <nav class="top-menu">
+        <div class="menu-container">
+            <div class="menu-content">
+                <a href="Main-Page.html" class="logo">MAG<span style="color:#2C2C2C">IC ENGLISH</span></a>
+                
+                <button class="burger" id="burger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <div class="nav-links" id="navLinks">
+                    <a href="Main-Page.html">Общая информация</a>
+                    <a href="Instruction.html">Методики</a>
+                    <a href="Plan.html">План</a>
+                    <!-- <a href="Progress.html" class="active">Мой прогресс</a> -->
+                    <a href="Gift.html" class="gift-link festive">Забрать подарок
+                        <span class="gift-emoji">🎁</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="header" id="header">
+        <div class="container">
+            <img src="Images/banner-online-school.jpg" alt="banner" class="banner">
+            <hr>
+        </div>
+    </header>
+
+    <main class="main" id="main">
+        <div class="container">
+            <section class="main-info" id="main-info">
+                <div class="information-about-course">
+                    <p class="text">
+                        <p class="block-1">
+                            <span class="bold-font title">ПЛАН ИЗУЧЕНИЯ АНГЛИЙСКОГО ЯЗЫКА</span>
+                        </p>
+
+                        <p class="block-2">
+                            <span class="bold-font title">CEFR - B2 (Upper-Intermediate)</span>
+                        </p>
+
+                        <p class="block-3">
+                            <span class="bold-font title-2">Grammar / Грамматика</span>
+                        </p>
+
+                        <p class="block-4">
+                            <ul class="grammar-checklist">
+                                <!-- 1. Present Perfect Continuous, Past Perfect Continuous, Future Perfect Continuous -->
+                                <li class="grammar-checklist-item" data-topic-id="perfect-continuous-tenses-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Perfect Continuous Tenses (Present, Past, Future)</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-perfect-continuous-tenses-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                                
+                                <!-- 2. Present Perfect vs Past Simple -->
+                                <li class="grammar-checklist-item" data-topic-id="present-perfect-vs-past-simple-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Present Perfect vs Past Simple (сложные случаи)</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-present-perfect-vs-past-simple-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 3. Future Perfect -->
+                                <li class="grammar-checklist-item" data-topic-id="future-perfect-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Future Perfect</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-future-perfect-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 4. Tense agreement -->
+                                <li class="grammar-checklist-item" data-topic-id="tete-tense-agreement-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Согласование времен в сложных предложениях</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-tete-tense-agreement-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 5. Conditionals 0, 1, 2, 3 и mixed -->
+                                <li class="grammar-checklist-item" data-topic-id="conditionals-0-1-2-3-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Условные предложения 0, 1, 2, 3 и смешанные</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-conditionals-0-1-2-3-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 6. Inversion в условных -->
+                                <li class="grammar-checklist-item" data-topic-id="inversion-conditionals-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Inversion в условных предложениях</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-inversion-conditionals-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 7. Wish / If only -->
+                                <li class="grammar-checklist-item" data-topic-id="wish-if-only-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Wish / If only + Past Simple / Past Perfect / would</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-wish-if-only-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 8. Reported questions и reported speech -->
+                                <li class="grammar-checklist-item" data-topic-id="reported-questions-speech-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Reported questions и reported speech</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-reported-questions-speech-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 9. Модальные глаголы в пассиве -->
+                                <li class="grammar-checklist-item" data-topic-id="modal-passive-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Модальные глаголы в пассиве</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-modal-passive-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 10. It is said that... / He is believed to... -->
+                                <li class="grammar-checklist-item" data-topic-id="ttt-it-is-said-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Структуры It is said that... / He is believed to...</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-ttt-it-is-said-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 11. Модальные глаголы для предположения -->
+                                <li class="grammar-checklist-item" data-topic-id="modal-deduction-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Модальные глаголы для предположения</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-modal-deduction-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 12. Различия must / have to / should и др. -->
+                                <li class="grammar-checklist-item" data-topic-id="tttt-modals-differences-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Различия must / have to / should / ought to</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-tttt-modals-differences-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 13. Relative clauses -->
+                                <li class="grammar-checklist-item" data-topic-id="relative-clauses-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Relative clauses: defining and non-defining</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-relative-clauses-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 14. Participle clauses -->
+                                <li class="grammar-checklist-item" data-topic-id="participle-clauses-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Participle clauses</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-participle-clauses-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 15. Linking words -->
+                                <li class="grammar-checklist-item" data-topic-id="linking-words-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Linking words: despite, although, however, whereas</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-linking-words-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 16. Inversion -->
+                                <li class="grammar-checklist-item" data-topic-id="inversion-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Inversion</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-inversion-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 17. Cleft sentences -->
+                                <li class="grammar-checklist-item" data-topic-id="cleft-sentences-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Cleft sentences</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-cleft-sentences-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 18. Emphasis с помощью do/does/did -->
+                                <li class="grammar-checklist-item" data-topic-id="emphasis-do-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Emphasis с помощью do/does/did</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-emphasis-do-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 19. Collocations -->
+                                <li class="grammar-checklist-item" data-topic-id="ttttt-collocations-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Collocations</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-ttttt-collocations-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p>
+
+                        <p class="block-5">
+                            <span class="bold-font title-2">Vocabulary / Словарный запас</span>
+                        </p>
+
+                        <p class="block-6">
+                            <ul class="grammar-checklist">
+                                <!-- 1. Работа и карьера -->
+                                <li class="grammar-checklist-item" data-topic-id="work-career-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Работа и карьера</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-work-career-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 2. Технологии -->
+                                <li class="grammar-checklist-item" data-topic-id="technology-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Технологии</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-technology-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 3. Наука -->
+                                <li class="grammar-checklist-item" data-topic-id="science-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Наука</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-science-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 4. Общество и культура -->
+                                <li class="grammar-checklist-item" data-topic-id="society-culture-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Общество и культура</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-society-culture-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 5. Искусство и развлечения -->
+                                <li class="grammar-checklist-item" data-topic-id="art-entertainment-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Искусство и развлечения</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-art-entertainment-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 6. Политика и экономика -->
+                                <li class="grammar-checklist-item" data-topic-id="politics-economy-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Политика и экономика</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-politics-economy-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 7. Эмоции и чувства -->
+                                <li class="grammar-checklist-item" data-topic-id="emotions-feelings-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Эмоции и чувства (продвинутые)</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-emotions-feelings-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 8. Законы и правопорядок -->
+                                <li class="grammar-checklist-item" data-topic-id="law-order-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Законы и правопорядок</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-law-order-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 9. Мода и стиль -->
+                                <li class="grammar-checklist-item" data-topic-id="fashion-style-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Мода и стиль</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-fashion-style-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+
+                                <!-- 10. История и исторические события -->
+                                <li class="grammar-checklist-item" data-topic-id="history-events-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">История и исторические события</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-history-events-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p>
+
+                        <p class="block-7">
+                            <span class="bold-font title-2">Writing</span>
+                        </p>
+
+                        <p class="block-8">
+                            <ul class="grammar-checklist">
+                                <li class="grammar-checklist-item" data-topic-id="writing-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Написание текстов уровня B2</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-writing-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p>
+
+                        <p class="block-9">
+                            <span class="bold-font title-2">Listening</span>
+                        </p>
+
+                        <p class="block-10">
+                            <ul class="grammar-checklist">
+                                <li class="grammar-checklist-item" data-topic-id="listening-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Аудирование уровня B2</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-listening-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p>
+
+                        <p class="block-11">
+                            <span class="bold-font title-2">Reading</span>
+                        </p>
+
+                        <p class="block-12">
+                            <ul class="grammar-checklist">
+                                <li class="grammar-checklist-item" data-topic-id="reading-b2">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox">
+                                        <span class="grammar-checkmark"></span>
+                                        <span class="item-text">Чтение уровня B2</span>
+                                    </label>
+                                    <button class="view-btn" data-modal-id="modal-reading-b2">
+                                        <span class="view-icon"></span>
+                                        <span>Посмотреть</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </p>
+                    </p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer" id="footer">
+        <div class="container">
+            <hr>
+            <nav class="nav_menu">
+                <ul>
+                    <!-- <li><a href="#" target="_blank" class="indet-min">Оферта</a></li>
+                    <li><a href="#" target="_blank">Политика конфиденциальности</a></li> -->
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Уведомление для Notion ссылок -->
+    <div class="notion-modal-overlay" id="notionModalOverlay"></div>
+    <div class="notion-link-modal" id="notionLinkModal">
+        <div class="notion-modal-content">
+            <div class="notion-modal-icon">📚</div>
+            <h3 class="notion-modal-title" id="modalTopicTitle">Материал доступен</h3>
+            <p class="notion-modal-text" id="modalTopicText">Вы переходите на страницу с материалом в Notion</p>
+            <a href="#" class="notion-link" id="modalNotionLink" target="_blank" rel="noopener noreferrer">
+                Перейти к материалу
+            </a>
+            <br>
+            <a href="#" class="notion-cancel" id="modalCancelLink">Отмена</a>
+        </div>
+    </div>
+
+    <script src="Scripts/links.js"></script>
+    <script src="Scripts/Progress.js" defer></script>
+    <script src="Scripts/Burger.js" defer></script>
+    <script src="Scripts/Test.js" defer></script>
+    <script src="Scripts/Grammar-checklist.js" defer></script>
+    <script src="Scripts/Modal.js" defer></script>
+    <script src="Scripts/Course-code.js" defer></script>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ProgressTracker !== 'undefined') {
+                window.progressTracker = new ProgressTracker();
+                setupCheckboxListeners();
+            }
+        });
+    </script>
+</body>
+</html>

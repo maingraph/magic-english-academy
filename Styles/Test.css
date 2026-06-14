@@ -1,0 +1,120 @@
+/* Test System Styles */
+.test-container {
+    max-width: 800px;
+    /* margin: 0 auto; */
+    padding: 20px;
+    margin: 20px 0 20px 0;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: left; /* Добавляем выравнивание по левому краю */
+}
+
+.test-questions {
+    margin-bottom: 30px;
+}
+
+.question-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.question-text {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #2C2C2C;
+}
+
+.answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.answer-option:hover {
+    background-color: #f0f0f0;
+}
+
+.answer-option input {
+    margin-right: 10px;
+}
+
+.test-controls {
+    display: flex;
+    justify-content: flex-start; /* Меняем center на flex-start */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-secondary {
+    background-color: #222222 !important;
+    padding: 10px 30px 10px 30px;
+    font-size: 1rem;
+}
+
+.btn {
+    font-size: 1rem;
+}
+
+.btn-secondary:hover {
+    background-color: #3e3e3e;
+}
+
+.test-results {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    text-align: left; /* Меняем center на left */
+    font-weight: 600;
+    display: none;
+}
+
+/* Для заголовка теста */
+.test-container h2 {
+    text-align: left; /* Выравниваем заголовок по левому краю */
+    margin-bottom: 20px;
+}
+
+/* Answer states */
+.correct-answer {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.wrong-answer {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.show-correct {
+    background-color: #e2f0fd;
+    border-color: #b8daff;
+    color: #004085;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .test-controls {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
