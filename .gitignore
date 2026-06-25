@@ -24,3 +24,5 @@ platform/.env.*
 !platform/.env.example
 !platform/.env.production.example
 platform/backups/
+platform/apps/*/.env*
+platform/apps/*/.vercel/
