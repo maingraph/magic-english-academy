@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { SessionProvider } from "../components/SessionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Magic English Platform",
-  description: "Interactive Magic English learning platform"
+  title: "Платформа Magic English",
+  description: "Интерактивная платформа для изучения английского языка"
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }

@@ -9,8 +9,8 @@ function buildLessonTitle(level: (typeof courseLevels)[number], index: number) {
 }
 
 function buildLessonBlocks(levelCode: string, lessonIndex: number) {
-  if (levelCode === "A1" && lessonIndex === 0) {
-    return [
+  const a1Lessons = [
+    [
       {
         type: "RICH_TEXT" as const,
         orderIndex: 1,
@@ -41,7 +41,105 @@ function buildLessonBlocks(levelCode: string, lessonIndex: number) {
           answer: "is"
         }
       }
-    ];
+    ],
+    [
+      {
+        type: "RICH_TEXT" as const,
+        orderIndex: 1,
+        content: {
+          heading: "Кто выполняет действие",
+          text: "Личные местоимения заменяют имена и предметы: I, you, he, she, it, we, they."
+        }
+      },
+      {
+        type: "EXAMPLE" as const,
+        orderIndex: 2,
+        content: {
+          title: "Замена существительного",
+          items: [
+            "Anna is a teacher. She is a teacher.",
+            "Tom and I are friends. We are friends.",
+            "The books are new. They are new."
+          ]
+        }
+      },
+      {
+        type: "TASK" as const,
+        orderIndex: 3,
+        content: {
+          title: "Выберите местоимение",
+          prompt: "Mike is from London. ___ is British.",
+          options: ["He", "She", "They"],
+          answer: "He"
+        }
+      }
+    ],
+    [
+      {
+        type: "RICH_TEXT" as const,
+        orderIndex: 1,
+        content: {
+          heading: "Регулярные действия",
+          text: "Present Simple описывает привычки и факты. С I, you, we, they используйте начальную форму глагола; с he, she, it добавьте -s."
+        }
+      },
+      {
+        type: "EXAMPLE" as const,
+        orderIndex: 2,
+        content: {
+          title: "Утверждения",
+          items: [
+            "I work every day.",
+            "She works every day.",
+            "They live in Warsaw."
+          ]
+        }
+      },
+      {
+        type: "TASK" as const,
+        orderIndex: 3,
+        content: {
+          title: "Проверьте правило",
+          prompt: "He ___ English every evening.",
+          options: ["study", "studies", "studying"],
+          answer: "studies"
+        }
+      }
+    ],
+    [
+      {
+        type: "RICH_TEXT" as const,
+        orderIndex: 1,
+        content: {
+          heading: "Слова для первого разговора",
+          text: "Начните с частых слов о семье, доме и повседневных действиях. Запоминайте их внутри коротких фраз."
+        }
+      },
+      {
+        type: "DICTIONARY_TERM" as const,
+        orderIndex: 2,
+        content: {
+          term: "family",
+          translation: "семья",
+          definition: "A group of people related to one another.",
+          examples: ["I have a big family.", "My family lives in Minsk."]
+        }
+      },
+      {
+        type: "TASK" as const,
+        orderIndex: 3,
+        content: {
+          title: "Подберите перевод",
+          prompt: "Как переводится слово family?",
+          options: ["работа", "семья", "город"],
+          answer: "семья"
+        }
+      }
+    ]
+  ];
+
+  if (levelCode === "A1" && lessonIndex < a1Lessons.length) {
+    return a1Lessons[lessonIndex];
   }
 
   return [
@@ -50,7 +148,7 @@ function buildLessonBlocks(levelCode: string, lessonIndex: number) {
       orderIndex: 1,
       content: {
         kind: "migration-note",
-        text: "This lesson slot is ready for native course content migration."
+        text: "Этот урок готов к переносу материалов курса."
       }
     }
   ];
@@ -65,7 +163,7 @@ async function main() {
       role: "STUDENT",
       profile: {
         create: {
-          displayName: "Magic Student"
+          displayName: "Ученик Magic English"
         }
       }
     },
@@ -76,10 +174,10 @@ async function main() {
       profile: {
         upsert: {
           create: {
-            displayName: "Magic Student"
+            displayName: "Ученик Magic English"
           },
           update: {
-            displayName: "Magic Student"
+            displayName: "Ученик Magic English"
           }
         }
       }
@@ -94,7 +192,7 @@ async function main() {
       role: "ADMIN",
       profile: {
         create: {
-          displayName: "Admin"
+          displayName: "Администратор"
         }
       }
     },
@@ -105,10 +203,10 @@ async function main() {
       profile: {
         upsert: {
           create: {
-            displayName: "Admin"
+            displayName: "Администратор"
           },
           update: {
-            displayName: "Admin"
+            displayName: "Администратор"
           }
         }
       }
@@ -132,16 +230,43 @@ async function main() {
     }
   });
 
+  await prisma.achievement.upsert({
+    where: { code: "FIRST_LESSON" },
+    create: {
+      code: "FIRST_LESSON",
+      title: "Первый шаг",
+      description: "Завершите первый урок.",
+      rule: { type: "completed_lessons", target: 1 }
+    },
+    update: {}
+  });
+
+  await prisma.article.upsert({
+    where: { slug: "how-to-study-with-magic-english" },
+    create: {
+      slug: "how-to-study-with-magic-english",
+      title: "Как учиться с Magic English",
+      excerpt: "Краткий гид по урокам, практике, домашним работам и прогрессу.",
+      content: {
+        type: "rich_text",
+        text: "Выберите свой уровень CEFR, откройте следующий урок, выполните интерактивные задания и отправьте домашнюю работу. Прогресс, баллы, словарь и достижения обновляются автоматически."
+      },
+      status: "PUBLISHED",
+      publishedAt: new Date()
+    },
+    update: {}
+  });
+
   const course = await prisma.course.upsert({
     where: { slug: "magic-english-main" },
     create: {
       slug: "magic-english-main",
       title: "Magic English",
-      description: "Native platform course structure seeded from the legacy course audit."
+      description: "Структура курса для интерактивной платформы Magic English."
     },
     update: {
       title: "Magic English",
-      description: "Native platform course structure seeded from the legacy course audit."
+      description: "Структура курса для интерактивной платформы Magic English."
     }
   });
 
@@ -172,7 +297,7 @@ async function main() {
     await prisma.module.create({
       data: {
         levelId: courseLevel.id,
-        title: "Legacy migration",
+        title: "Материалы курса",
         orderIndex: 1,
         lessons: {
           create: Array.from({ length: level.lessonCount }, (_, lessonIndex) => {
@@ -182,8 +307,8 @@ async function main() {
               slug: `${level.code.toLowerCase()}-${String(lessonIndex + 1).padStart(3, "0")}`,
               title,
               summary: lessonIndex < level.sampleTopics.length
-                ? "Seeded from the audited legacy course structure."
-                : "Placeholder for migrated Notion lesson content.",
+                ? "Интерактивный урок на основе программы курса."
+                : "Место для переноса материалов урока из Notion.",
               orderIndex: lessonIndex + 1,
               blocks: {
                 create: buildLessonBlocks(level.code, lessonIndex)

@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException
 } from "@nestjs/common";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { UserRole } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import type { ApiRole, ApiSessionUser, RequestWithUser } from "./auth.types";
@@ -22,6 +22,23 @@ export type AuthPayload = {
   email?: unknown;
   password?: unknown;
   displayName?: unknown;
+};
+
+export type PasswordResetRequestPayload = {
+  email?: unknown;
+};
+
+export type PasswordResetPayload = {
+  token?: unknown;
+  password?: unknown;
+};
+
+export type RequestMetadata = {
+  headers: Record<string, string | string[] | undefined>;
+  ip?: string;
+  socket?: {
+    remoteAddress?: string;
+  };
 };
 
 type CookieResponse = {
@@ -92,7 +109,7 @@ export class AuthService {
     response.clearCookie(cookieName, this.getClearCookieOptions());
   }
 
-  async register(payload: AuthPayload) {
+  async register(payload: AuthPayload, request?: RequestMetadata) {
     const email = this.parseEmail(payload.email);
     const password = this.parsePassword(payload.password);
     const displayName = this.parseDisplayName(payload.displayName, email);
@@ -103,7 +120,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException("User with this email already exists");
+      throw new ConflictException("Пользователь с такой электронной почтой уже существует");
     }
 
     const user = await this.prisma.user.create({
@@ -120,13 +137,15 @@ export class AuthService {
       include: { profile: true }
     });
 
+    await this.recordAuthEvent(user.id, "ACCOUNT_REGISTERED", request);
+
     return {
       user: this.toSessionUser(user),
       token: this.signToken({ sub: user.id, exp: this.getExpiryTimestamp() })
     };
   }
 
-  async login(payload: AuthPayload) {
+  async login(payload: AuthPayload, request?: RequestMetadata) {
     const email = this.parseEmail(payload.email);
     const password = this.parsePassword(payload.password);
 
@@ -136,12 +155,14 @@ export class AuthService {
     });
 
     if (!user?.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
-      throw new UnauthorizedException("Invalid email or password");
+      throw new UnauthorizedException("Неверная электронная почта или пароль");
     }
 
     if (user.status !== "ACTIVE") {
-      throw new UnauthorizedException("User account is not active");
+      throw new UnauthorizedException("Аккаунт пользователя неактивен");
     }
+
+    await this.recordAuthEvent(user.id, "LOGIN_SUCCESS", request);
 
     return {
       user: this.toSessionUser(user),
@@ -172,6 +193,84 @@ export class AuthService {
     }
 
     return this.toSessionUser(user);
+  }
+
+  async requestPasswordReset(payload: PasswordResetRequestPayload) {
+    const email = this.parseEmail(payload.email);
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { profile: true }
+    });
+
+    if (!user || user.status !== "ACTIVE") {
+      return {
+        accepted: true,
+        message: "Если аккаунт существует, письмо для сброса пароля уже отправлено."
+      };
+    }
+
+    const token = randomBytes(32).toString("base64url");
+    const tokenHash = this.hashResetToken(token);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await this.prisma.$transaction([
+      this.prisma.passwordResetToken.deleteMany({
+        where: {
+          userId: user.id,
+          OR: [{ usedAt: { not: null } }, { expiresAt: { lt: new Date() } }]
+        }
+      }),
+      this.prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt
+        }
+      })
+    ]);
+    await this.sendPasswordResetEmail(
+      user.email,
+      user.profile?.displayName ?? user.email,
+      token
+    );
+
+    return {
+      accepted: true,
+      message: "Если аккаунт существует, письмо для сброса пароля уже отправлено.",
+      ...(process.env.NODE_ENV !== "production" && !process.env.RESEND_API_KEY
+        ? { devToken: token }
+        : {})
+    };
+  }
+
+  async resetPassword(payload: PasswordResetPayload) {
+    const token = this.parseResetToken(payload.token);
+    const password = this.parsePassword(payload.password);
+    const reset = await this.prisma.passwordResetToken.findUnique({
+      where: { tokenHash: this.hashResetToken(token) }
+    });
+
+    if (!reset || reset.usedAt || reset.expiresAt <= new Date()) {
+      throw new UnauthorizedException("Ссылка для сброса пароля недействительна или устарела");
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: reset.userId },
+        data: {
+          passwordHash: await hashPassword(password)
+        }
+      }),
+      this.prisma.passwordResetToken.update({
+        where: { id: reset.id },
+        data: { usedAt: new Date() }
+      })
+    ]);
+
+    return {
+      reset: true,
+      message: "Пароль обновлён. Теперь можно войти."
+    };
   }
 
   private getTokenFromRequest(request: RequestWithUser) {
@@ -243,13 +342,13 @@ export class AuthService {
 
   private parseEmail(value: unknown) {
     if (typeof value !== "string") {
-      throw new UnauthorizedException("email must be a string");
+      throw new UnauthorizedException("Электронная почта должна быть строкой");
     }
 
     const email = value.trim().toLowerCase();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      throw new UnauthorizedException("email must be valid");
+      throw new UnauthorizedException("Укажите корректную электронную почту");
     }
 
     return email;
@@ -257,7 +356,7 @@ export class AuthService {
 
   private parsePassword(value: unknown) {
     if (typeof value !== "string" || value.length < 8 || value.length > 128) {
-      throw new UnauthorizedException("password must be between 8 and 128 characters");
+      throw new UnauthorizedException("Пароль должен содержать от 8 до 128 символов");
     }
 
     return value;
@@ -265,17 +364,17 @@ export class AuthService {
 
   private parseDisplayName(value: unknown, email: string) {
     if (value === undefined || value === null || value === "") {
-      return email.split("@")[0] ?? "Magic Student";
+      return email.split("@")[0] ?? "Ученик Magic English";
     }
 
     if (typeof value !== "string") {
-      throw new UnauthorizedException("displayName must be a string");
+      throw new UnauthorizedException("Имя должно быть строкой");
     }
 
     const displayName = value.trim();
 
     if (!displayName || displayName.length > 120) {
-      throw new UnauthorizedException("displayName must be between 1 and 120 characters");
+      throw new UnauthorizedException("Имя должно содержать от 1 до 120 символов");
     }
 
     return displayName;
@@ -283,6 +382,136 @@ export class AuthService {
 
   private getExpiryTimestamp() {
     return Math.floor(Date.now() / 1000) + sessionTtlSeconds;
+  }
+
+  private async recordAuthEvent(
+    userId: string,
+    type: string,
+    request?: RequestMetadata
+  ) {
+    if (!request) return;
+    const forwarded = request.headers["x-forwarded-for"];
+    const forwardedIp = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+    const ip = forwardedIp?.split(",")[0]?.trim() ?? request.ip ?? request.socket?.remoteAddress;
+    const userAgentValue = request.headers["user-agent"];
+    const userAgent = Array.isArray(userAgentValue) ? userAgentValue[0] : userAgentValue;
+
+    await this.prisma.activityEvent.create({
+      data: {
+        userId,
+        type,
+        ipHash: ip ? this.hashActivityValue(ip) : null,
+        userAgent: userAgent?.slice(0, 500) ?? null
+      }
+    });
+
+    if (type === "LOGIN_SUCCESS" && ip) {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentLogins = await this.prisma.activityEvent.findMany({
+        where: {
+          userId,
+          type: "LOGIN_SUCCESS",
+          createdAt: { gte: since },
+          ipHash: { not: null }
+        },
+        select: { ipHash: true }
+      });
+      const distinctIpHashes = new Set(
+        recentLogins.map((event) => event.ipHash).filter(Boolean)
+      );
+
+      if (distinctIpHashes.size >= 3) {
+        const existingSignal = await this.prisma.abuseSignal.findFirst({
+          where: {
+            userId,
+            type: "ACCOUNT_SHARING_SUSPECTED",
+            status: "OPEN",
+            createdAt: { gte: since }
+          }
+        });
+
+        if (!existingSignal) {
+          await this.prisma.abuseSignal.create({
+            data: {
+              userId,
+              type: "ACCOUNT_SHARING_SUSPECTED",
+              severity: "HIGH",
+              details: {
+                distinctNetworks: distinctIpHashes.size,
+                windowHours: 24
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
+  private hashResetToken(token: string) {
+    return createHash("sha256").update(token).digest("hex");
+  }
+
+  private hashActivityValue(value: string) {
+    return createHmac(
+      "sha256",
+      process.env.ACTIVITY_HASH_SECRET ?? this.getSecret()
+    )
+      .update(value)
+      .digest("hex");
+  }
+
+  private parseResetToken(value: unknown) {
+    if (typeof value !== "string" || value.length < 32 || value.length > 200) {
+      throw new UnauthorizedException("Некорректная ссылка для сброса пароля");
+    }
+
+    return value;
+  }
+
+  private async sendPasswordResetEmail(email: string, name: string, token: string) {
+    const apiKey = process.env.RESEND_API_KEY;
+
+    if (!apiKey) return;
+    const resetUrl = `${process.env.WEB_ORIGIN ?? "http://localhost:3000"}/login?reset=${encodeURIComponent(token)}`;
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM ?? "Magic English <accounts@magic-english-academy.com>",
+        to: [email],
+        subject: "Сброс пароля Magic English",
+        html: `
+          <div style="font-family:Arial,sans-serif;background:#f6f6f6;padding:32px">
+            <div style="max-width:560px;margin:auto;background:#fff;border:1px solid #eee;border-radius:8px;padding:28px">
+              <h1 style="margin-top:0;color:#2c2c2c">Сброс пароля</h1>
+              <p>Здравствуйте, ${this.escapeHtml(name)}. Ссылка действует один час.</p>
+              <a href="${resetUrl}" style="display:inline-block;background:#feb733;color:#fff;padding:13px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Выбрать новый пароль</a>
+            </div>
+          </div>
+        `
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`Password reset email failed: ${response.status}`);
+    }
+  }
+
+  private escapeHtml(value: string) {
+    return value.replace(
+      /[&<>"']/g,
+      (character) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[character] ?? character
+    );
   }
 
   private getSecret() {

@@ -22,3 +22,5 @@ platform/packages/*/dist/
 platform/.env
 platform/.env.*
 !platform/.env.example
+!platform/.env.production.example
+platform/backups/

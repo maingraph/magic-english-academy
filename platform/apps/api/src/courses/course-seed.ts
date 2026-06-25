@@ -1,62 +1,62 @@
 export const courseLevels = [
   {
     code: "A1",
-    title: "Beginner",
+    title: "Начальный",
     lessonCount: 41,
     status: "legacy-linked",
     sampleTopics: [
       "Глагол to be (am/is/are)",
       "Личные местоимения",
-      "Present Simple",
+      "Настоящее простое время (Present Simple)",
       "Базовая лексика"
     ]
   },
   {
     code: "A2",
-    title: "Pre-Intermediate",
+    title: "Ниже среднего",
     lessonCount: 28,
     status: "legacy-linked",
     sampleTopics: [
-      "Present Continuous",
-      "Past Simple",
-      "Future forms",
-      "Modal verbs"
+      "Настоящее длительное время (Present Continuous)",
+      "Прошедшее простое время (Past Simple)",
+      "Способы говорить о будущем",
+      "Модальные глаголы"
     ]
   },
   {
     code: "B1",
-    title: "Intermediate",
+    title: "Средний",
     lessonCount: 26,
     status: "legacy-linked",
     sampleTopics: [
-      "Future Simple",
-      "Present Perfect",
-      "Past Continuous",
-      "Reported Speech"
+      "Будущее простое время (Future Simple)",
+      "Настоящее совершённое время (Present Perfect)",
+      "Прошедшее длительное время (Past Continuous)",
+      "Косвенная речь (Reported Speech)"
     ]
   },
   {
     code: "B2",
-    title: "Upper-Intermediate",
+    title: "Выше среднего",
     lessonCount: 32,
     status: "legacy-linked",
     sampleTopics: [
-      "Perfect Continuous",
-      "Conditionals",
-      "Modal deduction",
-      "Cleft sentences"
+      "Совершённо-длительные времена",
+      "Условные предложения",
+      "Модальные глаголы для предположений",
+      "Выделительные конструкции"
     ]
   },
   {
     code: "C1",
-    title: "Advanced",
+    title: "Продвинутый",
     lessonCount: 37,
     status: "legacy-linked",
     sampleTopics: [
-      "Inversion for emphasis",
-      "Fronting",
-      "Academic phrases",
-      "Register shifting"
+      "Инверсия для усиления",
+      "Вынесение части предложения вперёд",
+      "Академические выражения",
+      "Смена стиля речи"
     ]
   }
 ] as const;

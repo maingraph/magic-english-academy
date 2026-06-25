@@ -3,7 +3,9 @@ import { AppShell } from "../../../../../components/AppShell";
 import { AuthGate } from "../../../../../components/AuthGate";
 import { LessonBlockRenderer } from "../../../../../components/LessonBlockRenderer";
 import { LessonProgressPanel } from "../../../../../components/LessonProgressPanel";
+import { LessonHomework } from "../../../../../components/LessonHomework";
 import { MagicButton } from "../../../../../components/MagicButton";
+import { TextSelectionTools } from "../../../../../components/TextSelectionTools";
 import { getNativeLesson } from "../../../../../lib/courses";
 
 type LessonPageProps = {
@@ -44,8 +46,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <div className="lesson-layout">
             <article className="lesson-content">
               {data.blocks.map((block) => (
-                <LessonBlockRenderer block={block} key={`${block.type}-${block.orderIndex}`} />
+                <LessonBlockRenderer
+                  block={block}
+                  key={`${block.type}-${block.orderIndex}`}
+                  lessonSlug={data.slug}
+                />
               ))}
+              <AuthGate>
+                <LessonHomework slug={data.slug} />
+              </AuthGate>
             </article>
 
             <aside className="lesson-sidebar">
@@ -59,6 +68,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </div>
             </aside>
           </div>
+          <TextSelectionTools lessonSlug={data.slug} />
         </div>
       </main>
     </AppShell>

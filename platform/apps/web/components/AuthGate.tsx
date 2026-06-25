@@ -1,17 +1,8 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type ApiRole = "student" | "teacher" | "admin" | "owner";
-
-type SessionResponse = {
-  user: {
-    email: string;
-    displayName: string;
-    role: ApiRole;
-  } | null;
-};
+import { useEffect } from "react";
+import { ApiRole, useSession } from "./SessionProvider";
 
 const roleRank: Record<ApiRole, number> = {
   student: 1,
@@ -19,8 +10,6 @@ const roleRank: Record<ApiRole, number> = {
   admin: 3,
   owner: 4
 };
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 export function AuthGate({
   children,
@@ -31,47 +20,13 @@ export function AuthGate({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [status, setStatus] = useState<"loading" | "ready" | "forbidden">("loading");
+  const { status, user } = useSession();
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadSession() {
-      try {
-        const response = await fetch(`${apiBaseUrl}/auth/session`, {
-          credentials: "include",
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error(`Session failed: ${response.status}`);
-        }
-
-        const session = (await response.json()) as SessionResponse;
-
-        if (!session.user) {
-          router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-          return;
-        }
-
-        if (roleRank[session.user.role] < roleRank[role]) {
-          setStatus("forbidden");
-          return;
-        }
-
-        setStatus("ready");
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error(error);
-          router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-        }
-      }
+    if (status === "ready" && !user) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     }
-
-    void loadSession();
-
-    return () => controller.abort();
-  }, [pathname, role, router]);
+  }, [pathname, router, status, user]);
 
   if (status === "loading") {
     return (
@@ -82,7 +37,7 @@ export function AuthGate({
     );
   }
 
-  if (status === "forbidden") {
+  if (user && roleRank[user.role] < roleRank[role]) {
     return (
       <section className="soft-card api-status warning">
         <h2>Нет доступа</h2>
@@ -91,5 +46,5 @@ export function AuthGate({
     );
   }
 
-  return <>{children}</>;
+  return user ? <>{children}</> : null;
 }

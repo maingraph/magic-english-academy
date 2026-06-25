@@ -27,7 +27,7 @@ export function getDevSessionUser(request: RequestWithUser): ApiSessionUser {
   return {
     id: getHeaderValue(request, "x-user-id", "dev-user"),
     email: getHeaderValue(request, "x-user-email", "student@magic.local"),
-    displayName: getHeaderValue(request, "x-user-name", "Magic Student"),
+    displayName: getHeaderValue(request, "x-user-name", "Ученик Magic English"),
     role
   };
 }

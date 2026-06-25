@@ -63,7 +63,6 @@ export function AdminDictionaryPanel() {
 
   useEffect(() => {
     void loadDictionary("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function createTerm(event: FormEvent<HTMLFormElement>) {

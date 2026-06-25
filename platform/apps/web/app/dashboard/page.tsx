@@ -1,6 +1,7 @@
 import { AppShell } from "../../components/AppShell";
 import { AuthGate } from "../../components/AuthGate";
 import { DashboardProgressPanel } from "../../components/DashboardProgressPanel";
+import { HomeworkPanel } from "../../components/HomeworkPanel";
 
 export default function DashboardPage() {
   return (
@@ -10,13 +11,14 @@ export default function DashboardPage() {
           <section className="section-copy">
             <h1>МОЙ ПРОГРЕСС</h1>
             <p>
-              Кабинет уже читает реальный прогресс из базы. Следующие шаги:
-              баллы, домашка, словарик и достижения.
+              Кабинет показывает реальный прогресс из базы: начатые и
+              завершённые уроки, процент курса и ближайшие занятия.
             </p>
           </section>
 
           <AuthGate>
             <DashboardProgressPanel />
+            <HomeworkPanel />
           </AuthGate>
         </div>
       </main>

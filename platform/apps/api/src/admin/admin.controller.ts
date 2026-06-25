@@ -2,13 +2,22 @@ import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from "@nestj
 import { CurrentUser } from "../auth/current-user.decorator";
 import { Roles } from "../auth/roles.decorator";
 import type { ApiSessionUser } from "../auth/auth.types";
-import type { AdminCreateDictionaryTermPayload, AdminUpdateLessonPayload } from "./admin.service";
+import { AssistantService, type AssistantTestPayload } from "../assistant/assistant.service";
+import type {
+  AdminArticlePayload,
+  AdminAssistantSettingsPayload,
+  AdminCreateDictionaryTermPayload,
+  AdminUpdateLessonPayload
+} from "./admin.service";
 import { AdminService } from "./admin.service";
 
 @Controller("admin")
 @Roles("admin")
 export class AdminController {
-  constructor(@Inject(AdminService) private readonly adminService: AdminService) {}
+  constructor(
+    @Inject(AdminService) private readonly adminService: AdminService,
+    @Inject(AssistantService) private readonly assistantService: AssistantService
+  ) {}
 
   @Get("overview")
   async getOverview(@CurrentUser() user: ApiSessionUser) {
@@ -21,6 +30,52 @@ export class AdminController {
   @Get("course-map")
   async getCourseMap() {
     return this.adminService.getCourseMap();
+  }
+
+  @Get("users")
+  async getUsers(@Query("q") query?: string) {
+    return this.adminService.getUsers(query);
+  }
+
+  @Get("activity")
+  async getActivity() {
+    return this.adminService.getActivity();
+  }
+
+  @Get("articles")
+  async getArticles() {
+    return this.adminService.getArticles();
+  }
+
+  @Post("articles")
+  async createArticle(
+    @CurrentUser() user: ApiSessionUser,
+    @Body() payload: AdminArticlePayload
+  ) {
+    return this.adminService.createArticle(user, payload);
+  }
+
+  @Patch("articles/:articleId")
+  async updateArticle(
+    @Param("articleId") articleId: string,
+    @Body() payload: AdminArticlePayload
+  ) {
+    return this.adminService.updateArticle(articleId, payload);
+  }
+
+  @Get("settings")
+  async getSettings() {
+    return this.adminService.getSettings();
+  }
+
+  @Patch("settings/assistant")
+  async updateAssistantSettings(@Body() payload: AdminAssistantSettingsPayload) {
+    return this.adminService.updateAssistantSettings(payload);
+  }
+
+  @Post("settings/assistant/test")
+  async testAssistantSettings(@Body() payload: AssistantTestPayload) {
+    return this.assistantService.testConnection(payload);
   }
 
   @Get("dictionary")

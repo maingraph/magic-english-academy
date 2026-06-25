@@ -7,22 +7,30 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm:dev:web\" \"npm:dev:api\"",
+    "dev": "node scripts/dev.mjs",
     "dev:web": "npm run dev -w @magic-english/web",
     "dev:api": "npm run dev -w @magic-english/api",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "smoke:api": "node scripts/smoke-api.mjs",
     "db:generate": "npm run db:generate -w @magic-english/api",
     "db:migrate": "npm run db:migrate -w @magic-english/api",
     "db:seed": "npm run db:seed -w @magic-english/api",
+    "db:demo": "npm run db:demo -w @magic-english/api",
     "db:studio": "npm run db:studio -w @magic-english/api"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "globals": "^17.7.0",
+    "postcss": "8.5.10",
+    "typescript-eslint": "^8.62.0"
   },
   "overrides": {
-    "postcss": "^8.5.10"
+    "multer": "2.2.0",
+    "postcss": "8.5.10"
   },
   "engines": {
     "node": ">=22.0.0",

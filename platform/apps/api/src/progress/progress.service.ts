@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ProgressStatus, UserRole } from "@prisma/client";
 import type { ApiRole, ApiSessionUser } from "../auth/auth.types";
+import { GamificationService } from "../gamification/gamification.service";
 import { PrismaService } from "../prisma/prisma.service";
 
 const roleMap: Record<ApiRole, UserRole> = {
@@ -12,7 +13,11 @@ const roleMap: Record<ApiRole, UserRole> = {
 
 @Injectable()
 export class ProgressService {
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(GamificationService)
+    private readonly gamificationService: GamificationService
+  ) {}
 
   async getSummary(user: ApiSessionUser) {
     await this.ensureUser(user);
@@ -87,6 +92,15 @@ export class ProgressService {
         completedAt: null
       }
     });
+
+    await this.prisma.activityEvent.create({
+      data: {
+        userId: user.id,
+        type: "LESSON_COMPLETED",
+        metadata: { lessonSlug: slug }
+      }
+    });
+    await this.gamificationService.syncForUser(user.id);
 
     return this.getLessonProgressResponse(user.id, lesson.slug);
   }

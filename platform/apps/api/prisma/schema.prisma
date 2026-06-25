@@ -41,6 +41,18 @@ enum ProgressStatus {
   COMPLETED
 }
 
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AbuseSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model User {
   id                 String              @id @default(cuid())
   email              String              @unique
@@ -59,6 +71,9 @@ model User {
   certificates        Certificate[]
   dictionaryTerms     UserDictionaryTerm[]
   assistantSessions   AssistantSession[]
+  authoredArticles    Article[]
+  abuseSignals        AbuseSignal[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Profile {
@@ -282,4 +297,60 @@ model AssistantMessage {
   tokenCount Int             @default(0)
   createdAt DateTime         @default(now())
   session   AssistantSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  excerpt     String?
+  content     Json
+  status      ArticleStatus @default(DRAFT)
+  authorId    String?
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  author      User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+}
+
+model AppSetting {
+  key            String   @id
+  valueEncrypted String?
+  valueJson      Json?
+  updatedAt      DateTime @updatedAt
+}
+
+model AbuseSignal {
+  id         String        @id @default(cuid())
+  userId     String?
+  type       String
+  severity   AbuseSeverity @default(LOW)
+  details    Json?
+  status     String        @default("OPEN")
+  createdAt  DateTime      @default(now())
+  resolvedAt DateTime?
+  user       User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model MetricSnapshot {
+  id        String   @id @default(cuid())
+  date      DateTime
+  type      String
+  value     Decimal  @db.Decimal(14, 2)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@unique([date, type])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }

@@ -89,8 +89,7 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
       <span className="admin-kicker">Статус</span>
       <h2>{getStatusText(status)}</h2>
       <p>
-        Прогресс сохраняется в базе для dev-ученика. Скоро сюда добавим баллы,
-        домашку и точность ответов.
+        Статус сохраняется в вашем аккаунте и сразу обновляет личный кабинет.
       </p>
       <button
         className="lesson-complete-btn"

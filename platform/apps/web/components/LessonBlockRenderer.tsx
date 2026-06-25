@@ -1,3 +1,6 @@
+import { LessonTaskBlock } from "./LessonTaskBlock";
+import { SaveWordButton } from "./SaveWordButton";
+
 type LessonBlock = {
   type: "RICH_TEXT" | "EXAMPLE" | "MEDIA" | "TASK" | "DICTIONARY_TERM";
   orderIndex: number;
@@ -18,7 +21,13 @@ function getStringArray(value: Record<string, unknown>, key: string) {
     : [];
 }
 
-export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
+export function LessonBlockRenderer({
+  block,
+  lessonSlug
+}: {
+  block: LessonBlock;
+  lessonSlug: string;
+}) {
   const content = isRecord(block.content) ? block.content : {};
 
   if (block.type === "EXAMPLE") {
@@ -40,18 +49,14 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     const options = getStringArray(content, "options");
 
     return (
-      <section className="lesson-block task-block">
-        <span className="admin-kicker">Практика</span>
-        <h2>{getString(content, "title") || "Задание"}</h2>
-        <p>{getString(content, "prompt")}</p>
-        <div className="lesson-options">
-          {options.map((option) => (
-            <button className="lesson-option" key={option} type="button">
-              {option}
-            </button>
-          ))}
-        </div>
-      </section>
+      <LessonTaskBlock
+        answer={getString(content, "answer")}
+        blockOrder={block.orderIndex}
+        lessonSlug={lessonSlug}
+        options={options}
+        prompt={getString(content, "prompt")}
+        title={getString(content, "title")}
+      />
     );
   }
 
@@ -71,6 +76,12 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
             ))}
           </ul>
         ) : null}
+        <SaveWordButton
+          definition={getString(content, "definition")}
+          lessonSlug={lessonSlug}
+          term={getString(content, "term")}
+          translation={getString(content, "translation")}
+        />
       </section>
     );
   }
@@ -90,7 +101,7 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
   return (
     <section className="lesson-block">
       <h2>{getString(content, "heading") || "Материал урока"}</h2>
-      <p>{getString(content, "text") || getString(content, "text") || getString(content, "kind")}</p>
+      <p>{getString(content, "text") || getString(content, "kind")}</p>
     </section>
   );
 }

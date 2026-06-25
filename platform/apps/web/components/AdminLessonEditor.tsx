@@ -123,7 +123,7 @@ function newBlockContent(type: LessonBlockType): BlockContent {
       term: "word",
       translation: "перевод",
       definition: "Короткое объяснение.",
-      examples: ["Use this word in a sentence."]
+      examples: ["Используйте это слово в предложении."]
     };
   }
 
