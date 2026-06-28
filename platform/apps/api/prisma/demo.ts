@@ -9,7 +9,6 @@ const demoStudents = [
     displayName: "Анна Смирнова",
     taskCorrect: 7,
     taskWrong: 1,
-    homeworkScore: 94,
     activeDays: 5
   },
   {
@@ -17,7 +16,6 @@ const demoStudents = [
     displayName: "Максим Орлов",
     taskCorrect: 5,
     taskWrong: 2,
-    homeworkScore: 88,
     activeDays: 4
   },
   {
@@ -25,7 +23,6 @@ const demoStudents = [
     displayName: "София Левина",
     taskCorrect: 4,
     taskWrong: 1,
-    homeworkScore: 76,
     activeDays: 3
   }
 ];
@@ -47,11 +44,13 @@ async function main() {
         blockOrder: 3
       },
       points: 10,
+      isCheckpoint: true,
       orderIndex: 3
     },
     update: {
       lessonId: lesson.id,
-      points: 10
+      points: 10,
+      isCheckpoint: true
     }
   });
 
@@ -85,12 +84,6 @@ async function main() {
         taskId: task.id
       }
     });
-    await prisma.homeworkSubmission.deleteMany({
-      where: {
-        userId: user.id,
-        lessonId: lesson.id
-      }
-    });
     await prisma.activityEvent.deleteMany({
       where: {
         userId: user.id,
@@ -117,18 +110,6 @@ async function main() {
           feedback: "Попробуйте ещё раз"
         }))
       ]
-    });
-    await prisma.homeworkSubmission.create({
-      data: {
-        userId: user.id,
-        lessonId: lesson.id,
-        content: {
-          text: "Демонстрационная домашняя работа для презентации."
-        },
-        score: student.homeworkScore,
-        feedback: "Хорошая работа. Продолжайте тренировать структуру предложений.",
-        reviewedAt: new Date()
-      }
     });
     await prisma.activityEvent.createMany({
       data: Array.from({ length: student.activeDays }, (_, index) => ({

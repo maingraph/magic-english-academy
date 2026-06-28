@@ -29,7 +29,7 @@ import { AssistantDrawer } from "./AssistantDrawer";
 import { useSession } from "./SessionProvider";
 
 const studentNav = [
-  { href: "/dashboard", label: "Мой прогресс", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Обзор", icon: LayoutDashboard },
   { href: "/courses", label: "Курс", icon: GraduationCap },
   { href: "/dictionary", label: "Словарь", icon: Library },
   { href: "/leaderboard", label: "Рейтинг", icon: Trophy },
@@ -42,7 +42,6 @@ const adminNav = [
   { href: "/admin/course", label: "Конструктор курса", icon: BookOpen },
   { href: "/admin/articles", label: "Статьи", icon: FileText },
   { href: "/admin/users", label: "Пользователи", icon: Users },
-  { href: "/admin/homework", label: "Домашние работы", icon: GraduationCap },
   { href: "/admin/security", label: "Безопасность", icon: ShieldCheck },
   { href: "/admin/settings", label: "Настройки", icon: Settings }
 ];
@@ -179,16 +178,18 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
               MAGIC ENGLISH
             </Link>
             <div className="app-topbar-actions">
-              <button
-                aria-expanded={isAssistantOpen}
-                className="assistant-trigger"
-                onClick={() => setIsAssistantOpen(true)}
-                type="button"
-                aria-label="Открыть ассистента"
-              >
-                <Bot size={18} />
-                <span>Ассистент</span>
-              </button>
+              {isLesson ? (
+                <button
+                  aria-expanded={isAssistantOpen}
+                  className="assistant-trigger"
+                  onClick={() => setIsAssistantOpen(true)}
+                  type="button"
+                  aria-label="Открыть ассистента"
+                >
+                  <Bot size={18} />
+                  <span>Ассистент</span>
+                </button>
+              ) : null}
               <Link className="profile-trigger" href="/profile">
                 <span className="profile-avatar">
                   {user?.displayName?.slice(0, 1).toUpperCase() ?? "M"}
@@ -224,11 +225,13 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
             );
           })}
         </nav>
-        <AssistantDrawer
-          onClose={() => setIsAssistantOpen(false)}
-          onOpen={() => setIsAssistantOpen(true)}
-          open={isAssistantOpen}
-        />
+        {isLesson ? (
+          <AssistantDrawer
+            onClose={() => setIsAssistantOpen(false)}
+            onOpen={() => setIsAssistantOpen(true)}
+            open={isAssistantOpen}
+          />
+        ) : null}
       </div>
     );
   }

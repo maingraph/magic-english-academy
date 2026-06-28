@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query } from "@nestjs/common";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { Roles } from "../auth/roles.decorator";
 import type { ApiSessionUser } from "../auth/auth.types";
@@ -7,6 +7,10 @@ import type {
   AdminArticlePayload,
   AdminAssistantSettingsPayload,
   AdminCreateDictionaryTermPayload,
+  AdminCreateUserPayload,
+  AdminCreateLessonPayload,
+  AdminModulePayload,
+  AdminMoveLessonPayload,
   AdminUpdateLessonPayload
 } from "./admin.service";
 import { AdminService } from "./admin.service";
@@ -32,9 +36,50 @@ export class AdminController {
     return this.adminService.getCourseMap();
   }
 
+  @Post("modules")
+  createModule(@Body() payload: AdminModulePayload) {
+    return this.adminService.createModule(payload);
+  }
+
+  @Patch("modules/:moduleId")
+  updateModule(
+    @Param("moduleId") moduleId: string,
+    @Body() payload: AdminModulePayload
+  ) {
+    return this.adminService.updateModule(moduleId, payload);
+  }
+
+  @Delete("modules/:moduleId")
+  deleteModule(@Param("moduleId") moduleId: string) {
+    return this.adminService.deleteModule(moduleId);
+  }
+
+  @Post("lessons")
+  createLesson(@Body() payload: AdminCreateLessonPayload) {
+    return this.adminService.createLesson(payload);
+  }
+
+  @Patch("lessons/:slug/move")
+  moveLesson(
+    @Param("slug") slug: string,
+    @Body() payload: AdminMoveLessonPayload
+  ) {
+    return this.adminService.moveLesson(slug, payload);
+  }
+
+  @Delete("lessons/:slug")
+  deleteLesson(@Param("slug") slug: string) {
+    return this.adminService.deleteLesson(slug);
+  }
+
   @Get("users")
   async getUsers(@Query("q") query?: string) {
     return this.adminService.getUsers(query);
+  }
+
+  @Post("users")
+  async createUser(@Body() payload: AdminCreateUserPayload) {
+    return this.adminService.createUser(payload);
   }
 
   @Get("activity")

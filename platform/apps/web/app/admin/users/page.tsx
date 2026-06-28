@@ -9,7 +9,7 @@ export default function AdminUsersPage() {
         <div className="container">
           <section className="section-copy">
             <h1>ПОЛЬЗОВАТЕЛИ</h1>
-            <p>Статус аккаунта, прогресс, баллы, домашние работы и сигналы риска.</p>
+            <p>Статус аккаунта, прогресс, баллы, проверочные задания и сигналы риска.</p>
           </section>
           <AuthGate role="admin">
             <AdminUsersPanel />

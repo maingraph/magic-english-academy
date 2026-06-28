@@ -18,7 +18,7 @@ type ProfileResponse = {
     currentLevel: string;
     completedLessons: number;
     taskPoints: number;
-    homeworkPoints: number;
+    checkpointCount: number;
   };
   achievements: Array<{
     code: string;
@@ -39,6 +39,10 @@ export function ProfilePanel() {
     "loading"
   );
   const [message, setMessage] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordStatus, setPasswordStatus] = useState<"idle" | "saving" | "error">("idle");
 
   useEffect(() => {
     void loadProfile();
@@ -87,6 +91,30 @@ export function ProfilePanel() {
     }
   }
 
+  async function changePassword(event: FormEvent) {
+    event.preventDefault();
+    setPasswordStatus("saving");
+    setPasswordMessage("Обновляем пароль...");
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/profile/password`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      if (!response.ok) throw new Error("Не удалось сменить пароль");
+      setCurrentPassword("");
+      setNewPassword("");
+      setPasswordStatus("idle");
+      setPasswordMessage("Пароль обновлён.");
+    } catch (error) {
+      setPasswordStatus("error");
+      setPasswordMessage(error instanceof Error ? error.message : "Не удалось сменить пароль");
+    }
+  }
+
   if (status === "loading") {
     return <div className="workspace-state">Загружаем профиль...</div>;
   }
@@ -95,7 +123,7 @@ export function ProfilePanel() {
     return <div className="workspace-state error">Профиль недоступен.</div>;
   }
 
-  const totalPoints = profile.course.taskPoints + profile.course.homeworkPoints;
+  const totalPoints = profile.course.taskPoints;
 
   return (
     <div className="profile-layout">
@@ -134,8 +162,8 @@ export function ProfilePanel() {
         </article>
         <article>
           <Award size={20} />
-          <strong>{profile.achievements.length}</strong>
-          <span>Достижения</span>
+          <strong>{profile.course.checkpointCount}</strong>
+          <span>Проверочные задания</span>
         </article>
       </section>
 
@@ -189,6 +217,44 @@ export function ProfilePanel() {
           </label>
         </div>
         {message ? <p className={`form-message ${status}`}>{message}</p> : null}
+      </form>
+
+      <form className="workspace-panel profile-form" onSubmit={changePassword}>
+        <div className="panel-heading">
+          <div>
+            <span>Безопасность</span>
+            <h2>Смена пароля</h2>
+          </div>
+          <button disabled={passwordStatus === "saving"} type="submit">
+            <Save size={17} />
+            {passwordStatus === "saving" ? "Сохраняем..." : "Сменить пароль"}
+          </button>
+        </div>
+        <div className="form-grid">
+          <label>
+            Текущий пароль
+            <input
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              minLength={8}
+              required
+              type="password"
+            />
+          </label>
+          <label>
+            Новый пароль
+            <input
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              minLength={8}
+              required
+              type="password"
+            />
+          </label>
+        </div>
+        {passwordMessage ? (
+          <p className={`form-message ${passwordStatus}`}>{passwordMessage}</p>
+        ) : null}
       </form>
     </div>
   );

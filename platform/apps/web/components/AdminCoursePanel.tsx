@@ -8,11 +8,14 @@ type AdminCourseMap = {
     title: string;
     description: string | null;
     levels: Array<{
+      id: string;
       code: string;
       title: string;
       lessonCount: number;
       modules: Array<{
+        id: string;
         title: string;
+        description: string | null;
         lessonCount: number;
         previewLessons: Array<{
           slug: string;
@@ -37,16 +40,26 @@ type AdminCourseMap = {
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const adminHeaders = {
+  "content-type": "application/json"
+};
 
 export function AdminCoursePanel({
+  refreshToken,
+  onChanged,
   onSelectLesson,
   selectedSlug
 }: {
+  refreshToken: number;
+  onChanged: () => void;
   onSelectLesson: (slug: string) => void;
   selectedSlug: string | null;
 }) {
   const [courseMap, setCourseMap] = useState<AdminCourseMap | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [moduleTitles, setModuleTitles] = useState<Record<string, string>>({});
+  const [lessonTitles, setLessonTitles] = useState<Record<string, string>>({});
+  const [moveTargets, setMoveTargets] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const controller = new AbortController();
@@ -75,7 +88,75 @@ export function AdminCoursePanel({
     void loadCourseMap();
 
     return () => controller.abort();
-  }, []);
+  }, [refreshToken]);
+
+  async function mutate(
+    endpoint: string,
+    options: RequestInit,
+    selectSlug?: string | null
+  ) {
+    const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+      credentials: "include",
+      headers: adminHeaders,
+      ...options
+    });
+
+    if (!response.ok) {
+      setStatus("error");
+      return null;
+    }
+
+    const data = await response.json().catch(() => null);
+    onChanged();
+    if (selectSlug) {
+      onSelectLesson(selectSlug);
+    }
+    return data;
+  }
+
+  async function createModule(levelId: string) {
+    const title = moduleTitles[levelId]?.trim();
+    if (!title) return;
+
+    await mutate("/admin/modules", {
+      method: "POST",
+      body: JSON.stringify({ levelId, title })
+    });
+    setModuleTitles((current) => ({ ...current, [levelId]: "" }));
+  }
+
+  async function createLesson(moduleId: string) {
+    const title = lessonTitles[moduleId]?.trim();
+    if (!title) return;
+
+    const lesson = await mutate("/admin/lessons", {
+      method: "POST",
+      body: JSON.stringify({ moduleId, title, summary: "Новый урок курса." })
+    });
+    if (lesson?.slug) {
+      onSelectLesson(lesson.slug);
+    }
+    setLessonTitles((current) => ({ ...current, [moduleId]: "" }));
+  }
+
+  async function deleteLesson(slug: string) {
+    if (!window.confirm("Удалить урок?")) return;
+    await mutate(`/admin/lessons/${slug}`, { method: "DELETE" });
+    if (selectedSlug === slug) onSelectLesson("");
+  }
+
+  async function moveLesson(slug: string, fallbackModuleId: string, orderIndex: number) {
+    const moduleId = moveTargets[slug] ?? fallbackModuleId;
+    await mutate(`/admin/lessons/${slug}/move`, {
+      method: "PATCH",
+      body: JSON.stringify({ moduleId, orderIndex })
+    }, slug);
+  }
+
+  async function deleteModule(moduleId: string) {
+    if (!window.confirm("Удалить пустую группу уроков?")) return;
+    await mutate(`/admin/modules/${moduleId}`, { method: "DELETE" });
+  }
 
   if (status === "loading") {
     return (
@@ -133,11 +214,49 @@ export function AdminCoursePanel({
             </div>
 
             <div className="admin-module-list">
+              <div className="admin-inline-form">
+                <input
+                  value={moduleTitles[level.id] ?? ""}
+                  onChange={(event) =>
+                    setModuleTitles((current) => ({
+                      ...current,
+                      [level.id]: event.target.value
+                    }))
+                  }
+                  placeholder="Новая группа уроков"
+                />
+                <button onClick={() => createModule(level.id)} type="button">
+                  Добавить группу
+                </button>
+              </div>
               {level.modules.map((module) => (
-                <div className="admin-module-row" key={module.title}>
+                <div className="admin-module-row" key={module.id}>
                   <div className="admin-module-title">
-                    <strong>{module.title}</strong>
+                    <span>
+                      <strong>{module.title}</strong>
+                      <small>{module.description}</small>
+                    </span>
                     <span>{module.lessonCount} уроков</span>
+                  </div>
+                  <div className="admin-inline-form">
+                    <input
+                      value={lessonTitles[module.id] ?? ""}
+                      onChange={(event) =>
+                        setLessonTitles((current) => ({
+                          ...current,
+                          [module.id]: event.target.value
+                        }))
+                      }
+                      placeholder="Название нового урока"
+                    />
+                    <button onClick={() => createLesson(module.id)} type="button">
+                      Добавить урок
+                    </button>
+                    {module.lessonCount === 0 ? (
+                      <button onClick={() => deleteModule(module.id)} type="button">
+                        Удалить группу
+                      </button>
+                    ) : null}
                   </div>
                   <ol className="admin-lesson-preview">
                     {module.lessons.map((lesson) => (
@@ -149,6 +268,36 @@ export function AdminCoursePanel({
                           onClick={() => onSelectLesson(lesson.slug)}
                         >
                           {lesson.title}
+                        </button>
+                        <select
+                          aria-label="Перенести урок"
+                          value={moveTargets[lesson.slug] ?? module.id}
+                          onChange={(event) =>
+                            setMoveTargets((current) => ({
+                              ...current,
+                              [lesson.slug]: event.target.value
+                            }))
+                          }
+                        >
+                          {level.modules.map((targetModule) => (
+                            <option key={targetModule.id} value={targetModule.id}>
+                              {targetModule.title}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          className="lesson-mini-action"
+                          onClick={() => moveLesson(lesson.slug, module.id, lesson.orderIndex)}
+                          type="button"
+                        >
+                          Перенести
+                        </button>
+                        <button
+                          className="lesson-mini-action danger"
+                          onClick={() => deleteLesson(lesson.slug)}
+                          type="button"
+                        >
+                          Удалить
                         </button>
                       </li>
                     ))}

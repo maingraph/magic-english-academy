@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post } from "@nestjs/common";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { ApiSessionUser } from "../auth/auth.types";
 import { ProgressService } from "./progress.service";
@@ -10,6 +10,19 @@ export class ProgressController {
   @Get("summary")
   async getSummary(@CurrentUser() user: ApiSessionUser) {
     return this.progressService.getSummary(user);
+  }
+
+  @Get("placement-test")
+  getPlacementTest() {
+    return this.progressService.getPlacementTest();
+  }
+
+  @Post("placement-test")
+  submitPlacementTest(
+    @CurrentUser() user: ApiSessionUser,
+    @Body() payload: { answers?: unknown }
+  ) {
+    return this.progressService.submitPlacementTest(user, payload.answers);
   }
 
   @Get("levels/:code")

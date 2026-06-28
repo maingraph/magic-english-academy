@@ -1,6 +1,7 @@
 import { AppShell } from "../../components/AppShell";
-import { LevelCard } from "../../components/LevelCard";
-import { getCourseInventory, getLevelEmoji } from "../../lib/courses";
+import { AuthGate } from "../../components/AuthGate";
+import { CourseRoadmap } from "../../components/CourseRoadmap";
+import { getCourseInventory } from "../../lib/courses";
 
 export default async function CoursesPage() {
   const inventory = await getCourseInventory();
@@ -9,26 +10,9 @@ export default async function CoursesPage() {
     <AppShell>
       <main className="page-main">
         <div className="container">
-          <section className="section-copy">
-            <h1>ПЛАН ИЗУЧЕНИЯ АНГЛИЙСКОГО ЯЗЫКА</h1>
-            <p>
-              Выберите свой уровень CEFR. Каждая карточка ведёт к урокам,
-              заданиям и прогрессу, который сохраняется в вашем аккаунте.
-            </p>
-          </section>
-
-          <section className="levels-container" aria-label="Уровни курса">
-            {inventory.levels.map((level) => (
-              <LevelCard
-                code={level.code}
-                emoji={getLevelEmoji(level.code)}
-                key={level.code}
-                lessons={level.lessonCount}
-                title={level.title}
-                topics={level.sampleTopics}
-              />
-            ))}
-          </section>
+          <AuthGate>
+            <CourseRoadmap levels={inventory.levels} />
+          </AuthGate>
         </div>
       </main>
     </AppShell>

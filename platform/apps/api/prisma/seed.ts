@@ -139,7 +139,24 @@ function buildLessonBlocks(levelCode: string, lessonIndex: number) {
   ];
 
   if (levelCode === "A1" && lessonIndex < a1Lessons.length) {
-    return a1Lessons[lessonIndex];
+    const blocks = a1Lessons[lessonIndex];
+
+    return [
+      ...blocks,
+      {
+        type: "ASSESSMENT" as const,
+        orderIndex: blocks.length + 1,
+        content: {
+          title: "Задание для проверки",
+          prompt:
+            lessonIndex === 0
+              ? "Выбери правильную форму: They ___ ready."
+              : "Выбери лучший ответ по теме урока.",
+          options: lessonIndex === 0 ? ["am", "is", "are"] : ["Первый вариант", "Второй вариант", "Третий вариант"],
+          answer: lessonIndex === 0 ? "are" : "Первый вариант"
+        }
+      }
+    ];
   }
 
   return [

@@ -12,9 +12,9 @@ const achievementDefinitions = [
   },
   {
     code: "FIRST_HOMEWORK",
-    title: "Первая домашняя работа",
-    description: "Отправьте первую домашнюю работу.",
-    rule: { type: "homework_submissions", target: 1 }
+    title: "Первое проверочное задание",
+    description: "Правильно выполните первое итоговое задание урока.",
+    rule: { type: "checkpoint_attempts", target: 1 }
   },
   {
     code: "THREE_DAY_STREAK",
@@ -51,8 +51,8 @@ export class GamificationService {
         this.prisma.lessonProgress.count({
           where: { userId: user.id, status: "COMPLETED" }
         }),
-        this.prisma.homeworkSubmission.count({
-          where: { userId: user.id }
+        this.prisma.taskAttempt.count({
+          where: { userId: user.id, isCorrect: true, task: { isCheckpoint: true } }
         }),
         this.prisma.activityEvent.findMany({
           where: { userId: user.id },
@@ -109,10 +109,14 @@ export class GamificationService {
       include: {
         profile: true,
         taskAttempts: {
-          where: { createdAt: { gte: start } }
-        },
-        homeworkSubmissions: {
-          where: { createdAt: { gte: start } }
+          where: { createdAt: { gte: start } },
+          include: {
+            task: {
+              select: {
+                isCheckpoint: true
+              }
+            }
+          }
         },
         activityEvents: {
           where: { createdAt: { gte: start } },
@@ -127,11 +131,10 @@ export class GamificationService {
           (sum, attempt) => sum + attempt.pointsEarned,
           0
         );
-        const homeworkPoints = account.homeworkSubmissions.reduce(
-          (sum, submission) => sum + (submission.score ?? 0),
-          0
-        );
         const correct = account.taskAttempts.filter((attempt) => attempt.isCorrect).length;
+        const checkpointCount = account.taskAttempts.filter(
+          (attempt) => attempt.isCorrect && attempt.task.isCheckpoint
+        ).length;
         const accuracy =
           account.taskAttempts.length === 0
             ? 0
@@ -144,9 +147,9 @@ export class GamificationService {
           userId: account.id,
           displayName: account.profile?.displayName ?? account.email,
           avatarUrl: account.profile?.avatarUrl ?? null,
-          points: taskPoints + homeworkPoints,
+          points: taskPoints,
           taskPoints,
-          homeworkPoints,
+          checkpointCount,
           accuracy,
           activeDays
         };
@@ -179,7 +182,9 @@ export class GamificationService {
       this.prisma.lessonProgress.count({
         where: { userId, status: "COMPLETED" }
       }),
-      this.prisma.homeworkSubmission.count({ where: { userId } }),
+      this.prisma.taskAttempt.count({
+        where: { userId, isCorrect: true, task: { isCheckpoint: true } }
+      }),
       this.prisma.activityEvent.findMany({
         where: { userId },
         select: { createdAt: true }
@@ -256,7 +261,7 @@ export class GamificationService {
     activeDays: number
   ) {
     if (type === "completed_lessons") return completedLessons;
-    if (type === "homework_submissions") return homeworkCount;
+    if (type === "checkpoint_attempts") return homeworkCount;
     if (type === "active_days") return activeDays;
     if (type === "course_completion") {
       return totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100);

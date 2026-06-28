@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { AppShell } from "../../../../../components/AppShell";
 import { AuthGate } from "../../../../../components/AuthGate";
 import { LessonBlockRenderer } from "../../../../../components/LessonBlockRenderer";
 import { LessonProgressPanel } from "../../../../../components/LessonProgressPanel";
-import { LessonHomework } from "../../../../../components/LessonHomework";
 import { MagicButton } from "../../../../../components/MagicButton";
 import { TextSelectionTools } from "../../../../../components/TextSelectionTools";
 import { getNativeLesson } from "../../../../../lib/courses";
@@ -17,11 +17,15 @@ type LessonPageProps = {
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { level, lesson } = await params;
-  const data = await getNativeLesson(lesson);
+  const cookieHeader = (await cookies()).toString();
+  const data = await getNativeLesson(lesson, cookieHeader);
 
   if (!data || data.level.code.toLowerCase() !== level.toLowerCase()) {
     notFound();
   }
+
+  const lessonBlocks = data.blocks.filter((block) => block.type !== "ASSESSMENT");
+  const assessmentBlocks = data.blocks.filter((block) => block.type === "ASSESSMENT");
 
   return (
     <AppShell>
@@ -45,16 +49,30 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
           <div className="lesson-layout">
             <article className="lesson-content">
-              {data.blocks.map((block) => (
+              {lessonBlocks.map((block) => (
                 <LessonBlockRenderer
                   block={block}
                   key={`${block.type}-${block.orderIndex}`}
                   lessonSlug={data.slug}
                 />
               ))}
-              <AuthGate>
-                <LessonHomework slug={data.slug} />
-              </AuthGate>
+              {assessmentBlocks.length > 0 ? (
+                <section className="lesson-assessment-group">
+                  <div className="panel-heading">
+                    <div>
+                      <span>После урока</span>
+                      <h2>Задания для проверки</h2>
+                    </div>
+                  </div>
+                  {assessmentBlocks.map((block) => (
+                    <LessonBlockRenderer
+                      block={block}
+                      key={`${block.type}-${block.orderIndex}`}
+                      lessonSlug={data.slug}
+                    />
+                  ))}
+                </section>
+              ) : null}
             </article>
 
             <aside className="lesson-sidebar">

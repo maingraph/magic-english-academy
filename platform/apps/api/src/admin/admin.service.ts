@@ -8,6 +8,7 @@ import {
 import { createCipheriv, createHash, randomBytes } from "node:crypto";
 import { ArticleStatus, LessonBlockType, Prisma } from "@prisma/client";
 import type { ApiSessionUser } from "../auth/auth.types";
+import { hashPassword } from "../auth/password";
 import { CoursesService } from "../courses/courses.service";
 import { PrismaService } from "../prisma/prisma.service";
 
@@ -17,6 +18,28 @@ export type AdminUpdateLessonPayload = {
   title?: unknown;
   summary?: unknown;
   blocks?: unknown;
+};
+
+export type AdminModulePayload = {
+  levelId?: unknown;
+  title?: unknown;
+  description?: unknown;
+};
+
+export type AdminCreateLessonPayload = {
+  moduleId?: unknown;
+  title?: unknown;
+  summary?: unknown;
+};
+
+export type AdminMoveLessonPayload = {
+  moduleId?: unknown;
+  orderIndex?: unknown;
+};
+
+export type AdminCreateUserPayload = {
+  email?: unknown;
+  displayName?: unknown;
 };
 
 export type AdminCreateDictionaryTermPayload = {
@@ -59,7 +82,7 @@ export class AdminService {
       activeUsers,
       taskAttempts,
       correctAttempts,
-      pendingHomework,
+      checkpointAttempts,
       openSignals,
       sales
     ] = await Promise.all([
@@ -84,7 +107,9 @@ export class AdminService {
       this.prisma.taskAttempt.count({
         where: { createdAt: { gte: since }, isCorrect: true }
       }),
-      this.prisma.homeworkSubmission.count({ where: { reviewedAt: null } }),
+      this.prisma.taskAttempt.count({
+        where: { task: { isCheckpoint: true }, createdAt: { gte: since } }
+      }),
       this.prisma.abuseSignal.count({ where: { status: "OPEN" } }),
       this.prisma.metricSnapshot.aggregate({
         where: { type: "SALE", date: { gte: since } },
@@ -161,9 +186,9 @@ export class AdminService {
           tone: openSignals > 0 ? "warning" : "neutral"
         },
         {
-          label: "Домашние работы без проверки",
-          count: pendingHomework,
-          tone: pendingHomework > 0 ? "warning" : "neutral"
+          label: "Проверочные задания за 7 дней",
+          count: checkpointAttempts,
+          tone: checkpointAttempts > 0 ? "good" : "neutral"
         }
       ]
     };
@@ -184,7 +209,6 @@ export class AdminService {
         profile: true,
         lessonProgress: true,
         taskAttempts: true,
-        homeworkSubmissions: true,
         activityEvents: {
           orderBy: { createdAt: "desc" },
           take: 1
@@ -210,15 +234,73 @@ export class AdminService {
           (progress) => progress.status === "COMPLETED"
         ).length,
         points:
-          user.taskAttempts.reduce((sum, attempt) => sum + attempt.pointsEarned, 0) +
-          user.homeworkSubmissions.reduce(
-            (sum, submission) => sum + (submission.score ?? 0),
-            0
-          ),
-        homeworkCount: user.homeworkSubmissions.length,
+          user.taskAttempts.reduce((sum, attempt) => sum + attempt.pointsEarned, 0),
+        checkpointCount: user.taskAttempts.filter((attempt) => attempt.isCorrect).length,
         lastActiveAt: user.activityEvents[0]?.createdAt ?? null,
         openSignals: user.abuseSignals.length
       }))
+    };
+  }
+
+  async createUser(payload: AdminCreateUserPayload) {
+    const email = this.parseEmail(payload.email);
+    const displayName =
+      this.parseOptionalString(payload.displayName, "displayName", 120) ??
+      email.split("@")[0];
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true }
+    });
+
+    if (existingUser) {
+      throw new ConflictException("Пользователь с такой электронной почтой уже существует");
+    }
+
+    const temporaryPassword = this.generateTemporaryPassword();
+    const firstLevel = await this.prisma.courseLevel.findFirst({
+      orderBy: { orderIndex: "asc" },
+      select: { id: true }
+    });
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        passwordHash: await hashPassword(temporaryPassword),
+        role: "STUDENT",
+        status: "ACTIVE",
+        profile: {
+          create: {
+            displayName
+          }
+        },
+        ...(firstLevel
+          ? {
+              enrollments: {
+                create: {
+                  levelId: firstLevel.id
+                }
+              }
+            }
+          : {})
+      },
+      include: { profile: true }
+    });
+
+    await this.prisma.activityEvent.create({
+      data: {
+        userId: user.id,
+        type: "ACCOUNT_CREATED_BY_ADMIN"
+      }
+    });
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.profile?.displayName ?? user.email,
+        role: user.role.toLowerCase(),
+        status: user.status.toLowerCase()
+      },
+      temporaryPassword
     };
   }
 
@@ -458,6 +540,7 @@ export class AdminService {
       modules: level.modules.map((module) => ({
         id: module.id,
         title: module.title,
+        description: module.description,
         orderIndex: module.orderIndex,
         lessonCount: module.lessons.length,
         lessons: module.lessons,
@@ -480,6 +563,184 @@ export class AdminService {
         lessons: levels.reduce((sum, level) => sum + level.lessonCount, 0)
       }
     };
+  }
+
+  async createModule(payload: AdminModulePayload) {
+    const levelId = this.parseRequiredString(payload.levelId, "levelId", 80);
+    const title = this.parseRequiredString(payload.title, "title", 180);
+    const description = this.parseOptionalString(
+      payload.description,
+      "description",
+      500
+    );
+    const level = await this.prisma.courseLevel.findUnique({
+      where: { id: levelId },
+      select: { id: true }
+    });
+
+    if (!level) throw new NotFoundException("Уровень не найден");
+    const last = await this.prisma.module.aggregate({
+      where: { levelId },
+      _max: { orderIndex: true }
+    });
+
+    const module = await this.prisma.module.create({
+      data: {
+        levelId,
+        title,
+        description,
+        orderIndex: (last._max.orderIndex ?? 0) + 1
+      }
+    });
+
+    return module;
+  }
+
+  async updateModule(moduleId: string, payload: AdminModulePayload) {
+    const existing = await this.prisma.module.findUnique({ where: { id: moduleId } });
+    if (!existing) throw new NotFoundException("Группа уроков не найдена");
+
+    return this.prisma.module.update({
+      where: { id: moduleId },
+      data: {
+        ...(payload.title !== undefined
+          ? { title: this.parseRequiredString(payload.title, "title", 180) }
+          : {}),
+        ...(payload.description !== undefined
+          ? {
+              description: this.parseOptionalString(
+                payload.description,
+                "description",
+                500
+              )
+            }
+          : {})
+      }
+    });
+  }
+
+  async deleteModule(moduleId: string) {
+    const module = await this.prisma.module.findUnique({
+      where: { id: moduleId },
+      include: { _count: { select: { lessons: true } } }
+    });
+
+    if (!module) throw new NotFoundException("Группа уроков не найдена");
+    if (module._count.lessons > 0) {
+      throw new BadRequestException(
+        "Сначала перенесите или удалите уроки из этой группы"
+      );
+    }
+
+    await this.prisma.module.delete({ where: { id: moduleId } });
+    return { deleted: true };
+  }
+
+  async createLesson(payload: AdminCreateLessonPayload) {
+    const moduleId = this.parseRequiredString(payload.moduleId, "moduleId", 80);
+    const title = this.parseRequiredString(payload.title, "title", 180);
+    const summary = this.parseOptionalString(payload.summary, "summary", 500);
+    const module = await this.prisma.module.findUnique({
+      where: { id: moduleId },
+      include: { level: true }
+    });
+
+    if (!module) throw new NotFoundException("Группа уроков не найдена");
+    const last = await this.prisma.lesson.aggregate({
+      where: { moduleId },
+      _max: { orderIndex: true }
+    });
+    const baseSlug = this.slugify(`${module.level.code}-${title}`) || "lesson";
+    let slug = baseSlug;
+    let suffix = 2;
+
+    while (await this.prisma.lesson.findUnique({ where: { slug }, select: { id: true } })) {
+      slug = `${baseSlug}-${suffix}`;
+      suffix += 1;
+    }
+
+    return this.prisma.lesson.create({
+      data: {
+        moduleId,
+        slug,
+        title,
+        summary,
+        orderIndex: (last._max.orderIndex ?? 0) + 1,
+        blocks: {
+          create: {
+            type: LessonBlockType.RICH_TEXT,
+            orderIndex: 1,
+            content: {
+              heading: "Материал урока",
+              text: "Добавьте содержание урока."
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async moveLesson(slug: string, payload: AdminMoveLessonPayload) {
+    const moduleId = this.parseRequiredString(payload.moduleId, "moduleId", 80);
+    const orderIndex = this.parseInteger(payload.orderIndex, "orderIndex", 1, 1000);
+    const [lesson, targetModule] = await Promise.all([
+      this.prisma.lesson.findUnique({ where: { slug } }),
+      this.prisma.module.findUnique({ where: { id: moduleId } })
+    ]);
+
+    if (!lesson) throw new NotFoundException("Урок не найден");
+    if (!targetModule) throw new NotFoundException("Группа уроков не найдена");
+
+    await this.prisma.$transaction(async (transaction) => {
+      await transaction.lesson.update({
+        where: { id: lesson.id },
+        data: { moduleId, orderIndex }
+      });
+      const affectedModules = [...new Set([lesson.moduleId, moduleId])];
+
+      for (const affectedModuleId of affectedModules) {
+        const lessons = await transaction.lesson.findMany({
+          where: { moduleId: affectedModuleId },
+          orderBy: [{ orderIndex: "asc" }, { title: "asc" }],
+          select: { id: true }
+        });
+        await Promise.all(
+          lessons.map((item, index) =>
+            transaction.lesson.update({
+              where: { id: item.id },
+              data: { orderIndex: index + 1 }
+            })
+          )
+        );
+      }
+    });
+
+    return this.getLessonForEdit(slug);
+  }
+
+  async deleteLesson(slug: string) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug },
+      select: { id: true, moduleId: true }
+    });
+    if (!lesson) throw new NotFoundException("Урок не найден");
+
+    await this.prisma.lesson.delete({ where: { id: lesson.id } });
+    const remaining = await this.prisma.lesson.findMany({
+      where: { moduleId: lesson.moduleId },
+      orderBy: { orderIndex: "asc" },
+      select: { id: true }
+    });
+    await this.prisma.$transaction(
+      remaining.map((item, index) =>
+        this.prisma.lesson.update({
+          where: { id: item.id },
+          data: { orderIndex: index + 1 }
+        })
+      )
+    );
+
+    return { deleted: true };
   }
 
   async getDictionary(query?: string) {
@@ -578,6 +839,7 @@ export class AdminService {
         title: lesson.module.level.title
       },
       module: {
+        id: lesson.module.id,
         title: lesson.module.title,
         orderIndex: lesson.module.orderIndex
       },
@@ -676,6 +938,28 @@ export class AdminService {
     }
 
     return text.length > 0 ? text : null;
+  }
+
+  private parseEmail(value: unknown) {
+    if (typeof value !== "string") {
+      throw new BadRequestException("email must be a string");
+    }
+
+    const email = value.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 180) {
+      throw new BadRequestException("Укажите корректную электронную почту");
+    }
+
+    return email;
+  }
+
+  private generateTemporaryPassword() {
+    const alphabet =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    const random = Array.from(randomBytes(14), (byte) => alphabet[byte % alphabet.length]).join("");
+
+    return `Magic-${random}!`;
   }
 
   private parseStringList(value: unknown, field: string, maxItems: number) {
@@ -797,6 +1081,14 @@ export class AdminService {
     }
 
     return { title, slug, excerpt, content, status };
+  }
+
+  private slugify(value: string) {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9а-яё]+/gi, "-")
+      .replace(/^-|-$/g, "");
   }
 
   private parseInteger(

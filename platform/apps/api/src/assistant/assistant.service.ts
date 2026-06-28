@@ -54,6 +54,9 @@ export class AssistantService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async getStatus(user: ApiSessionUser, lessonSlug?: string) {
+    if (!lessonSlug) {
+      throw new BadRequestException("Ассистент доступен только внутри урока");
+    }
     const config = await this.getConfig();
     const used = await this.dailyUsage(user.id);
 
@@ -63,7 +66,7 @@ export class AssistantService {
       dailyQuota: config.dailyQuota,
       used,
       remaining: Math.max(config.dailyQuota - used, 0),
-      context: lessonSlug ? "lesson" : "platform",
+      context: "lesson",
       actions: Object.entries(assistantActions).map(([id, action]) => ({
         id,
         label: action.label
@@ -75,6 +78,9 @@ export class AssistantService {
     const action = this.parseAction(payload.action);
     const text = this.parseText(payload.text);
     const lessonSlug = this.parseLessonSlug(payload.lessonSlug);
+    if (!lessonSlug) {
+      throw new BadRequestException("Ассистент доступен только внутри урока");
+    }
     const config = await this.getConfig();
 
     if (!config.apiKey) {
@@ -113,12 +119,17 @@ export class AssistantService {
           }
         })
       : null;
-    const session = await this.prisma.assistantSession.create({
-      data: {
-        userId: user.id,
-        lessonId: lesson?.id ?? null
-      }
-    });
+    const session =
+      (await this.prisma.assistantSession.findFirst({
+        where: { userId: user.id, lessonId: lesson?.id ?? null },
+        orderBy: { createdAt: "desc" }
+      })) ??
+      (await this.prisma.assistantSession.create({
+        data: {
+          userId: user.id,
+          lessonId: lesson?.id ?? null
+        }
+      }));
     const lessonContext = lesson
       ? JSON.stringify({
           title: lesson.title,
@@ -192,6 +203,39 @@ export class AssistantService {
         used: used + 1,
         remaining: Math.max(config.dailyQuota - used - 1, 0)
       }
+    };
+  }
+
+  async getHistory(user: ApiSessionUser, lessonSlug?: string) {
+    if (!lessonSlug) {
+      throw new BadRequestException("Укажите урок");
+    }
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { slug: lessonSlug },
+      select: { id: true }
+    });
+
+    if (!lesson) throw new BadRequestException("Урок не найден");
+    const session = await this.prisma.assistantSession.findFirst({
+      where: { userId: user.id, lessonId: lesson.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        messages: {
+          where: { role: "assistant" },
+          orderBy: { createdAt: "asc" },
+          take: 30,
+          select: {
+            id: true,
+            role: true,
+            content: true,
+            createdAt: true
+          }
+        }
+      }
+    });
+
+    return {
+      messages: session?.messages ?? []
     };
   }
 

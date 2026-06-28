@@ -15,12 +15,13 @@ export function LoginForm() {
   const resetToken = searchParams.get("reset");
   const [email, setEmail] = useState("student@magic.local");
   const [password, setPassword] = useState("MagicStudent123!");
-  const [mode, setMode] = useState<"login" | "register" | "forgot" | "reset">(
+  const [mode, setMode] = useState<"login" | "forgot" | "reset">(
     resetToken ? "reset" : "login"
   );
-  const [displayName, setDisplayName] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
-  const [message, setMessage] = useState("Используйте выданный логин или создайте учебный аккаунт.");
+  const [message, setMessage] = useState(
+    "Используйте аккаунт, который выдал администратор после покупки курса."
+  );
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,9 +29,7 @@ export function LoginForm() {
     setMessage(
       mode === "login"
         ? "Входим..."
-        : mode === "register"
-          ? "Создаем аккаунт..."
-          : mode === "forgot"
+        : mode === "forgot"
             ? "Отправляем ссылку..."
             : "Обновляем пароль..."
     );
@@ -41,7 +40,7 @@ export function LoginForm() {
           ? "password/forgot"
           : mode === "reset"
             ? "password/reset"
-            : mode;
+            : "login";
       const response = await fetch(`${apiBaseUrl}/auth/${endpoint}`, {
         method: "POST",
         headers: {
@@ -51,7 +50,6 @@ export function LoginForm() {
         body: JSON.stringify({
           email,
           password,
-          displayName,
           token: resetToken
         })
       });
@@ -60,9 +58,7 @@ export function LoginForm() {
         throw new Error(
           mode === "login"
             ? "Неверный логин или пароль."
-            : mode === "register"
-              ? "Не удалось создать аккаунт."
-              : "Не удалось выполнить запрос."
+            : "Не удалось выполнить запрос."
         );
       }
 
@@ -110,13 +106,7 @@ export function LoginForm() {
         >
           Вход
         </button>
-        <button
-          className={mode === "register" ? "active" : ""}
-          onClick={() => setMode("register")}
-          type="button"
-        >
-          Регистрация
-        </button>
+        <span>Аккаунт создаёт администратор</span>
       </div>
 
       {mode === "forgot" || mode === "reset" ? (
@@ -140,19 +130,6 @@ export function LoginForm() {
             </button>
           </div>
         </div>
-      ) : null}
-
-      {mode === "register" ? (
-        <label>
-          Имя
-          <input
-            name="displayName"
-            onChange={(event) => setDisplayName(event.target.value)}
-            placeholder="Как вас назвать"
-            type="text"
-            value={displayName}
-          />
-        </label>
       ) : null}
 
       {mode !== "reset" ? (
@@ -187,9 +164,7 @@ export function LoginForm() {
           ? "Подождите..."
           : mode === "login"
             ? "Войти"
-            : mode === "register"
-              ? "Создать аккаунт"
-              : mode === "forgot"
+            : mode === "forgot"
                 ? "Отправить ссылку"
                 : "Сохранить пароль"}
       </button>

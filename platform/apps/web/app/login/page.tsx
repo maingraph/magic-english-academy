@@ -11,7 +11,8 @@ export default function LoginPage() {
           <LoginForm />
         </Suspense>
         <p className="auth-note">
-          Доступ к кабинету и админке теперь идет через защищенную cookie-сессию.
+          Если вы купили курс, используйте email и пароль, которые прислал администратор.
+          После входа пароль можно сменить в профиле.
         </p>
       </section>
     </main>

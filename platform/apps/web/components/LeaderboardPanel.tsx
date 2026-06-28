@@ -10,7 +10,7 @@ type Entry = {
   avatarUrl: string | null;
   points: number;
   taskPoints: number;
-  homeworkPoints: number;
+  checkpointCount: number;
   accuracy: number;
   activeDays: number;
   isCurrentUser: boolean;

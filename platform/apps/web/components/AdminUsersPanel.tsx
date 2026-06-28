@@ -1,7 +1,7 @@
 "use client";
 
-import { Search, ShieldAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { KeyRound, Search, ShieldAlert, UserPlus } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 
 type UserRow = {
   id: string;
@@ -11,9 +11,17 @@ type UserRow = {
   status: string;
   completedLessons: number;
   points: number;
-  homeworkCount: number;
+  checkpointCount: number;
   lastActiveAt: string | null;
   openSignals: number;
+};
+
+type CreatedAccount = {
+  user: {
+    email: string;
+    displayName: string;
+  };
+  temporaryPassword: string;
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
@@ -26,17 +34,24 @@ const roleLabels: Record<string, string> = {
 export function AdminUsersPanel() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [query, setQuery] = useState("");
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [createdAccount, setCreatedAccount] = useState<CreatedAccount | null>(null);
+  const [createStatus, setCreateStatus] = useState<"idle" | "saving" | "error">("idle");
+
+  async function loadUsers(signal?: AbortSignal) {
+    const response = await fetch(`${apiBaseUrl}/admin/users?q=${encodeURIComponent(query)}`, {
+      credentials: "include",
+      signal
+    });
+    const data = response.ok ? ((await response.json()) as { users: UserRow[] }) : { users: [] };
+    setUsers(data.users);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      fetch(`${apiBaseUrl}/admin/users?q=${encodeURIComponent(query)}`, {
-        credentials: "include",
-        signal: controller.signal
-      })
-        .then((response) => (response.ok ? response.json() : { users: [] }))
-        .then((data: { users: UserRow[] }) => setUsers(data.users))
-        .catch(() => undefined);
+      loadUsers(controller.signal).catch(() => undefined);
     }, 180);
 
     return () => {
@@ -44,6 +59,33 @@ export function AdminUsersPanel() {
       controller.abort();
     };
   }, [query]);
+
+  async function createAccount(event: FormEvent) {
+    event.preventDefault();
+    setCreateStatus("saving");
+    setCreatedAccount(null);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/admin/users`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, displayName })
+      });
+
+      if (!response.ok) {
+        throw new Error("Не удалось создать аккаунт.");
+      }
+
+      setCreatedAccount((await response.json()) as CreatedAccount);
+      setEmail("");
+      setDisplayName("");
+      setCreateStatus("idle");
+      await loadUsers();
+    } catch {
+      setCreateStatus("error");
+    }
+  }
 
   return (
     <section className="workspace-panel">
@@ -53,6 +95,42 @@ export function AdminUsersPanel() {
           <h2>Пользователи</h2>
         </div>
       </div>
+      <form className="admin-account-form" onSubmit={createAccount}>
+        <label>
+          Email ученика
+          <input
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="student@example.com"
+            required
+            type="email"
+          />
+        </label>
+        <label>
+          Имя
+          <input
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            placeholder="Имя для профиля"
+          />
+        </label>
+        <button disabled={createStatus === "saving"} type="submit">
+          <UserPlus size={17} />
+          {createStatus === "saving" ? "Создаём..." : "Создать аккаунт"}
+        </button>
+      </form>
+      {createdAccount ? (
+        <div className="created-account">
+          <KeyRound size={18} />
+          <span>
+            <strong>{createdAccount.user.email}</strong>
+            <small>Пароль: {createdAccount.temporaryPassword}</small>
+          </span>
+        </div>
+      ) : null}
+      {createStatus === "error" ? (
+        <p className="form-message error">Аккаунт не создан. Проверьте email.</p>
+      ) : null}
       <div className="workspace-search">
         <Search size={18} />
         <input
@@ -68,7 +146,7 @@ export function AdminUsersPanel() {
           <span>Роль</span>
           <span>Уроки</span>
           <span>Баллы</span>
-          <span>Домашние работы</span>
+          <span>Проверочные</span>
           <span>Последняя активность</span>
           <span>Сигналы</span>
         </div>
@@ -81,7 +159,7 @@ export function AdminUsersPanel() {
             <span className="role-badge">{roleLabels[user.role] ?? user.role}</span>
             <strong>{user.completedLessons}</strong>
             <strong>{user.points}</strong>
-            <strong>{user.homeworkCount}</strong>
+            <strong>{user.checkpointCount}</strong>
             <span>{user.lastActiveAt ? new Date(user.lastActiveAt).toLocaleDateString("ru-RU") : "—"}</span>
             <span className={user.openSignals > 0 ? "signal-count active" : "signal-count"}>
               <ShieldAlert size={15} />

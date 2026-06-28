@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { ProgressStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { courseLevels } from "./course-seed";
@@ -40,7 +40,7 @@ export class CoursesService {
     return level;
   }
 
-  async getLevelLessons(code: string, userId?: string) {
+  async getLevelLessons(code: string, userId: string) {
     const level = await this.prisma.courseLevel.findFirst({
       where: { code: { equals: code, mode: "insensitive" } },
       include: {
@@ -55,7 +55,7 @@ export class CoursesService {
                 summary: true,
                 orderIndex: true,
                 progress: {
-                  where: { userId: userId ?? "__anonymous__" },
+                  where: { userId },
                   select: { status: true }
                 }
               }
@@ -68,6 +68,7 @@ export class CoursesService {
     if (!level) {
       throw new NotFoundException(`Course level ${code} not found`);
     }
+    await this.assertLevelAccess(userId, level.id, level.orderIndex);
 
     return {
       code: level.code,
@@ -90,7 +91,7 @@ export class CoursesService {
     };
   }
 
-  async getLesson(slug: string, userId?: string) {
+  async getLesson(slug: string, userId: string) {
     const lesson = await this.prisma.lesson.findUnique({
       where: { slug },
       include: {
@@ -103,7 +104,7 @@ export class CoursesService {
           orderBy: { orderIndex: "asc" }
         },
         progress: {
-          where: { userId: userId ?? "__anonymous__" },
+          where: { userId },
           select: {
             status: true,
             completedAt: true,
@@ -116,6 +117,11 @@ export class CoursesService {
     if (!lesson) {
       throw new NotFoundException(`Lesson ${slug} not found`);
     }
+    await this.assertLevelAccess(
+      userId,
+      lesson.module.level.id,
+      lesson.module.level.orderIndex
+    );
 
     return {
       slug: lesson.slug,
@@ -175,6 +181,28 @@ export class CoursesService {
       });
     } catch {
       return [];
+    }
+  }
+
+  private async assertLevelAccess(userId: string, levelId: string, orderIndex: number) {
+    if (orderIndex === 1) {
+      await this.prisma.enrollment.upsert({
+        where: { userId_levelId: { userId, levelId } },
+        create: { userId, levelId },
+        update: {}
+      });
+      return;
+    }
+
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { userId_levelId: { userId, levelId } },
+      select: { id: true }
+    });
+
+    if (!enrollment) {
+      throw new ForbiddenException(
+        "Уровень пока закрыт. Завершите предыдущий уровень или пройдите входной тест."
+      );
     }
   }
 }

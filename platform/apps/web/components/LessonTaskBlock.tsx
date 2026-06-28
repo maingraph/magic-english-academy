@@ -9,6 +9,7 @@ type LessonTaskBlockProps = {
   prompt: string;
   options: string[];
   answer: string;
+  checkpoint?: boolean;
 };
 
 export function LessonTaskBlock({
@@ -17,7 +18,8 @@ export function LessonTaskBlock({
   options,
   answer,
   lessonSlug,
-  blockOrder
+  blockOrder,
+  checkpoint = false
 }: LessonTaskBlockProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [result, setResult] = useState<{
@@ -77,8 +79,10 @@ export function LessonTaskBlock({
   }
 
   return (
-    <section className="lesson-block task-block">
-      <span className="admin-kicker">Практика</span>
+    <section className={`lesson-block task-block ${checkpoint ? "checkpoint-task" : ""}`}>
+      <span className="admin-kicker">
+        {checkpoint ? "Задание для проверки" : "Практика"}
+      </span>
       <h2>{title || "Задание"}</h2>
       <p>{prompt}</p>
       <div className="lesson-options" role="group" aria-label={prompt}>

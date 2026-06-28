@@ -17,6 +17,14 @@ export class AssistantController {
     return this.assistantService.getStatus(user, lessonSlug);
   }
 
+  @Get("history")
+  getHistory(
+    @CurrentUser() user: ApiSessionUser,
+    @Query("lessonSlug") lessonSlug?: string
+  ) {
+    return this.assistantService.getHistory(user, lessonSlug);
+  }
+
   @Post("run")
   runAction(
     @CurrentUser() user: ApiSessionUser,

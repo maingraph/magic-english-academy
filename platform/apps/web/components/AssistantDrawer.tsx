@@ -56,6 +56,7 @@ export function AssistantDrawer({
   const [text, setText] = useState("");
   const [selectedAction, setSelectedAction] = useState<ActionId>("explain");
   const [output, setOutput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [quota, setQuota] = useState<{ remaining: number; configured: boolean } | null>(
     null
@@ -75,14 +76,20 @@ export function AssistantDrawer({
   }, [onOpen]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !lessonSlug) return;
     const params = lessonSlug ? `?lessonSlug=${encodeURIComponent(lessonSlug)}` : "";
-    fetch(`${apiBaseUrl}/assistant/status${params}`, { credentials: "include" })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (data) {
-          setQuota({ remaining: data.remaining, configured: data.configured });
-        }
+    Promise.all([
+      fetch(`${apiBaseUrl}/assistant/status${params}`, { credentials: "include" }),
+      fetch(`${apiBaseUrl}/assistant/history${params}`, { credentials: "include" })
+    ])
+      .then(async ([statusResponse, historyResponse]) => {
+        const data = statusResponse.ok ? await statusResponse.json() : null;
+        const historyData = historyResponse.ok
+          ? ((await historyResponse.json()) as { messages: Array<{ content: string }> })
+          : null;
+
+        if (data) setQuota({ remaining: data.remaining, configured: data.configured });
+        setHistory(historyData?.messages.map((message) => message.content) ?? []);
       })
       .catch(() => setQuota(null));
   }, [lessonSlug, open]);
@@ -107,6 +114,7 @@ export function AssistantDrawer({
         usage: { remaining: number };
       };
       setOutput(data.output);
+      setHistory((current) => [...current, data.output]);
       setQuota((current) =>
         current ? { ...current, remaining: data.usage.remaining } : current
       );
@@ -186,7 +194,16 @@ export function AssistantDrawer({
             {status === "loading" ? "Обрабатываем..." : "Запустить"}
           </button>
 
-          {output ? (
+          {history.length > 0 ? (
+            <div className="assistant-history">
+              {history.map((item, index) => (
+                <div className="assistant-output" key={`${index}-${item.slice(0, 20)}`}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {output && history.at(-1) !== output ? (
             <div className={`assistant-output ${status === "error" ? "error" : ""}`}>
               {output}
             </div>

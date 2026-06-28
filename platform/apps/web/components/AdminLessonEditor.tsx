@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type LessonBlockType = "RICH_TEXT" | "EXAMPLE" | "MEDIA" | "TASK" | "DICTIONARY_TERM";
+type LessonBlockType =
+  | "RICH_TEXT"
+  | "EXAMPLE"
+  | "MEDIA"
+  | "TASK"
+  | "ASSESSMENT"
+  | "DICTIONARY_TERM";
 
 type BlockContent = Record<string, string | string[]>;
 
@@ -36,7 +42,8 @@ type EditableLesson = {
 const blockTypes: Array<{ value: LessonBlockType; label: string }> = [
   { value: "RICH_TEXT", label: "Текст" },
   { value: "EXAMPLE", label: "Примеры" },
-  { value: "TASK", label: "Задание" },
+  { value: "TASK", label: "Задание внутри урока" },
+  { value: "ASSESSMENT", label: "Задание для проверки" },
   { value: "DICTIONARY_TERM", label: "Словарь" },
   { value: "MEDIA", label: "Медиа" }
 ];
@@ -71,7 +78,7 @@ function normalizeContent(type: LessonBlockType, content: unknown): BlockContent
     };
   }
 
-  if (type === "TASK") {
+  if (type === "TASK" || type === "ASSESSMENT") {
     return {
       title: asString(source.title),
       prompt: asString(source.prompt),
@@ -109,7 +116,7 @@ function newBlockContent(type: LessonBlockType): BlockContent {
     return { title: "Примеры", items: ["I am ready.", "She is happy."] };
   }
 
-  if (type === "TASK") {
+  if (type === "TASK" || type === "ASSESSMENT") {
     return {
       title: "Мини-практика",
       prompt: "Выбери правильный вариант.",
@@ -536,7 +543,7 @@ function BlockFields({
     );
   }
 
-  if (block.type === "TASK") {
+  if (block.type === "TASK" || block.type === "ASSESSMENT") {
     return (
       <>
         <TextField

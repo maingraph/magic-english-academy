@@ -37,7 +37,13 @@ export type NativeLesson = {
     orderIndex: number;
   };
   blocks: Array<{
-    type: "RICH_TEXT" | "EXAMPLE" | "MEDIA" | "TASK" | "DICTIONARY_TERM";
+    type:
+      | "RICH_TEXT"
+      | "EXAMPLE"
+      | "MEDIA"
+      | "TASK"
+      | "ASSESSMENT"
+      | "DICTIONARY_TERM";
     orderIndex: number;
     content: unknown;
   }>;
@@ -166,10 +172,18 @@ export async function getCourseLevel(code: string): Promise<CourseLevel | null> 
   ) ?? null;
 }
 
-export async function getCourseLevelLessons(code: string): Promise<CourseLevelLessons | null> {
+function authHeaders(cookieHeader?: string) {
+  return cookieHeader ? { cookie: cookieHeader } : undefined;
+}
+
+export async function getCourseLevelLessons(
+  code: string,
+  cookieHeader?: string
+): Promise<CourseLevelLessons | null> {
   try {
     const response = await fetch(`${apiBaseUrl}/courses/levels/${code}/lessons`, {
-      cache: "no-store"
+      cache: "no-store",
+      headers: authHeaders(cookieHeader)
     });
 
     if (!response.ok) {
@@ -182,10 +196,14 @@ export async function getCourseLevelLessons(code: string): Promise<CourseLevelLe
   }
 }
 
-export async function getNativeLesson(slug: string): Promise<NativeLesson | null> {
+export async function getNativeLesson(
+  slug: string,
+  cookieHeader?: string
+): Promise<NativeLesson | null> {
   try {
     const response = await fetch(`${apiBaseUrl}/courses/lessons/${slug}`, {
-      cache: "no-store"
+      cache: "no-store",
+      headers: authHeaders(cookieHeader)
     });
 
     if (!response.ok) {

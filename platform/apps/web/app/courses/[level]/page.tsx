@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { AppShell } from "../../../components/AppShell";
 import { ChecklistPreview } from "../../../components/ChecklistPreview";
 import { MagicButton } from "../../../components/MagicButton";
@@ -20,8 +21,9 @@ type LevelPageProps = {
 
 export default async function LevelPage({ params }: LevelPageProps) {
   const { level } = await params;
+  const cookieHeader = (await cookies()).toString();
   const data = await getCourseLevel(level);
-  const lessonData = await getCourseLevelLessons(level);
+  const lessonData = await getCourseLevelLessons(level, cookieHeader);
 
   if (!data) {
     notFound();

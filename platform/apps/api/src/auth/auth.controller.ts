@@ -48,23 +48,6 @@ export class AuthController {
 
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
-  @Post("register")
-  async register(
-    @Body() payload: AuthPayload,
-    @Req() request: RequestMetadata,
-    @Res({ passthrough: true }) response: CookieResponse
-  ) {
-    const session = await this.authService.register(payload, request);
-    this.authService.setSessionCookie(response, session.token);
-
-    return {
-      user: session.user,
-      mode: "cookie-session"
-    };
-  }
-
-  @Public()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post("password/forgot")
   requestPasswordReset(@Body() payload: PasswordResetRequestPayload) {
     return this.authService.requestPasswordReset(payload);

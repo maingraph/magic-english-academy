@@ -1,12 +1,23 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  UnauthorizedException
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import type { ApiSessionUser } from "../auth/auth.types";
+import { hashPassword, verifyPassword } from "../auth/password";
 
 export type UpdateProfilePayload = {
   displayName?: unknown;
   avatarUrl?: unknown;
   locale?: unknown;
   timezone?: unknown;
+};
+
+export type ChangePasswordPayload = {
+  currentPassword?: unknown;
+  newPassword?: unknown;
 };
 
 @Injectable()
@@ -19,8 +30,15 @@ export class ProfileService {
       include: {
         profile: true,
         lessonProgress: true,
-        taskAttempts: true,
-        homeworkSubmissions: true,
+        taskAttempts: {
+          include: {
+            task: {
+              select: {
+                isCheckpoint: true
+              }
+            }
+          }
+        },
         userAchievements: {
           include: { achievement: true },
           orderBy: { earnedAt: "desc" }
@@ -54,10 +72,9 @@ export class ProfileService {
           (sum, attempt) => sum + attempt.pointsEarned,
           0
         ),
-        homeworkPoints: account.homeworkSubmissions.reduce(
-          (sum, submission) => sum + (submission.score ?? 0),
-          0
-        )
+        checkpointCount: account.taskAttempts.filter(
+          (attempt) => attempt.isCorrect && attempt.task.isCheckpoint
+        ).length
       },
       achievements: account.userAchievements.map((earned) => ({
         code: earned.achievement.code,
@@ -99,6 +116,38 @@ export class ProfileService {
     });
 
     return this.getProfile(user);
+  }
+
+  async changePassword(user: ApiSessionUser, payload: ChangePasswordPayload) {
+    const currentPassword = this.requiredPassword(payload.currentPassword, "currentPassword");
+    const newPassword = this.requiredPassword(payload.newPassword, "newPassword");
+    const account = await this.prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      select: { passwordHash: true }
+    });
+
+    if (!account.passwordHash || !(await verifyPassword(currentPassword, account.passwordHash))) {
+      throw new UnauthorizedException("Текущий пароль указан неверно");
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: await hashPassword(newPassword)
+      }
+    });
+
+    await this.prisma.activityEvent.create({
+      data: {
+        userId: user.id,
+        type: "PASSWORD_CHANGED"
+      }
+    });
+
+    return {
+      changed: true,
+      message: "Пароль обновлён."
+    };
   }
 
   private optionalText(value: unknown, field: string, maxLength: number) {
@@ -143,5 +192,13 @@ export class ProfileService {
     } catch {
       throw new BadRequestException("avatarUrl must be a valid HTTP(S) URL");
     }
+  }
+
+  private requiredPassword(value: unknown, field: string) {
+    if (typeof value !== "string" || value.length < 8 || value.length > 128) {
+      throw new BadRequestException(`${field} must contain 8 to 128 characters`);
+    }
+
+    return value;
   }
 }

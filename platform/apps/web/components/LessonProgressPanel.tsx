@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type LessonStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
@@ -25,7 +24,6 @@ function getStatusText(status: LessonStatus) {
 }
 
 export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanelProps) {
-  const router = useRouter();
   const [status, setStatus] = useState<LessonStatus>(initialStatus);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -47,7 +45,6 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
         if (response.ok) {
           const progress = (await response.json()) as { status: LessonStatus };
           setStatus(progress.status);
-          router.refresh();
         }
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -59,7 +56,7 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
     void startLesson();
 
     return () => controller.abort();
-  }, [initialStatus, router, slug]);
+  }, [initialStatus, slug]);
 
   async function completeLesson() {
     setIsSaving(true);
@@ -76,7 +73,6 @@ export function LessonProgressPanel({ slug, initialStatus }: LessonProgressPanel
 
       const progress = (await response.json()) as { status: LessonStatus };
       setStatus(progress.status);
-      router.refresh();
     } catch (error) {
       console.error(error);
     } finally {

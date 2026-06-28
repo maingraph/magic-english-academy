@@ -1,0 +1,28 @@
+# Local secrets
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production.example
+
+# Local deployment metadata and dependencies
+**/.vercel
+**/node_modules
+**/.next
+**/dist
+**/tsconfig.tsbuildinfo
+
+# Local agent/audit artifacts
+.opencode
+.codex-audit
+CODEX_HANDOFF.md
+opencode-export.md
+OPENCODE-GUIDE.md
+AGENTS.md
+
+# Legacy static prototype files outside the deployable platform app
+Fonts
+Icons
+Images
+Scripts
+Styles
+*.html

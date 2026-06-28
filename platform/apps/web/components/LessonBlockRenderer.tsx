@@ -2,7 +2,13 @@ import { LessonTaskBlock } from "./LessonTaskBlock";
 import { SaveWordButton } from "./SaveWordButton";
 
 type LessonBlock = {
-  type: "RICH_TEXT" | "EXAMPLE" | "MEDIA" | "TASK" | "DICTIONARY_TERM";
+  type:
+    | "RICH_TEXT"
+    | "EXAMPLE"
+    | "MEDIA"
+    | "TASK"
+    | "ASSESSMENT"
+    | "DICTIONARY_TERM";
   orderIndex: number;
   content: unknown;
 };
@@ -45,13 +51,14 @@ export function LessonBlockRenderer({
     );
   }
 
-  if (block.type === "TASK") {
+  if (block.type === "TASK" || block.type === "ASSESSMENT") {
     const options = getStringArray(content, "options");
 
     return (
       <LessonTaskBlock
         answer={getString(content, "answer")}
         blockOrder={block.orderIndex}
+        checkpoint={block.type === "ASSESSMENT"}
         lessonSlug={lessonSlug}
         options={options}
         prompt={getString(content, "prompt")}
