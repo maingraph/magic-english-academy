@@ -7,6 +7,7 @@ import {
 import { PrismaService } from "../prisma/prisma.service";
 import type { ApiSessionUser } from "../auth/auth.types";
 import { hashPassword, verifyPassword } from "../auth/password";
+import { activityStats, localCalendarDate } from "./activity.utils";
 
 export type UpdateProfilePayload = {
   displayName?: unknown;
@@ -150,6 +151,62 @@ export class ProfileService {
     };
   }
 
+  async recordVisit(user: ApiSessionUser) {
+    const timezone = await this.getTimezone(user.id);
+    const date = this.localDate(new Date(), timezone);
+
+    await this.prisma.userDailyActivity.upsert({
+      where: {
+        userId_date: {
+          userId: user.id,
+          date
+        }
+      },
+      create: {
+        userId: user.id,
+        date,
+        source: "PLATFORM_VISIT"
+      },
+      update: {
+        source: "PLATFORM_VISIT"
+      }
+    });
+
+    return {
+      recorded: true,
+      date: date.toISOString().slice(0, 10),
+      timezone
+    };
+  }
+
+  async getActivity(user: ApiSessionUser, monthsValue?: string) {
+    const months = this.parseMonths(monthsValue);
+    const timezone = await this.getTimezone(user.id);
+    const today = this.localDate(new Date(), timezone);
+    const start = new Date(today);
+    start.setUTCDate(start.getUTCDate() - months * 31);
+
+    const rows = await this.prisma.userDailyActivity.findMany({
+      where: {
+        userId: user.id,
+        date: { gte: start, lte: today }
+      },
+      orderBy: { date: "asc" },
+      select: { date: true }
+    });
+    const activeDays = rows.map((row) => row.date.toISOString().slice(0, 10));
+    const { weeklyDays, streakWeeks } = activityStats(activeDays, today);
+
+    return {
+      timezone,
+      months,
+      today: today.toISOString().slice(0, 10),
+      activeDays,
+      weeklyDays,
+      streakWeeks
+    };
+  }
+
   private optionalText(value: unknown, field: string, maxLength: number) {
     if (value === undefined) {
       return undefined;
@@ -200,5 +257,32 @@ export class ProfileService {
     }
 
     return value;
+  }
+
+  private async getTimezone(userId: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      select: { timezone: true }
+    });
+    const timezone = profile?.timezone ?? "Europe/Warsaw";
+
+    try {
+      new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format();
+      return timezone;
+    } catch {
+      return "Europe/Warsaw";
+    }
+  }
+
+  private localDate(now: Date, timezone: string) {
+    return localCalendarDate(now, timezone);
+  }
+
+  private parseMonths(value?: string) {
+    const parsed = Number(value ?? 6);
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > 12) {
+      throw new BadRequestException("months must be an integer between 1 and 12");
+    }
+    return parsed;
   }
 }

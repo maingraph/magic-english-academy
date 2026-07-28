@@ -53,6 +53,8 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - run: npm audit --omit=dev --audit-level=high
       - run: npm exec -w @magic-english/api -- prisma migrate deploy --schema prisma/schema.prisma
       - run: npm run db:seed

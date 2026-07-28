@@ -136,10 +136,10 @@ function newBlockContent(type: LessonBlockType): BlockContent {
 
   if (type === "MEDIA") {
     return {
-      title: "Материал",
+      title: "Видеоразбор",
       url: "https://",
-      caption: "Описание ссылки или видео.",
-      mediaType: "link"
+      caption: "Короткий разбор домашней работы или темы уровня.",
+      mediaType: "video"
     };
   }
 
@@ -610,7 +610,7 @@ function BlockFields({
           onChange={(value) => onContentChange(index, "title", value)}
         />
         <TextField
-          label="Ссылка"
+          label="Ссылка (YouTube, Vimeo или MP4)"
           value={asString(block.content.url)}
           onChange={(value) => onContentChange(index, "url", value)}
         />

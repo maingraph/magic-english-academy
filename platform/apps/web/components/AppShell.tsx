@@ -15,8 +15,12 @@ import {
   LogOut,
   Menu,
   MessagesSquare,
+  Newspaper,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   ShieldCheck,
+  StickyNote,
   Trophy,
   Users,
   X
@@ -24,13 +28,16 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AssistantDrawer } from "./AssistantDrawer";
 import { useSession } from "./SessionProvider";
 
 const studentNav = [
   { href: "/dashboard", label: "Обзор", icon: LayoutDashboard },
   { href: "/courses", label: "Курс", icon: GraduationCap },
+  { href: "/feed", label: "Лента", icon: Newspaper },
+  { href: "/notes", label: "Заметки", icon: StickyNote },
+  { href: "/assistant", label: "Magic AI", icon: Bot },
   { href: "/dictionary", label: "Словарь", icon: Library },
   { href: "/leaderboard", label: "Рейтинг", icon: Trophy },
   { href: "/achievements", label: "Достижения", icon: Award },
@@ -48,12 +55,16 @@ const adminNav = [
 
 const workspacePrefixes = [
   "/dashboard",
+  "/feed",
+  "/notes",
+  "/assistant",
   "/dictionary",
   "/leaderboard",
   "/achievements",
   "/profile",
   "/admin"
 ];
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 function isActive(pathname: string, href: string) {
   if (href === "/admin") {
@@ -74,6 +85,7 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
   const { user, status, logout } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const isLesson = pathname.includes("/lessons/");
   const isWorkspace =
     workspacePrefixes.some((prefix) => pathname.startsWith(prefix)) ||
@@ -81,20 +93,51 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
     (status === "ready" && Boolean(user) && pathname.startsWith("/courses"));
   const canAdmin = user?.role === "admin" || user?.role === "owner";
 
+  useEffect(() => {
+    setIsSidebarCollapsed(localStorage.getItem("magic-sidebar-collapsed") === "true");
+  }, []);
+
+  useEffect(() => {
+    if (status !== "ready" || !user) return;
+    void fetch(`${apiBaseUrl}/profile/activity/visit`, {
+      method: "POST",
+      credentials: "include"
+    });
+  }, [status, user]);
+
+  function toggleSidebar() {
+    setIsSidebarCollapsed((current) => {
+      const next = !current;
+      localStorage.setItem("magic-sidebar-collapsed", String(next));
+      return next;
+    });
+  }
+
   async function handleLogout() {
     await logout();
+    navigator.serviceWorker?.controller?.postMessage({ type: "CLEAR_PRIVATE_CACHE" });
     setIsMenuOpen(false);
     router.push("/login");
   }
 
   if (isWorkspace) {
     return (
-      <div className="app-shell">
+      <div className={`app-shell ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <aside className={`app-sidebar ${isMenuOpen ? "open" : ""}`}>
           <div className="app-sidebar-head">
             <Link href="/dashboard" className="app-brand" onClick={() => setIsMenuOpen(false)}>
-              <span>MAG</span>IC ENGLISH
+              <span className="app-brand-full"><span>MAG</span>IC ENGLISH</span>
+              <span className="app-brand-mark" aria-hidden="true">✦</span>
             </Link>
+            <button
+              className="sidebar-collapse"
+              onClick={toggleSidebar}
+              type="button"
+              aria-label={isSidebarCollapsed ? "Развернуть меню" : "Свернуть меню"}
+              title={isSidebarCollapsed ? "Развернуть меню" : "Свернуть меню"}
+            >
+              {isSidebarCollapsed ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}
+            </button>
             <button
               className="sidebar-close"
               onClick={() => setIsMenuOpen(false)}

@@ -54,11 +54,9 @@ export class AssistantService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async getStatus(user: ApiSessionUser, lessonSlug?: string) {
-    if (!lessonSlug) {
-      throw new BadRequestException("Ассистент доступен только внутри урока");
-    }
     const config = await this.getConfig();
     const used = await this.dailyUsage(user.id);
+    const context = await this.resolveContext(user.id, this.parseLessonSlug(lessonSlug));
 
     return {
       configured: Boolean(config.apiKey),
@@ -66,7 +64,7 @@ export class AssistantService {
       dailyQuota: config.dailyQuota,
       used,
       remaining: Math.max(config.dailyQuota - used, 0),
-      context: "lesson",
+      context: this.serializeContext(context),
       actions: Object.entries(assistantActions).map(([id, action]) => ({
         id,
         label: action.label
@@ -74,13 +72,29 @@ export class AssistantService {
     };
   }
 
+  async getContext(user: ApiSessionUser) {
+    const context = await this.resolveContext(user.id, null);
+    const recent = await this.prisma.lessonProgress.findMany({
+      where: { userId: user.id, status: { not: "NOT_STARTED" } },
+      orderBy: { updatedAt: "desc" },
+      take: 8,
+      include: {
+        lesson: {
+          select: { slug: true, title: true, summary: true }
+        }
+      }
+    });
+
+    return {
+      selected: this.serializeContext(context),
+      recent: recent.map(({ lesson, updatedAt }) => ({ ...lesson, updatedAt }))
+    };
+  }
+
   async runAction(user: ApiSessionUser, payload: AssistantActionPayload) {
     const action = this.parseAction(payload.action);
     const text = this.parseText(payload.text);
     const lessonSlug = this.parseLessonSlug(payload.lessonSlug);
-    if (!lessonSlug) {
-      throw new BadRequestException("Ассистент доступен только внутри урока");
-    }
     const config = await this.getConfig();
 
     if (!config.apiKey) {
@@ -109,20 +123,11 @@ export class AssistantService {
       });
     }
 
-    const lesson = lessonSlug
-      ? await this.prisma.lesson.findUnique({
-          where: { slug: lessonSlug },
-          include: {
-            blocks: {
-              orderBy: { orderIndex: "asc" }
-            }
-          }
-        })
-      : null;
+    const lesson = await this.resolveContext(user.id, lessonSlug);
     const session =
       (await this.prisma.assistantSession.findFirst({
         where: { userId: user.id, lessonId: lesson?.id ?? null },
-        orderBy: { createdAt: "desc" }
+        orderBy: { updatedAt: "desc" }
       })) ??
       (await this.prisma.assistantSession.create({
         data: {
@@ -130,26 +135,24 @@ export class AssistantService {
           lessonId: lesson?.id ?? null
         }
       }));
+    const recentMessages = await this.prisma.assistantMessage.findMany({
+      where: { sessionId: session.id, role: { in: ["user", "assistant"] } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: { role: true, content: true }
+    });
     const lessonContext = lesson
       ? JSON.stringify({
           title: lesson.title,
           summary: lesson.summary,
           blocks: lesson.blocks.map((block) => block.content)
         }).slice(0, 5000)
-      : "Контекст урока отсутствует.";
-    const userInput = [
+      : "Общий режим: конкретный урок ещё не выбран.";
+    const modelInput = [
       `Действие: ${assistantActions[action].label}`,
-      `Выделение или ответ ученика: ${text || "Используй только контекст урока."}`,
+      `Сообщение ученика: ${text || "Предложи короткое полезное упражнение."}`,
       `Контекст урока: ${lessonContext}`
     ].join("\n\n");
-
-    await this.prisma.assistantMessage.create({
-      data: {
-        sessionId: session.id,
-        role: "user",
-        content: userInput
-      }
-    });
 
     const client = this.createClient(config.provider, config.apiKey);
     const response = await client.chat.completions.create({
@@ -166,7 +169,11 @@ export class AssistantService {
             assistantActions[action].instruction
           ].join(" ")
         },
-        { role: "user", content: userInput }
+        ...recentMessages.reverse().map((message) => ({
+          role: message.role === "assistant" ? ("assistant" as const) : ("user" as const),
+          content: message.content
+        })),
+        { role: "user", content: modelInput }
       ],
       max_tokens: 450
     });
@@ -176,29 +183,44 @@ export class AssistantService {
       throw new ServiceUnavailableException("Провайдер вернул пустой ответ");
     }
 
-    await this.prisma.assistantMessage.create({
-      data: {
-        sessionId: session.id,
-        role: "assistant",
-        content: output,
-        tokenCount: response.usage?.total_tokens ?? 0
-      }
-    });
-    await this.prisma.activityEvent.create({
-      data: {
-        userId: user.id,
-        type: "ASSISTANT_ACTION_USED",
-        metadata: {
-          action,
-          lessonSlug: lessonSlug ?? null,
-          tokens: response.usage?.total_tokens ?? 0
+    await this.prisma.$transaction([
+      this.prisma.assistantMessage.create({
+        data: {
+          sessionId: session.id,
+          role: "user",
+          content: text || assistantActions[action].label,
+          metadata: { action, lessonSlug: lesson?.slug ?? null }
         }
-      }
-    });
+      }),
+      this.prisma.assistantMessage.create({
+        data: {
+          sessionId: session.id,
+          role: "assistant",
+          content: output,
+          tokenCount: response.usage?.total_tokens ?? 0
+        }
+      }),
+      this.prisma.assistantSession.update({
+        where: { id: session.id },
+        data: { updatedAt: new Date() }
+      }),
+      this.prisma.activityEvent.create({
+        data: {
+          userId: user.id,
+          type: "ASSISTANT_ACTION_USED",
+          metadata: {
+            action,
+            lessonSlug: lesson?.slug ?? null,
+            tokens: response.usage?.total_tokens ?? 0
+          }
+        }
+      })
+    ]);
 
     return {
       action,
       output,
+      context: this.serializeContext(lesson),
       usage: {
         used: used + 1,
         remaining: Math.max(config.dailyQuota - used - 1, 0)
@@ -207,36 +229,74 @@ export class AssistantService {
   }
 
   async getHistory(user: ApiSessionUser, lessonSlug?: string) {
-    if (!lessonSlug) {
-      throw new BadRequestException("Укажите урок");
-    }
-    const lesson = await this.prisma.lesson.findUnique({
-      where: { slug: lessonSlug },
-      select: { id: true }
-    });
-
-    if (!lesson) throw new BadRequestException("Урок не найден");
+    const lesson = await this.resolveContext(
+      user.id,
+      this.parseLessonSlug(lessonSlug)
+    );
     const session = await this.prisma.assistantSession.findFirst({
-      where: { userId: user.id, lessonId: lesson.id },
-      orderBy: { createdAt: "desc" },
+      where: { userId: user.id, lessonId: lesson?.id ?? null },
+      orderBy: { updatedAt: "desc" },
       include: {
         messages: {
-          where: { role: "assistant" },
-          orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: "desc" },
           take: 30,
           select: {
             id: true,
             role: true,
             content: true,
-            createdAt: true
+            createdAt: true,
+            metadata: true
           }
         }
       }
     });
 
     return {
-      messages: session?.messages ?? []
+      context: this.serializeContext(lesson),
+      messages: [...(session?.messages ?? [])].reverse()
     };
+  }
+
+  private async resolveContext(userId: string, lessonSlug: string | null) {
+    if (lessonSlug) {
+      const lesson = await this.prisma.lesson.findUnique({
+        where: { slug: lessonSlug },
+        include: { blocks: { orderBy: { orderIndex: "asc" } } }
+      });
+
+      if (!lesson) throw new BadRequestException("Урок не найден");
+      return lesson;
+    }
+
+    const latest = await this.prisma.lessonProgress.findFirst({
+      where: { userId, status: { not: "NOT_STARTED" } },
+      orderBy: { updatedAt: "desc" },
+      include: {
+        lesson: {
+          include: { blocks: { orderBy: { orderIndex: "asc" } } }
+        }
+      }
+    });
+
+    return latest?.lesson ?? null;
+  }
+
+  private serializeContext(
+    lesson: { slug: string; title: string; summary: string | null } | null
+  ) {
+    return lesson
+      ? {
+          mode: "lesson" as const,
+          lessonSlug: lesson.slug,
+          title: lesson.title,
+          summary: lesson.summary
+        }
+      : {
+          mode: "general" as const,
+          lessonSlug: null,
+          title: "Общая практика",
+          summary: null
+        };
   }
 
   async testConnection(payload: AssistantTestPayload) {
@@ -366,8 +426,8 @@ export class AssistantService {
 
     const text = value.trim();
 
-    if (text.length > 1600) {
-      throw new BadRequestException("Текст должен содержать не более 1600 символов");
+    if (text.length > 4000) {
+      throw new BadRequestException("Текст должен содержать не более 4000 символов");
     }
 
     return text;

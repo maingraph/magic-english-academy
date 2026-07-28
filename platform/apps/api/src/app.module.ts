@@ -8,8 +8,10 @@ import { AuthModule } from "./auth/auth.module";
 import { CoursesModule } from "./courses/courses.module";
 import { HealthModule } from "./health/health.module";
 import { DictionaryModule } from "./dictionary/dictionary.module";
+import { FeedModule } from "./feed/feed.module";
 import { GamificationModule } from "./gamification/gamification.module";
 import { LearningModule } from "./learning/learning.module";
+import { NotesModule } from "./notes/notes.module";
 import { ProfileModule } from "./profile/profile.module";
 import { ProgressModule } from "./progress/progress.module";
 import { PrismaModule } from "./prisma/prisma.module";
@@ -33,8 +35,10 @@ import { PrismaModule } from "./prisma/prisma.module";
     ProgressModule,
     ProfileModule,
     DictionaryModule,
+    FeedModule,
     GamificationModule,
-    LearningModule
+    LearningModule,
+    NotesModule
   ],
   providers: [
     {

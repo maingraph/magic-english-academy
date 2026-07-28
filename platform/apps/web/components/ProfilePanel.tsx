@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Award, BookOpenCheck, Check, Save, Star } from "lucide-react";
 import { useSession } from "./SessionProvider";
+import { ProfileActivity } from "./ProfileActivity";
 
 type ProfileResponse = {
   email: string;
@@ -166,6 +167,8 @@ export function ProfilePanel() {
           <span>Проверочные задания</span>
         </article>
       </section>
+
+      <ProfileActivity />
 
       <form className="workspace-panel profile-form" onSubmit={saveProfile}>
         <div className="panel-heading">

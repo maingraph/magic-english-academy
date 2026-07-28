@@ -27,6 +27,26 @@ function getStringArray(value: Record<string, unknown>, key: string) {
     : [];
 }
 
+function getVideoEmbedUrl(value: string) {
+  try {
+    const url = new URL(value);
+    if (url.hostname === "youtu.be") {
+      return `https://www.youtube-nocookie.com/embed/${url.pathname.slice(1)}`;
+    }
+    if (url.hostname.endsWith("youtube.com")) {
+      const id = url.searchParams.get("v") ?? url.pathname.split("/").at(-1);
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+    }
+    if (url.hostname.endsWith("vimeo.com")) {
+      const id = url.pathname.split("/").filter(Boolean).at(-1);
+      return id ? `https://player.vimeo.com/video/${id}` : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 export function LessonBlockRenderer({
   block,
   lessonSlug
@@ -94,13 +114,34 @@ export function LessonBlockRenderer({
   }
 
   if (block.type === "MEDIA") {
+    const url = getString(content, "url");
+    const mediaType = getString(content, "mediaType");
+    const embedUrl = getVideoEmbedUrl(url);
+    const isVideoFile = mediaType === "video" || /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+
     return (
       <section className="lesson-block media-block">
         <h2>{getString(content, "title") || "Материал"}</h2>
         <p>{getString(content, "caption")}</p>
-        <a href={getString(content, "url")} rel="noreferrer" target="_blank">
-          Открыть материал
-        </a>
+        {embedUrl ? (
+          <div className="lesson-video">
+            <iframe
+              src={embedUrl}
+              title={getString(content, "title") || "Видео урока"}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : isVideoFile ? (
+          <video className="lesson-video-file" controls preload="metadata">
+            <source src={url} />
+          </video>
+        ) : (
+          <a href={url} rel="noreferrer" target="_blank">
+            Открыть материал
+          </a>
+        )}
       </section>
     );
   }

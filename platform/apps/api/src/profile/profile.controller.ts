@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Patch } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Patch, Post, Query } from "@nestjs/common";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { ApiSessionUser } from "../auth/auth.types";
 import {
@@ -30,5 +30,18 @@ export class ProfileController {
     @Body() payload: ChangePasswordPayload
   ) {
     return this.profileService.changePassword(user, payload);
+  }
+
+  @Post("activity/visit")
+  recordVisit(@CurrentUser() user: ApiSessionUser) {
+    return this.profileService.recordVisit(user);
+  }
+
+  @Get("activity")
+  getActivity(
+    @CurrentUser() user: ApiSessionUser,
+    @Query("months") months?: string
+  ) {
+    return this.profileService.getActivity(user, months);
   }
 }

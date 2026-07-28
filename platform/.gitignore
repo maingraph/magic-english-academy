@@ -9,3 +9,5 @@ coverage
 *.tsbuildinfo
 .codex-progress.md
 .codex-screenshots/
+test-results/
+playwright-report/

@@ -79,6 +79,26 @@ export function CourseRoadmap({ levels }: { levels: CourseLevel[] }) {
     () => new Map(summary?.levelProgress.map((level) => [level.code, level]) ?? []),
     [summary]
   );
+  const displayLevels = useMemo(
+    () =>
+      levels.some((level) => level.code.toUpperCase() === "A0")
+        ? levels
+        : [
+            {
+              code: "A0",
+              title: "Старт с нуля",
+              lessonCount: 0,
+              status: "planned",
+              sampleTopics: [
+                "Алфавит и звуки",
+                "Приветствия и знакомство",
+                "Числа и первые фразы"
+              ]
+            },
+            ...levels
+          ],
+    [levels]
+  );
 
   async function submitPlacement() {
     const orderedAnswers = questions.map((question) => answers[question.id] ?? "");
@@ -111,7 +131,7 @@ export function CourseRoadmap({ levels }: { levels: CourseLevel[] }) {
       <section className="course-roadmap-hero">
         <div>
           <span className="admin-kicker">Карта курса</span>
-          <h1>Путь от A1 до C1</h1>
+          <h1>Путь от A0 до C1</h1>
           <p>
             Уровни открываются по прогрессу. Если английский уже есть, входной тест
             сразу перенесёт вас на подходящий уровень.
@@ -138,9 +158,10 @@ export function CourseRoadmap({ levels }: { levels: CourseLevel[] }) {
       </section>
 
       <section className="course-roadmap" aria-label="Уровни курса">
-        {levels.map((level) => {
+        {displayLevels.map((level) => {
           const progress = progressByCode.get(level.code);
-          const isUnlocked = progress?.isUnlocked ?? level.code === "A1";
+          const isPlanned = level.status === "planned";
+          const isUnlocked = !isPlanned && (progress?.isUnlocked ?? level.code === "A1");
           const percent = progress?.percent ?? 0;
 
           return (
@@ -173,6 +194,8 @@ export function CourseRoadmap({ levels }: { levels: CourseLevel[] }) {
                     <Route size={16} />
                     Открыть уровень
                   </Link>
+                ) : isPlanned ? (
+                  <small>Блок A0 добавлен в маршрут. Уроки готовятся к публикации.</small>
                 ) : (
                   <small>Откроется после 80% предыдущего уровня или входного теста.</small>
                 )}

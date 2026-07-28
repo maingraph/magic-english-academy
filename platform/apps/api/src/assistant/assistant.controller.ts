@@ -17,6 +17,11 @@ export class AssistantController {
     return this.assistantService.getStatus(user, lessonSlug);
   }
 
+  @Get("context")
+  getContext(@CurrentUser() user: ApiSessionUser) {
+    return this.assistantService.getContext(user);
+  }
+
   @Get("history")
   getHistory(
     @CurrentUser() user: ApiSessionUser,

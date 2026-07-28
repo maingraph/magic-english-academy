@@ -54,27 +54,46 @@ enum AbuseSeverity {
   HIGH
 }
 
+enum FeedPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NoteColor {
+  CREAM
+  WHITE
+  ORANGE
+}
+
 model User {
-  id                 String              @id @default(cuid())
-  email              String              @unique
-  passwordHash       String?
-  role               UserRole            @default(STUDENT)
-  status             UserStatus          @default(ACTIVE)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  profile            Profile?
-  enrollments        Enrollment[]
-  lessonProgress     LessonProgress[]
-  taskAttempts       TaskAttempt[]
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String?
+  role                UserRole             @default(STUDENT)
+  status              UserStatus           @default(ACTIVE)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  profile             Profile?
+  enrollments         Enrollment[]
+  lessonProgress      LessonProgress[]
+  taskAttempts        TaskAttempt[]
   homeworkSubmissions HomeworkSubmission[]
-  activityEvents     ActivityEvent[]
-  userAchievements   UserAchievement[]
+  activityEvents      ActivityEvent[]
+  userAchievements    UserAchievement[]
   certificates        Certificate[]
   dictionaryTerms     UserDictionaryTerm[]
   assistantSessions   AssistantSession[]
   authoredArticles    Article[]
   abuseSignals        AbuseSignal[]
   passwordResetTokens PasswordResetToken[]
+  feedPosts           FeedPost[]           @relation("FeedPostAuthor")
+  feedComments        FeedComment[]
+  feedLikes           FeedLike[]
+  feedBookmarks       FeedBookmark[]
+  feedViews           FeedView[]
+  notes               UserNote[]
+  dailyActivity       UserDailyActivity[]
 }
 
 model Profile {
@@ -121,39 +140,41 @@ model Module {
 }
 
 model Lesson {
-  id          String           @id @default(cuid())
-  moduleId    String
-  slug        String           @unique
-  title       String
-  summary     String?
-  orderIndex  Int
-  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  blocks      LessonBlock[]
-  progress    LessonProgress[]
-  tasks       Task[]
-  dictionaryTerms LessonDictionaryTerm[]
+  id                String                 @id @default(cuid())
+  moduleId          String
+  slug              String                 @unique
+  title             String
+  summary           String?
+  orderIndex        Int
+  module            Module                 @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  blocks            LessonBlock[]
+  progress          LessonProgress[]
+  tasks             Task[]
+  dictionaryTerms   LessonDictionaryTerm[]
+  notes             UserNote[]
+  assistantSessions AssistantSession[]
 }
 
 model LessonBlock {
-  id          String          @id @default(cuid())
-  lessonId    String
-  type        LessonBlockType
-  orderIndex  Int
-  content     Json
-  lesson      Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  lessonId   String
+  type       LessonBlockType
+  orderIndex Int
+  content    Json
+  lesson     Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Task {
-  id          String        @id @default(cuid())
-  lessonId    String
-  type        TaskType
-  prompt      Json
-  points      Int           @default(1)
-  isCheckpoint Boolean      @default(false)
-  orderIndex  Int
-  lesson      Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  options     TaskOption[]
-  attempts    TaskAttempt[]
+  id           String        @id @default(cuid())
+  lessonId     String
+  type         TaskType
+  prompt       Json
+  points       Int           @default(1)
+  isCheckpoint Boolean       @default(false)
+  orderIndex   Int
+  lesson       Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  options      TaskOption[]
+  attempts     TaskAttempt[]
 }
 
 model TaskOption {
@@ -165,13 +186,13 @@ model TaskOption {
 }
 
 model Enrollment {
-  id        String      @id @default(cuid())
-  userId    String
-  levelId   String
-  startsAt  DateTime    @default(now())
-  endsAt    DateTime?
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  level     CourseLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  id       String      @id @default(cuid())
+  userId   String
+  levelId  String
+  startsAt DateTime    @default(now())
+  endsAt   DateTime?
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level    CourseLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
 
   @@unique([userId, levelId])
 }
@@ -190,28 +211,28 @@ model LessonProgress {
 }
 
 model TaskAttempt {
-  id          String   @id @default(cuid())
-  userId      String
-  taskId      String
-  answer      Json
-  isCorrect   Boolean
-  pointsEarned Int    @default(0)
-  feedback    String?
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  userId       String
+  taskId       String
+  answer       Json
+  isCorrect    Boolean
+  pointsEarned Int      @default(0)
+  feedback     String?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model HomeworkSubmission {
-  id        String   @id @default(cuid())
-  userId    String
-  lessonId  String
-  content   Json
-  score     Int?
-  feedback  String?
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  userId     String
+  lessonId   String
+  content    Json
+  score      Int?
+  feedback   String?
+  createdAt  DateTime  @default(now())
   reviewedAt DateTime?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Achievement {
@@ -263,11 +284,11 @@ model LessonDictionaryTerm {
 }
 
 model UserDictionaryTerm {
-  userId String
-  termId String
-  savedAt DateTime @default(now())
-  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  term   DictionaryTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  userId  String
+  termId  String
+  savedAt DateTime       @default(now())
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  term    DictionaryTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
 
   @@id([userId, termId])
 }
@@ -283,23 +304,145 @@ model ActivityEvent {
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
+model UserDailyActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  source    String   @default("PLATFORM_VISIT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
 model AssistantSession {
   id        String             @id @default(cuid())
   userId    String
   lessonId  String?
   createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
   user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson?            @relation(fields: [lessonId], references: [id], onDelete: SetNull)
   messages  AssistantMessage[]
+
+  @@index([userId, lessonId, updatedAt])
 }
 
 model AssistantMessage {
-  id        String           @id @default(cuid())
-  sessionId String
-  role      String
-  content   String
-  tokenCount Int             @default(0)
-  createdAt DateTime         @default(now())
-  session   AssistantSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id         String           @id @default(cuid())
+  sessionId  String
+  role       String
+  content    String
+  tokenCount Int              @default(0)
+  metadata   Json?
+  createdAt  DateTime         @default(now())
+  session    AssistantSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+model FeedPost {
+  id          String           @id @default(cuid())
+  authorId    String
+  title       String
+  text        String
+  status      FeedPostStatus   @default(PUBLISHED)
+  isPinned    Boolean          @default(false)
+  publishedAt DateTime?
+  scheduledAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  author      User             @relation("FeedPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  attachments FeedAttachment[]
+  comments    FeedComment[]
+  likes       FeedLike[]
+  bookmarks   FeedBookmark[]
+  views       FeedView[]
+
+  @@index([status, isPinned, publishedAt])
+  @@index([authorId, createdAt])
+}
+
+model FeedAttachment {
+  id         String   @id @default(cuid())
+  postId     String
+  name       String
+  mimeType   String
+  size       Int
+  storageKey String   @unique
+  url        String
+  createdAt  DateTime @default(now())
+  post       FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model FeedComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  post      FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model FeedLike {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model FeedBookmark {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model FeedView {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([postId, createdAt])
+}
+
+model UserNote {
+  id        String    @id @default(cuid())
+  userId    String
+  lessonId  String?
+  title     String
+  text      String
+  color     NoteColor @default(CREAM)
+  isPinned  Boolean   @default(false)
+  position  Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson?   @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([userId, position])
+  @@index([userId, isPinned, updatedAt])
+  @@index([lessonId])
 }
 
 model Article {
@@ -347,13 +490,13 @@ model MetricSnapshot {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
 }

@@ -40,9 +40,12 @@ services:
       AUTH_SECRET: ${AUTH_SECRET}
       SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY}
       ACTIVITY_HASH_SECRET: ${ACTIVITY_HASH_SECRET}
+      FEED_UPLOAD_DIR: /app/uploads/feed
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-Magic English <accounts@magic-english-academy.com>}
       ALLOW_DEV_AUTH: "false"
+    volumes:
+      - feed_uploads:/app/uploads/feed
     depends_on:
       postgres:
         condition: service_healthy
@@ -88,3 +91,4 @@ volumes:
   redis_data:
   caddy_data:
   caddy_config:
+  feed_uploads:
