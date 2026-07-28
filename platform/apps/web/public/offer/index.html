@@ -694,7 +694,7 @@
       max-width: 1120px;
       width: 100%;
       min-height: 670px;
-      margin: -42px auto 0;
+      margin: -70px auto 0;
     }
 
     .photo-collage::before,
@@ -1264,7 +1264,7 @@
       padding-top: 34px;
     }
 
-    .compare-footer > p {
+    .compare-footer > P {
       max-width: 530px;
       margin: 0;
       color: rgba(23, 20, 15, .54);
@@ -5873,7 +5873,7 @@
       font-size: 10px;
     }
 
-    .ai-chat-head > i {
+    .ai-chat-head > I {
       width: 7px;
       height: 7px;
       border-radius: 50%;
@@ -6649,8 +6649,23 @@
 
     .hero-positioned h1 {
       max-width: 820px;
-      font-size: clamp(54px, 6.5vw, 94px);
+      font-size: clamp(54px, 6vw, 86px);
       line-height: .98;
+    }
+
+    @media (min-width: 981px) and (max-width: 1160px) {
+      .photo-tile.two {
+        left: 0;
+      }
+
+      .photo-tile.three,
+      .photo-tile.four {
+        right: 0;
+      }
+
+      .photo-tile.five {
+        left: 0;
+      }
     }
 
     .why-title,
@@ -6686,6 +6701,37 @@
       min-height: 50px;
       border-radius: 999px;
       padding-inline: 22px;
+      transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease;
+    }
+
+    .primary:active,
+    .secondary:active,
+    .arrow-button:active,
+    .ghost-button:active,
+    .buy:active,
+    button:active:not(:disabled) {
+      transform: translateY(1px) scale(.985);
+    }
+
+    :where(a, button, input, summary):focus-visible {
+      outline: 3px solid rgba(242, 154, 22, .5);
+      outline-offset: 4px;
+    }
+
+    button:disabled,
+    [aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: .58;
+    }
+
+    [data-countdown] {
+      min-width: 8ch;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+
+    section[id] {
+      scroll-margin-top: 110px;
     }
 
     .photo-tile,
@@ -6817,6 +6863,10 @@
 
     .reviews-rail {
       padding-block: 6px 18px;
+    }
+
+    .reviews-rail:focus-within .reviews-track {
+      animation-play-state: paused;
     }
 
     .review-card {
@@ -6977,6 +7027,66 @@
       .payment-placeholder {
         grid-template-columns: 1fr;
       }
+
+      .reviews-rail {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        overscroll-behavior-inline: contain;
+      }
+
+      .reviews-track {
+        display: flex;
+        width: max-content;
+        max-width: none;
+        animation: none;
+      }
+
+      .reviews-track .review-card:nth-child(n+5) {
+        display: grid;
+      }
+
+      .reviews-track .review-card[aria-hidden="true"] {
+        display: none;
+      }
+
+      .review-card {
+        width: min(82vw, 340px);
+        scroll-snap-align: start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
+      .reviews-track {
+        width: auto;
+        max-width: 100%;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+      }
+
+      .review-card {
+        scroll-snap-align: start;
+      }
+
+      .reviews-track .review-card[aria-hidden="true"] {
+        display: none;
+      }
+
+      .cursor-glow {
+        display: none;
+      }
     }
 
     /* Only the selected product option is visible in production. Alternatives remain
@@ -7049,49 +7159,49 @@
       <circle cx="1322" cy="22" r="3" fill="#f29a16" opacity=".36"/>
     </svg>
     <div class="promo-inner">
-      <button class="promo-pill" type="button" data-payment>скидка 70%</button>
-      <span>доступ за 75 BYN вместо <s>250 BYN</s></span>
+      <button class="promo-pill" type="button" data-payment>Скидка 75%</button>
+      <span>Доступ за 75 BYN вместо <s>300 BYN</s></span>
       <span class="promo-time" data-countdown>23:59:59</span>
-      <button class="promo-link" type="button" data-payment>забрать</button>
+      <button class="promo-link" type="button" data-payment>Забрать</button>
     </div>
   </div>
 
   <nav class="nav" aria-label="главная навигация">
     <a class="brand" href="#positioned" aria-label="magic english">
-      <img src="assets/magic-star-logo.png" alt="">
+      <img src="assets/magic-star-logo.png" alt="" width="640" height="640">
       <span class="brand-name"><span class="magic-word">MAG<span class="brand-i">I</span>C</span><span class="english-word">ENGLISH</span></span>
     </a>
-    <div class="links">
-      <a href="#why-02">кому нужно</a>
-      <a href="#inside">что внутри</a>
-      <a href="#platform">платформа</a>
-      <a href="#club">клуб</a>
-      <a href="#reviews">отзывы</a>
-      <a href="#faq">faq</a>
-      <a class="mobile-login" href="/login">войти в платформу</a>
+    <div class="links" id="mainNavigation">
+      <a href="#why-02">Кому нужно</a>
+      <a href="#inside">Что внутри</a>
+      <a href="#platform">Платформа</a>
+      <a href="#club">Клуб</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#faq">FAQ</a>
+      <a class="mobile-login" href="/login">Войти в платформу</a>
     </div>
     <div class="nav-actions">
-      <a class="platform-login" href="/login">войти</a>
-      <a class="buy" href="#contact" data-payment>получить доступ</a>
+      <a class="platform-login" href="/login">Войти</a>
+      <a class="buy" href="#contact" data-payment>Получить доступ</a>
     </div>
-    <button class="menu" type="button" aria-label="меню">☰</button>
+    <button class="menu" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mainNavigation">☰</button>
   </nav>
 
   <main>
     <section class="variant hero-positioned" id="positioned">
       <div class="wrap">
         <div class="variant-head">
-          <div class="label">вариант 01 - позиционирование</div>
-          <p class="eyebrow">платформа + практика + поддержка</p>
+          <div class="label">Вариант 01 - позиционирование</div>
+          <p class="eyebrow">Платформа + практика + поддержка</p>
         </div>
         <div class="layout">
           <div class="text-area" data-deck>
             <h1 data-title>Английский, который наконец <span class="script">идёт по плану</span></h1>
             <p class="copy" data-copy>Magic English Plan собирает уроки, практику, словарь, прогресс и поддержку в один маршрут от A0 до C1. Открываешь кабинет и сразу видишь следующий шаг.</p>
-            <div class="hero-offer"><span class="sale">скидка 70%</span><strong>75 BYN</strong><s>250 BYN</s><span>примерно $26 вместо $87</span></div>
+            <div class="hero-offer"><span class="sale">Скидка 75%</span><strong>75 BYN</strong><s>300 BYN</s><span>Примерно $26 вместо $104</span></div>
             <div class="actions">
-              <a class="primary" href="#contact" data-payment>получить доступ за 75 BYN</a>
-              <a class="secondary" href="#inside">посмотреть что внутри</a>
+              <a class="primary" href="#contact" data-payment>Получить доступ за 75 BYN</a>
+              <a class="secondary" href="#inside">Посмотреть что внутри</a>
             </div>
             <div class="text-switcher" aria-label="переключить текст">
               <button type="button" data-prev aria-label="предыдущий текст">‹</button>
@@ -7103,11 +7213,11 @@
             <svg class="collage-spark one" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1.7 14.3 9.7 22.3 12 14.3 14.3 12 22.3 9.7 14.3 1.7 12 9.7 9.7z"/></svg>
             <svg class="collage-spark two" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.8 14 9.9 21.2 12 14 14.1 12 21.2 10 14.1 2.8 12 10 9.9z"/></svg>
             <svg class="collage-spark three" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 4 13.7 10.3 20 12 13.7 13.7 12 20 10.3 13.7 4 12 10.3 10.3z"/></svg>
-            <button class="photo-tile one video-trigger" type="button" data-modal-title="видео-превью платформы" data-modal-copy="сюда можно поставить ролик: ученик открывает уровень, проходит урок, делает домашку и записывается на speaking club." data-modal-media="место под видео 16:9 или вертикальный reels-фрагмент"><span class="play"></span><strong>видео</strong><p class="tiny">показать ученика и платформу в одном кадре</p></button>
-            <button class="photo-tile two video-trigger" type="button" data-modal-title="словарь и повторение" data-modal-copy="сюда лучше добавить скрин словаря: карточки слов, примеры из уроков, отметка сложных слов и повторение по дням." data-modal-media="место под скрин словаря или короткую gif-анимацию"><strong>словарь</strong><p class="tiny">слова из уроков и повторение</p></button>
-            <button class="photo-tile three video-trigger" type="button" data-modal-title="speaking club" data-modal-copy="сюда можно поставить фото или скрин закрытого клуба: темы встреч, поиск партнера, расписание speaking-практики." data-modal-media="место под фото клуба, скрин telegram или расписание"><strong>speaking</strong><p class="tiny">фото или скрин club-встречи</p></button>
-            <button class="photo-tile four video-trigger" type="button" data-modal-title="прогресс ученика" data-modal-copy="сюда подойдет скрин трекера: уровень, стрик, домашка, достижения и понятный следующий шаг." data-modal-media="место под скрин прогресса и достижений"><strong>прогресс</strong><p class="tiny">уровень, стрик и домашка</p></button>
-            <button class="photo-tile five video-trigger" type="button" data-modal-title="помощь по теме" data-modal-copy="сюда можно добавить скрин, где ученик задает вопрос по теме, просит примеры или дополнительное задание. ии помощник лучше подать как маленький бонус, а не главный смысл курса." data-modal-media="место под скрин помощника или короткую переписку"><strong>помощь</strong><p class="tiny">вопросы по уроку и доп задания</p></button>
+            <button class="photo-tile one video-trigger" type="button" data-modal-title="видео-превью платформы" data-modal-copy="сюда можно поставить ролик: ученик открывает уровень, проходит урок, делает домашку и записывается на speaking club." data-modal-media="место под видео 16:9 или вертикальный reels-фрагмент"><span class="play"></span><strong>Видео</strong><p class="tiny">Показать ученика и платформу в одном кадре</p></button>
+            <button class="photo-tile two video-trigger" type="button" data-modal-title="словарь и повторение" data-modal-copy="сюда лучше добавить скрин словаря: карточки слов, примеры из уроков, отметка сложных слов и повторение по дням." data-modal-media="место под скрин словаря или короткую gif-анимацию"><strong>Словарь</strong><p class="tiny">Слова из уроков и повторение</p></button>
+            <button class="photo-tile three video-trigger" type="button" data-modal-title="speaking club" data-modal-copy="сюда можно поставить фото или скрин закрытого клуба: темы встреч, поиск партнёра, расписание speaking-практики." data-modal-media="место под фото клуба, скрин telegram или расписание"><strong>Speaking</strong><p class="tiny">Фото или скрин club-встречи</p></button>
+            <button class="photo-tile four video-trigger" type="button" data-modal-title="прогресс ученика" data-modal-copy="сюда подойдёт скрин трекера: уровень, стрик, домашка, достижения и понятный следующий шаг." data-modal-media="место под скрин прогресса и достижений"><strong>Прогресс</strong><p class="tiny">Уровень, стрик и домашка</p></button>
+            <button class="photo-tile five video-trigger" type="button" data-modal-title="помощь по теме" data-modal-copy="сюда можно добавить скрин, где ученик задает вопрос по теме, просит примеры или дополнительное задание. ИИ-помощник лучше подать как маленький бонус, а не главный смысл курса." data-modal-media="место под скрин помощника или короткую переписку"><strong>Помощь</strong><p class="tiny">Вопросы по уроку и доп. задания</p></button>
           </div>
         </div>
       </div>
@@ -7116,17 +7226,17 @@
     <section class="variant hero-wide" id="wide">
       <div class="wrap">
         <div class="variant-head">
-          <div class="label">вариант 02 - текст и широкое видео</div>
-          <p class="eyebrow">от a0 до c1, без хаоса и бесконечных сохраненок</p>
+          <div class="label">Вариант 02 - текст и широкое видео</div>
+          <p class="eyebrow">От A0 до C1, без хаоса и бесконечных сохранёнок</p>
         </div>
         <div class="layout">
           <div class="text-area" data-deck>
             <h1 data-title>Английский, который наконец <span class="script">идёт по плану</span></h1>
-            <p class="copy" data-copy>magic english plan собирает уроки, домашки, прогресс, словарь и speaking-практику в один маршрут. ты каждый день видишь не “надо учить английский”, а конкретный следующий шаг.</p>
-            <div class="hero-offer"><span class="sale">скидка 70%</span><strong>75 BYN</strong><s>250 BYN</s><span>примерно $26 вместо $87</span></div>
+            <p class="copy" data-copy>Magic English Plan собирает уроки, домашки, прогресс, словарь и speaking-практику в один маршрут. Ты каждый день видишь не «надо учить английский», а конкретный следующий шаг.</p>
+            <div class="hero-offer"><span class="sale">Скидка 75%</span><strong>75 BYN</strong><s>300 BYN</s><span>Примерно $26 вместо $104</span></div>
             <div class="actions">
-              <a class="primary" href="#payment" data-payment>открыть доступ за 75 BYN</a>
-              <a class="secondary" href="#inside">посмотреть что внутри</a>
+              <a class="primary" href="#payment" data-payment>Открыть доступ за 75 BYN</a>
+              <a class="secondary" href="#inside">Посмотреть что внутри</a>
             </div>
             <div class="text-switcher" aria-label="переключить текст">
               <button type="button" data-prev aria-label="предыдущий текст">‹</button>
@@ -7137,9 +7247,9 @@
           <button class="video-trigger wide-video paper-grid" type="button" data-modal-title="большое видео о курсе" data-modal-copy="сюда можно поставить главный ролик оффера: что внутри курса, как выглядит платформа, как устроен маршрут и зачем нужна разговорная практика." data-modal-media="место под главное видео 16:9">
             <div class="wide-video-main"><span class="play"></span></div>
             <div class="video-list">
-              <div class="soft-card"><strong>сначала маршрут</strong><p class="tiny">уровень, тема дня и что будет после нее</p></div>
-              <div class="soft-card"><strong>потом действие</strong><p class="tiny">урок, тест, домашка и разбор сложного момента</p></div>
-              <div class="soft-card"><strong>и практика</strong><p class="tiny">speaking club, партнер и закрепление в словаре</p></div>
+              <div class="soft-card"><strong>Сначала маршрут</strong><p class="tiny">Уровень, тема дня и что будет после нее</p></div>
+              <div class="soft-card"><strong>Потом действие</strong><p class="tiny">Урок, тест, домашка и разбор сложного момента</p></div>
+              <div class="soft-card"><strong>И практика</strong><p class="tiny">Speaking club, партнёр и закрепление в словаре</p></div>
             </div>
           </button>
         </div>
@@ -7149,34 +7259,34 @@
     <section class="why-variant why-editorial" id="why-01">
       <div class="wrap">
         <div class="variant-head reveal">
-          <div class="label">блок 02 / вариант 01</div>
-          <p class="eyebrow">редакционная раскладка</p>
+          <div class="label">Блок 02 / вариант 01</div>
+          <p class="eyebrow">Редакционная раскладка</p>
         </div>
         <div class="editorial-layout">
           <div class="editorial-copy reveal">
             <h2 class="why-title">Перестань собирать английский <span class="script">по кусочкам</span></h2>
-            <p class="why-lead">не чтобы снова начать английский. чтобы продолжить его завтра, через неделю и дойти до результата, который можно увидеть.</p>
+            <p class="why-lead">Не чтобы снова начать английский. Чтобы продолжить его завтра, через неделю и дойти до результата, который можно увидеть.</p>
             <div class="actions">
-              <button class="arrow-button" type="button" data-payment>начать по плану</button>
-              <span class="micro-price"><strong>75 BYN</strong><s>250 BYN</s></span>
+              <button class="arrow-button" type="button" data-payment>Начать по плану</button>
+              <span class="micro-price"><strong>75 BYN</strong><s>300 BYN</s></span>
             </div>
           </div>
           <div class="purpose-list">
             <article class="purpose-row reveal">
               <span class="num">01</span>
-              <div><h3>знать, что учить сегодня</h3><p>открываешь кабинет и видишь конкретный следующий шаг, а не бесконечный выбор курсов, роликов и сохраненок.</p></div>
+              <div><h3>Знать, что учить сегодня</h3><p>Открываешь кабинет и видишь конкретный следующий шаг, а не бесконечный выбор курсов, роликов и сохраненок.</p></div>
             </article>
             <article class="purpose-row reveal">
               <span class="num">02</span>
-              <div><h3>не бросать после первых тем</h3><p>маршрут, домашки и видимый прогресс помогают сохранять ритм даже в те недели, когда мотивация отдыхает.</p></div>
+              <div><h3>Не бросать после первых тем</h3><p>Маршрут, домашки и видимый прогресс помогают сохранять ритм даже в те недели, когда мотивация отдыхает.</p></div>
             </article>
             <article class="purpose-row reveal">
               <span class="num">03</span>
-              <div><h3>перенести английский в речь</h3><p>знания не остаются в тестах: внутри есть speaking-практика, закрытое сообщество и партнеры по уровню.</p></div>
+              <div><h3>Перенести английский в речь</h3><p>Знания не остаются в тестах: внутри есть speaking-практика, закрытое сообщество и партнёры по уровню.</p></div>
             </article>
             <article class="purpose-row reveal">
               <span class="num">04</span>
-              <div><h3>видеть, что ты движешься</h3><p>уровень, пройденные темы, домашки и достижения складываются в понятную картину роста.</p></div>
+              <div><h3>Видеть, что ты движешься</h3><p>Уровень, пройденные темы, домашки и достижения складываются в понятную картину роста.</p></div>
             </article>
           </div>
         </div>
@@ -7186,52 +7296,52 @@
     <section class="why-variant why-compare" id="why-02">
       <div class="wrap">
         <div class="variant-head reveal">
-          <div class="label">блок 02</div>
-          <p class="eyebrow">не еще один курс, а понятная система</p>
+          <div class="label">Блок 02</div>
+          <p class="eyebrow">Не ещё один курс, а понятная система</p>
         </div>
         <div class="compare-heading reveal">
           <div>
             <h2 class="why-title">Перестань собирать английский <span class="brand-title">по кусочкам</span></h2>
           </div>
           <div class="compare-summary">
-            <strong>чтобы перестать начинать английский и наконец продолжить</strong>
-            <p>plan убирает лишний выбор и превращает каждое занятие в понятный следующий шаг.</p>
+            <strong>Чтобы перестать начинать английский и наконец продолжить</strong>
+            <p>Plan убирает лишний выбор и превращает каждое занятие в понятный следующий шаг.</p>
           </div>
         </div>
         <div class="compare-board reveal">
           <div class="compare-columns" aria-hidden="true">
-            <span class="old-label">что было</span>
-            <span class="new-label">сейчас с magic plan</span>
+            <span class="old-label">Что было</span>
+            <span class="new-label">Сейчас с magic plan</span>
           </div>
           <div class="compare-row">
             <span class="compare-number">01</span>
-            <span class="compare-old">сохранять уроки на потом</span>
+            <span class="compare-old">Сохранять уроки на потом</span>
             <span class="compare-arrow" aria-hidden="true">→</span>
-            <strong class="compare-new">видеть один следующий шаг</strong>
+            <strong class="compare-new">Видеть один следующий шаг</strong>
           </div>
           <div class="compare-row">
             <span class="compare-number">02</span>
-            <span class="compare-old">прыгать между темами</span>
+            <span class="compare-old">Прыгать между темами</span>
             <span class="compare-arrow" aria-hidden="true">→</span>
-            <strong class="compare-new">двигаться по своему уровню</strong>
+            <strong class="compare-new">Двигаться по своему уровню</strong>
           </div>
           <div class="compare-row">
             <span class="compare-number">03</span>
-            <span class="compare-old">знать правила, но молчать</span>
+            <span class="compare-old">Знать правила, но молчать</span>
             <span class="compare-arrow" aria-hidden="true">→</span>
-            <strong class="compare-new">использовать английский в речи</strong>
+            <strong class="compare-new">Использовать английский в речи</strong>
           </div>
           <div class="compare-row">
             <span class="compare-number">04</span>
-            <span class="compare-old">гадать, стал ли английский лучше</span>
+            <span class="compare-old">Гадать, стал ли английский лучше</span>
             <span class="compare-arrow" aria-hidden="true">→</span>
-            <strong class="compare-new">видеть реальный прогресс</strong>
+            <strong class="compare-new">Видеть реальный прогресс</strong>
           </div>
         </div>
         <div class="compare-footer reveal">
-          <p>один кабинет вместо десятка вкладок. уроки, практика и прогресс уже связаны между собой.</p>
-          <span class="compare-price"><small>сейчас</small><strong>75 BYN</strong><s>250 BYN</s></span>
-          <button class="arrow-button" type="button" data-payment>начать по плану</button>
+          <p>Один кабинет вместо десятка вкладок. Уроки, практика и прогресс уже связаны между собой.</p>
+          <span class="compare-price"><small>Сейчас</small><strong>75 BYN</strong><s>300 BYN</s></span>
+          <button class="arrow-button" type="button" data-payment>Начать по плану</button>
         </div>
       </div>
     </section>
@@ -7240,104 +7350,104 @@
       <div class="wrap">
         <div class="inside-heading reveal">
           <h2>Один кабинет вместо десятка вкладок</h2>
-          <p>это не склад уроков и не очередная папка с сохраненками. внутри собран маршрут, который каждый день подсказывает: что открыть, что закрепить, где повторить и когда перенести тему в речь.</p>
+          <p>Это не склад уроков и не очередная папка с сохранёнками. Внутри собран маршрут, который каждый день подсказывает: что открыть, что закрепить, где повторить и когда перенести тему в речь.</p>
         </div>
         <div class="inside-options">
           <article class="inside-card main reveal">
             <small>/ 01</small>
-            <h3>маршрут от A0 до C1</h3>
-            <p>темы идут по уровням и не расползаются по вкладкам. открыл урок, разобрал правило, закрепил тестом и получил понятное следующее действие.</p>
+            <h3>Маршрут от A0 до C1</h3>
+            <p>Темы идут по уровням и не расползаются по вкладкам. Открыл урок, разобрал правило, закрепил тестом и получил понятное следующее действие.</p>
             <div class="inside-mock">
               <div class="mock-level">
                 <div class="progress-ring">43%</div>
                 <div class="mock-lines">
-                  <div class="mock-line"><span>тем пройдено</span><strong>6/14</strong></div>
-                  <div class="mock-line"><span>урок сегодня</span><strong>modals</strong></div>
-                  <div class="mock-line"><span>статус</span><strong>в работе</strong></div>
+                  <div class="mock-line"><span>Тем пройдено</span><strong>6/14</strong></div>
+                  <div class="mock-line"><span>Урок сегодня</span><strong>Modals</strong></div>
+                  <div class="mock-line"><span>Статус</span><strong>В работе</strong></div>
                 </div>
               </div>
               <div class="lesson-list">
-                <div class="lesson-item"><span class="lesson-check">✓</span><span>01</span><span>глаголы состояния</span><span>→</span></div>
-                <div class="lesson-item"><span class="lesson-check">✓</span><span>02</span><span>герундий</span><span>→</span></div>
-                <div class="lesson-item"><span class="lesson-check">✓</span><span>03</span><span>used to</span><span>→</span></div>
-                <div class="lesson-item"><span class="lesson-check" style="background:#fff;color:#bbb;border:1px solid rgba(23,20,15,.15)"> </span><span>04</span><span>модальные глаголы</span><span>→</span></div>
+                <div class="lesson-item"><span class="lesson-check">✓</span><span>01</span><span>Глаголы состояния</span><span>→</span></div>
+                <div class="lesson-item"><span class="lesson-check">✓</span><span>02</span><span>Герундий</span><span>→</span></div>
+                <div class="lesson-item"><span class="lesson-check">✓</span><span>03</span><span>Used to</span><span>→</span></div>
+                <div class="lesson-item"><span class="lesson-check" style="background:#fff;color:#bbb;border:1px solid rgba(23,20,15,.15)"> </span><span>04</span><span>Модальные глаголы</span><span>→</span></div>
               </div>
             </div>
           </article>
           <article class="inside-card slim reveal">
             <small>/ 02</small>
-            <h3>помощник по уроку</h3>
-            <p>когда тема не заходит с первого раза, можно спросить проще, попросить примеры, мини-тест или еще одно задание на закрепление.</p>
+            <h3>Помощник по уроку</h3>
+            <p>Когда тема не заходит с первого раза, можно спросить проще, попросить примеры, мини-тест или ещё одно задание на закрепление.</p>
             <div class="ai-chat-demo">
               <div class="ai-chat-head">
                 <span class="ai-avatar">✦</span>
-                <div><strong>помощник по уроку</strong><small>всегда рядом с темой</small></div>
+                <div><strong>Помощник по уроку</strong><small>Всегда рядом с темой</small></div>
                 <i></i>
               </div>
               <div class="ai-chat-feed">
-                <div class="ai-message user"><p>не понимаю разницу между <b>say</b> и <b>tell</b>. объясни проще</p></div>
+                <div class="ai-message user"><p>Не понимаю разницу между <b>say</b> и <b>tell</b>. Объясни проще.</p></div>
                 <div class="ai-message bot">
                   <span class="ai-avatar">✦</span>
-                  <div><p><b>say</b> - сказать что-то.<br><b>tell</b> - сказать что-то кому-то.</p><p class="ai-example">say hello · tell me the truth</p></div>
+                  <div><p><b>Say</b> - сказать что-то.<br><b>Tell</b> - сказать что-то кому-то.</p><p class="ai-example">Say hello · tell me the truth</p></div>
                 </div>
-                <div class="ai-message user compact"><p>дай короткое задание</p></div>
+                <div class="ai-message user compact"><p>Дай короткое задание</p></div>
                 <div class="ai-message bot">
                   <span class="ai-avatar">✦</span>
-                  <div><p>выбери верный вариант:</p><div class="ai-answers"><button type="button">say me</button><button type="button">tell me</button></div></div>
+                  <div><p>Выбери верный вариант:</p><div class="ai-answers"><button type="button">Say me</button><button type="button">Tell me</button></div></div>
                 </div>
               </div>
-              <div class="ai-composer"><span>спросить по этому уроку</span><button type="button" aria-label="отправить">↑</button></div>
+              <div class="ai-composer"><span>Спросить по этому уроку</span><button type="button" aria-label="отправить">↑</button></div>
             </div>
           </article>
           <article class="inside-card slim reveal">
             <small>/ 03</small>
-            <h3>трекер прогресса</h3>
-            <p>видишь темп, стрик, домашки и статистику. прогресс перестает быть ощущением “вроде стало лучше” и превращается в цифры.</p>
+            <h3>Трекер прогресса</h3>
+            <p>Видишь темп, стрик, домашки и статистику. Прогресс перестаёт быть ощущением “вроде стало лучше” и превращается в цифры.</p>
             <div class="tracker-mock">
               <div class="tracker-head">
                 <div>
-                  <small>твой прогресс</small>
-                  <strong>общая статистика</strong>
+                  <small>Твой прогресс</small>
+                  <strong>Общая статистика</strong>
                 </div>
                 <span class="streak-pill"><i class="flame"></i><span data-countup data-target="5">5</span></span>
               </div>
               <div class="tracker-grid">
-                <div class="tracker-ring"><strong><span data-countup data-target="51">51</span>%</strong><small>курс</small></div>
+                <div class="tracker-ring"><strong><span data-countup data-target="51">51</span>%</strong><small>Курс</small></div>
                 <div class="mock-lines">
-                  <div class="mock-line"><span>темы</span><strong>29/57</strong></div>
-                  <div class="mock-line"><span>уровень</span><strong>a2</strong></div>
+                  <div class="mock-line"><span>Темы</span><strong>29/57</strong></div>
+                  <div class="mock-line"><span>Уровень</span><strong>A2</strong></div>
                 </div>
               </div>
               <div class="tracker-days">
-                <span class="tracker-day done"><em>пн</em><i></i></span>
-                <span class="tracker-day done"><em>вт</em><i></i></span>
-                <span class="tracker-day done"><em>ср</em><i></i></span>
-                <span class="tracker-day done"><em>чт</em><i></i></span>
-                <span class="tracker-day done"><em>пт</em><i></i></span>
-                <span class="tracker-day"><em>сб</em><i></i></span>
-                <span class="tracker-day"><em>вс</em><i></i></span>
+                <span class="tracker-day done"><em>Пн</em><i></i></span>
+                <span class="tracker-day done"><em>Вт</em><i></i></span>
+                <span class="tracker-day done"><em>Ср</em><i></i></span>
+                <span class="tracker-day done"><em>Чт</em><i></i></span>
+                <span class="tracker-day done"><em>Пт</em><i></i></span>
+                <span class="tracker-day"><em>Сб</em><i></i></span>
+                <span class="tracker-day"><em>Вс</em><i></i></span>
               </div>
             </div>
           </article>
           <article class="inside-card slim reveal">
             <small>/ 04</small>
-            <h3>библиотека и шаблоны</h3>
-            <p>гайды, pdf, чек-листы, словари и заготовки фраз, которые можно открыть перед уроком, повторением или speaking club.</p>
+            <h3>Библиотека и шаблоны</h3>
+            <p>Гайды, pdf, чек-листы, словари и заготовки фраз, которые можно открыть перед уроком, повторением или speaking club.</p>
             <div class="file-library">
-              <div class="file-row"><i>pdf</i><div><strong>1000 идиом без зубрежки</strong><span>скачать файл</span></div><b>↓</b></div>
-              <div class="file-row"><i>txt</i><div><strong>фразы для speaking club</strong><span>открыть перед встречей</span></div><b>↓</b></div>
-              <div class="file-row"><i>video</i><div><strong>короткие разборы ошибок</strong><span>повторить за 7 минут</span></div><b>▶</b></div>
-              <div class="file-row"><i>pdf</i><div><strong>чек-лист повторения</strong><span>вернуться к теме вовремя</span></div><b>↓</b></div>
+              <div class="file-row"><i>Pdf</i><div><strong>1000 идиом без зубрежки</strong><span>Скачать файл</span></div><b>↓</b></div>
+              <div class="file-row"><i>Txt</i><div><strong>Фразы для speaking club</strong><span>Открыть перед встречей</span></div><b>↓</b></div>
+              <div class="file-row"><i>Video</i><div><strong>Короткие разборы ошибок</strong><span>Повторить за 7 минут</span></div><b>▶</b></div>
+              <div class="file-row"><i>Pdf</i><div><strong>Чек-лист повторения</strong><span>Вернуться к теме вовремя</span></div><b>↓</b></div>
             </div>
             <div class="inside-mini-grid">
-              <div class="inside-mini"><strong>готовые шаблоны</strong><span>письма, диалоги, заметки и планы повторения</span></div>
-              <div class="inside-mini"><strong>быстрый доступ</strong><span>материалы лежат рядом с темой, а не в папке на потом</span></div>
+              <div class="inside-mini"><strong>Готовые шаблоны</strong><span>Письма, диалоги, заметки и планы повторения</span></div>
+              <div class="inside-mini"><strong>Быстрый доступ</strong><span>Материалы лежат рядом с темой, а не в папке на потом</span></div>
             </div>
           </article>
         </div>
         <div class="inside-price-row reveal">
-          <div class="inside-price"><small>цена сегодня</small><strong>75 BYN</strong><s>250 BYN</s><span class="discount">-70%</span></div>
-          <button class="arrow-button" type="button" data-payment>получить доступ</button>
+          <div class="inside-price"><small>Цена сегодня</small><strong>75 BYN</strong><s>300 BYN</s><span class="discount">-75%</span></div>
+          <button class="arrow-button" type="button" data-payment>Получить доступ</button>
         </div>
       </div>
     </section>
@@ -7347,31 +7457,31 @@
         <div class="learning-layout">
           <div class="learning-copy reveal">
             <h2>Открой урок. Сделай шаг. Увидь прогресс.</h2>
-            <p>каждый заход в платформу должен заканчиваться действием, а не ощущением “я просто посмотрел еще один урок”.</p>
+            <p>Каждый заход в платформу должен заканчиваться действием, а не ощущением “я просто посмотрел ещё один урок”.</p>
             <div class="actions">
-              <button class="arrow-button" type="button" data-payment>начать за 75 BYN</button>
+              <button class="arrow-button" type="button" data-payment>Начать за 75 BYN</button>
             </div>
           </div>
           <div class="learning-steps">
             <article class="learning-step reveal">
               <span class="step-number">01</span>
-              <div><h3>открываешь следующий урок</h3><p>платформа показывает уровень, тему и что нужно сделать сегодня, без выбора из десятков вкладок.</p></div>
+              <div><h3>Открываешь следующий урок</h3><p>Платформа показывает уровень, тему и что нужно сделать сегодня, без выбора из десятков вкладок.</p></div>
             </article>
             <article class="learning-step reveal">
               <span class="step-number">02</span>
-              <div><h3>разбираешь тему и закрепляешь</h3><p>короткая теория, примеры, тест и домашка помогают не просто понять, а проверить себя.</p></div>
+              <div><h3>Разбираешь тему и закрепляешь</h3><p>Короткая теория, примеры, тест и домашка помогают не просто понять, а проверить себя.</p></div>
             </article>
             <article class="learning-step reveal">
               <span class="step-number">03</span>
-              <div><h3>сохраняешь слова и заметки</h3><p>словарь, личные пометки и повторение остаются рядом с уроком, а не теряются в разных сервисах.</p></div>
+              <div><h3>Сохраняешь слова и заметки</h3><p>Словарь, личные пометки и повторение остаются рядом с уроком, а не теряются в разных сервисах.</p></div>
             </article>
             <article class="learning-step reveal">
               <span class="step-number">04</span>
-              <div><h3>переносишь тему в речь</h3><p>speaking club, закрытое сообщество и партнеры по уровню помогают начать говорить спокойнее.</p></div>
+              <div><h3>Переносишь тему в речь</h3><p>Speaking club, закрытое сообщество и партнёры по уровню помогают начать говорить спокойнее.</p></div>
             </article>
             <article class="learning-step reveal">
               <span class="step-number">05</span>
-              <div><h3>видишь прогресс и продолжаешь</h3><p>трекер, достижения, домашки и сертификат показывают, что английский реально двигается.</p></div>
+              <div><h3>Видишь прогресс и продолжаешь</h3><p>Трекер, достижения, домашки и сертификат показывают, что английский реально двигается.</p></div>
             </article>
           </div>
         </div>
@@ -7381,39 +7491,39 @@
     <section class="levels-block" id="levels">
       <div class="wrap">
         <div class="levels-head reveal">
-          <h2>уровни без скачков и провалов</h2>
-          <p>в magic english plan ты не прыгаешь из present simple сразу в conditionals. каждый уровень собирает словарь, грамматику, чтение, письмо и speaking в понятный маршрут.</p>
+          <h2>Уровни без скачков и провалов</h2>
+          <p>В Magic English Plan ты не прыгаешь из Present Simple сразу в Conditionals. Каждый уровень собирает словарь, грамматику, чтение, письмо и speaking в понятный маршрут.</p>
         </div>
         <div class="level-list">
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - a0</strong><span>мягкий старт с нуля: звуки, алфавит, первые слова и базовые фразы без перегруза.</span><div class="level-topics"><span>алфавит и произношение</span><span>приветствия и числа</span><span>первые предложения</span></div></div>
-            <div class="skill-cloud"><b>sounds</b><b>vocabulary</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — A0</strong><span>Мягкий старт с нуля: звуки, алфавит, первые слова и базовые фразы без перегруза.</span><div class="level-topics"><span>Алфавит и произношение</span><span>Приветствия и числа</span><span>Первые предложения</span></div></div>
+            <div class="skill-cloud"><b>Sounds</b><b>Vocabulary</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - a1</strong><span>база для старта: простые фразы, вопросы, первые диалоги и спокойный вход в грамматику.</span><div class="level-topics"><span>to be, am/is/are</span><span>местоимения и вопросы</span><span>первые фразы о себе</span></div></div>
-            <div class="skill-cloud"><b>vocabulary</b><b>writing</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — A1</strong><span>База для старта: простые фразы, вопросы, первые диалоги и спокойный вход в грамматику.</span><div class="level-topics"><span>To be, am/is/are</span><span>Местоимения и вопросы</span><span>Первые фразы о себе</span></div></div>
+            <div class="skill-cloud"><b>Vocabulary</b><b>Writing</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - a2</strong><span>повседневные темы, времена, личные истории, базовый speaking и уверенное повторение.</span><div class="level-topics"><span>past simple и future</span><span>еда, поездки, работа</span><span>короткие истории</span></div></div>
-            <div class="skill-cloud"><b>vocabulary</b><b>writing</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — A2</strong><span>Повседневные темы, времена, личные истории, базовый speaking и уверенное повторение.</span><div class="level-topics"><span>Past Simple и Future</span><span>Еда, поездки, работа</span><span>Короткие истории</span></div></div>
+            <div class="skill-cloud"><b>Vocabulary</b><b>Writing</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - b1</strong><span>меньше перевода в голове, больше связной речи, аргументов, историй и понятных конструкций.</span><div class="level-topics"><span>conditionals</span><span>мнение и аргументы</span><span>связная речь</span></div></div>
-            <div class="skill-cloud"><b>vocabulary</b><b>writing</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — B1</strong><span>Меньше перевода в голове, больше связной речи, аргументов, историй и понятных конструкций.</span><div class="level-topics"><span>Conditionals</span><span>Мнение и аргументы</span><span>Связная речь</span></div></div>
+            <div class="skill-cloud"><b>Vocabulary</b><b>Writing</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - b2</strong><span>сложнее тексты, живые обсуждения, устойчивые фразы, аккуратная грамматика и больше свободы.</span><div class="level-topics"><span>нюансы времен</span><span>дискуссии и эссе</span><span>фразовые глаголы</span></div></div>
-            <div class="skill-cloud"><b>vocabulary</b><b>writing</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — B2</strong><span>Сложнее тексты, живые обсуждения, устойчивые фразы, аккуратная грамматика и больше свободы.</span><div class="level-topics"><span>Нюансы времён</span><span>Дискуссии и эссе</span><span>Фразовые глаголы</span></div></div>
+            <div class="skill-cloud"><b>Vocabulary</b><b>Writing</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
           <article class="level-card reveal">
-            <div class="level-name"><strong>cefr - c1</strong><span>нюансы, стиль, скорость понимания, уверенная речь и английский, который звучит взрослее.</span><div class="level-topics"><span>тон и стиль</span><span>сложные тексты</span><span>свободный speaking</span></div></div>
-            <div class="skill-cloud"><b>vocabulary</b><b>writing</b><b>reading</b><b>grammar</b><b>speaking</b></div>
-            <button class="arrow-button" type="button" data-payment>перейти на уровень</button>
+            <div class="level-name"><strong>CEFR — C1</strong><span>Нюансы, стиль, скорость понимания, уверенная речь и английский, который звучит взрослее.</span><div class="level-topics"><span>Тон и стиль</span><span>Сложные тексты</span><span>Свободный speaking</span></div></div>
+            <div class="skill-cloud"><b>Vocabulary</b><b>Writing</b><b>Reading</b><b>Grammar</b><b>Speaking</b></div>
+            <button class="arrow-button" type="button" data-payment>Перейти на уровень</button>
           </article>
         </div>
       </div>
@@ -7424,16 +7534,16 @@
         <div class="club-layout">
           <div class="club-copy reveal">
             <div>
-              <p class="eyebrow">бонусы уже входят в доступ</p>
+              <p class="eyebrow">Бонусы уже входят в доступ</p>
               <h2>Учись самостоятельно, но не оставайся один</h2>
             </div>
             <div class="gift-intro">
-              <p>ты получаешь не просто курс. внутри уже есть закрытое сообщество, speaking club, ребята твоего уровня, календарь занятий, подборка ресурсов, методики запоминания слов и большая библиотека учебников и материалов.</p>
-              <p>можно учиться самому, но всегда есть к кому прийти с вопросом, с кем поговорить и откуда взять следующий материал.</p>
+              <p>Ты получаешь не просто курс. Внутри уже есть закрытое сообщество, speaking club, ребята твоего уровня, календарь занятий, подборка ресурсов, методики запоминания слов и большая библиотека учебников и материалов.</p>
+              <p>Можно учиться самому, но всегда есть к кому прийти с вопросом, с кем поговорить и откуда взять следующий материал.</p>
             </div>
             <div class="actions">
-              <button class="arrow-button" type="button" data-payment>забрать курс и бонусы</button>
-              <button class="ghost-button" type="button" data-scroll-target="#achievements">посмотреть результат</button>
+              <button class="arrow-button" type="button" data-payment>Забрать курс и бонусы</button>
+              <button class="ghost-button" type="button" data-scroll-target="#achievements">Посмотреть результат</button>
             </div>
           </div>
           <div class="gift-board reveal">
@@ -7452,40 +7562,40 @@
                 <path d="M111 59c25-2 45-10 45-26 0-9-7-15-17-15-16 0-25 21-28 41Z" fill="none" stroke="#f29a16" stroke-width="11" stroke-linecap="round"/>
                 <path d="m110 4 4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#fff"/>
               </svg>
-              <h3>закрытое сообщество</h3>
-              <p>чат учеников, вопросы по урокам, мини-разборы и ощущение, что ты не один наедине с английским.</p>
-              <div class="gift-tags"><span>поддержка</span><span>ритм</span><span>вопросы</span></div>
+              <h3>Закрытое сообщество</h3>
+              <p>Чат учеников, вопросы по урокам, мини-разборы и ощущение, что ты не один наедине с английским.</p>
+              <div class="gift-tags"><span>Поддержка</span><span>Ритм</span><span>Вопросы</span></div>
             </article>
             <article class="gift-card" data-gift="gift 02">
-              <h3>speaking club</h3>
-              <p>встречи по темам уровня: сначала готовишь фразы, потом спокойно говоришь в группе.</p>
+              <h3>Speaking club</h3>
+              <p>Встречи по темам уровня: сначала готовишь фразы, потом спокойно говоришь в группе.</p>
             </article>
             <article class="gift-card" data-gift="gift 03">
-              <h3>партнер по уровню</h3>
-              <p>можно найти человека рядом по уровню и практиковать короткие созвоны без стресса.</p>
+              <h3>Партнёр по уровню</h3>
+              <p>Можно найти человека рядом по уровню и практиковать короткие созвоны без стресса.</p>
             </article>
             <article class="gift-card wide" data-gift="gift 04">
               <div>
-                <h3>темы, фразы и сценарии для практики</h3>
-                <p>не надо сидеть перед созвоном и думать, о чем говорить. открываешь тему недели, готовишь несколько фраз и идешь практиковаться.</p>
+                <h3>Темы, фразы и сценарии для практики</h3>
+                <p>Не надо сидеть перед созвоном и думать, о чем говорить. Открываешь тему недели, готовишь несколько фраз и идешь практиковаться.</p>
               </div>
-              <div class="gift-tags"><span>small talk</span><span>travel</span><span>work</span><span>life</span></div>
+              <div class="gift-tags"><span>Small talk</span><span>Travel</span><span>Work</span><span>Life</span></div>
             </article>
             <article class="gift-card bonus" data-gift="bonus 01">
-              <h3>календарь занятий</h3>
-              <p>готовый план на 30 дней, чтобы спокойно войти в ритм и не решать каждое утро, что учить сегодня.</p>
+              <h3>Календарь занятий</h3>
+              <p>Готовый план на 30 дней, чтобы спокойно войти в ритм и не решать каждое утро, что учить сегодня.</p>
             </article>
             <article class="gift-card bonus" data-gift="bonus 02">
-              <h3>слова, которые остаются</h3>
-              <p>простые методики повторения и запоминания, чтобы слова переходили в речь, а не исчезали через неделю.</p>
+              <h3>Слова, которые остаются</h3>
+              <p>Простые методики повторения и запоминания, чтобы слова переходили в речь, а не исчезали через неделю.</p>
             </article>
             <article class="gift-card bonus" data-gift="bonus 03">
-              <h3>подборка ресурсов</h3>
-              <p>словари, каналы, сайты и тренажеры уже отобраны по уровням. не придется проверять сотни ссылок самому.</p>
+              <h3>Подборка ресурсов</h3>
+              <p>Словари, каналы, сайты и тренажеры уже отобраны по уровням. Не придётся проверять сотни ссылок самому.</p>
             </article>
             <article class="gift-card bonus" data-gift="bonus 04">
-              <h3>учебники и материалы</h3>
-              <p>рабочие листы, таблицы, чек-листы, pdf и дополнительные задания для каждой большой темы.</p>
+              <h3>Учебники и материалы</h3>
+              <p>Рабочие листы, таблицы, чек-листы, pdf и дополнительные задания для каждой большой темы.</p>
             </article>
           </div>
         </div>
@@ -7495,8 +7605,8 @@
     <section class="final-section" id="achievements">
       <div class="wrap">
         <div class="section-heading reveal">
-          <h2>ты видишь, что английский действительно двигается</h2>
-          <p>иногда занимаешься неделями и кажется, что стоишь на месте. здесь каждый шаг остается перед глазами: закрытые темы, домашки, серия занятий, новый уровень и результат, которым приятно поделиться.</p>
+          <h2>Ты видишь, что английский действительно двигается</h2>
+          <p>Иногда занимаешься неделями и кажется, что стоишь на месте. Здесь каждый шаг остается перед глазами: закрытые темы, домашки, серия занятий, новый уровень и результат, которым приятно поделиться.</p>
         </div>
         <div class="achievement-layout">
           <article class="certificate-card reveal">
@@ -7511,9 +7621,9 @@
                 </g>
                 <text x="380" y="164" text-anchor="middle" font-family="Montserrat, Arial" font-size="18" font-weight="800" fill="#e17c00" letter-spacing="3">MAGIC ENGLISH PLAN</text>
                 <text x="380" y="226" text-anchor="middle" font-family="Montserrat, Arial" font-size="46" font-weight="800" fill="#17140f">CERTIFICATE</text>
-                <text x="380" y="266" text-anchor="middle" font-family="Montserrat, Arial" font-size="15" fill="#77736d">подтверждает завершение уровня английского языка</text>
+                <text x="380" y="266" text-anchor="middle" font-family="Montserrat, Arial" font-size="15" fill="#77736d">Подтверждает завершение уровня английского языка</text>
                 <line x1="175" y1="337" x2="585" y2="337" stroke="#17140f" stroke-opacity=".24"/>
-                <text x="380" y="322" text-anchor="middle" font-family="Montserrat, Arial" font-size="25" font-weight="700" fill="#17140f">имя ученика</text>
+                <text x="380" y="322" text-anchor="middle" font-family="Montserrat, Arial" font-size="25" font-weight="700" fill="#17140f">Имя ученика</text>
                 <text x="180" y="399" font-family="Montserrat, Arial" font-size="13" font-weight="700" fill="#77736d">LEVEL B1</text>
                 <text x="580" y="399" text-anchor="end" font-family="Montserrat, Arial" font-size="13" font-weight="700" fill="#77736d">2026</text>
                 <circle cx="380" cy="400" r="30" fill="#17140f"/>
@@ -7521,19 +7631,19 @@
               </svg>
             </div>
             <div class="certificate-copy">
-              <span class="result-label">уровень закрыт</span>
-              <h3>не просто прошел уроки, а дошел до результата</h3>
-              <p>после каждого большого уровня ты получаешь сертификат. его можно сохранить, добавить в портфолио или просто оставить себе как честное напоминание: я это сделал.</p>
+              <span class="result-label">Уровень закрыт</span>
+              <h3>Не просто прошел уроки, а дошел до результата</h3>
+              <p>После каждого большого уровня ты получаешь сертификат. Его можно сохранить, добавить в портфолио или просто оставить себе как честное напоминание: я это сделал.</p>
             </div>
           </article>
           <div class="achievement-stack">
             <article class="achievement-card reveal">
-              <div><span class="result-label">немного азарта</span><h3>двигаться вместе веселее</h3><p>в рейтинге видно, кто держит ритм на этой неделе. без давления и гонки, просто еще один повод открыть сегодняшний урок.</p></div>
-              <div class="leader-list"><span><b>1. mila</b><em>560 xp</em></span><span><b>2. alex</b><em>510 xp</em></span><span><b>3. you</b><em>485 xp</em></span></div>
+              <div><span class="result-label">Немного азарта</span><h3>Двигаться вместе веселее</h3><p>В рейтинге видно, кто держит ритм на этой неделе. Без давления и гонки, просто ещё один повод открыть сегодняшний урок.</p></div>
+              <div class="leader-list"><span><b>1. Mila</b><em>560 xp</em></span><span><b>2. Alex</b><em>510 xp</em></span><span><b>3. You</b><em>485 xp</em></span></div>
             </article>
             <article class="achievement-card reveal">
-              <div><span class="result-label">рост складывается из шагов</span><h3>платформа замечает твои победы</h3><p>первая домашка, семь дней подряд, закрытая тема или спокойный speaking. прогресс начинается задолго до сертификата.</p></div>
-              <div class="victory-list"><span><b>7 дней</b><em>стрик без провалов</em></span><span><b>a2</b><em>уровень в работе</em></span><span><b>50 тем</b><em>закрыто в маршруте</em></span><span><b>homework</b><em>первая домашка сдана</em></span></div>
+              <div><span class="result-label">Рост складывается из шагов</span><h3>Платформа замечает твои победы</h3><p>Первая домашка, семь дней подряд, закрытая тема или спокойный speaking. Прогресс начинается задолго до сертификата.</p></div>
+              <div class="victory-list"><span><b>7 дней</b><em>Стрик без провалов</em></span><span><b>A2</b><em>Уровень в работе</em></span><span><b>50 тем</b><em>Закрыто в маршруте</em></span><span><b>Homework</b><em>Первая домашка сдана</em></span></div>
             </article>
           </div>
         </div>
@@ -7544,58 +7654,48 @@
       <div class="wrap">
         <div class="reviews-head">
           <div class="section-heading reveal">
-            <h2>что говорят ученики</h2>
-            <p>про порядок, спокойный темп, speaking и ощущение, что английский наконец не разваливается на десятки вкладок.</p>
+            <h2>Что говорят ученики</h2>
+            <p>Про порядок, спокойный темп, speaking и ощущение, что английский наконец не разваливается на десятки вкладок.</p>
           </div>
           <div class="rating-summary reveal">
             <strong>4.9</strong>
-            <div><div class="rating-stars">★★★★★</div><span>из 5 · 1020+ отзывов</span></div>
-            <button class="arrow-button" type="button" data-payment>получить доступ</button>
+            <div><div class="rating-stars">★★★★★</div><span>Из 5 · 1020+ отзывов</span></div>
+            <button class="arrow-button" type="button" data-payment>Получить доступ</button>
           </div>
         </div>
         <div class="reviews-rail reveal" aria-label="отзывы учеников">
           <div class="reviews-track">
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">раньше открывала видео, сохраняла и пропадала. тут просто вижу урок дня и делаю его без долгих раздумий.</p><div class="review-meta"><strong>аня</strong><span>a1 - a2</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">трекер неожиданно мотивирует. когда уже есть серия, не хочется ломать ее из-за одного ленивого вечера.</p><div class="review-meta"><strong>максим</strong><span>b1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">speaking стал менее страшным, потому что перед встречей есть тема, фразы и понимание, что говорить.</p><div class="review-meta"><strong>лиза</strong><span>speaking club</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">мне нравится, что слова не теряются. прошла урок, добавила примеры, потом вернулась и повторила.</p><div class="review-meta"><strong>саша</strong><span>словарь</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">после перерыва не было чувства, что все заново. платформа показала, где я остановилась, и я продолжила.</p><div class="review-meta"><strong>ирина</strong><span>a2</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">самое ценное - нет хаоса. не надо искать тему, тест, слова и домашку в разных местах.</p><div class="review-meta"><strong>даниил</strong><span>маршрут</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">понравилось, что можно заниматься с телефона. утром открыла тему, вечером добила домашку.</p><div class="review-meta"><strong>марина</strong><span>mobile</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я наконец перестала прыгать между уровнями. сначала закрываю базу, потом спокойно иду дальше.</p><div class="review-meta"><strong>катя</strong><span>a1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">домашки короткие, но после них тема реально садится. без ощущения школы и перегруза.</p><div class="review-meta"><strong>рома</strong><span>домашки</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 белорусских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">партнер по практике помог не откладывать speaking. договорились на 15 минут и реально созвонились.</p><div class="review-meta"><strong>никита</strong><span>партнер</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я люблю, когда видно следующий шаг. тут его видно всегда, и это сильно снижает тревогу.</p><div class="review-meta"><strong>вика</strong><span>план</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">у меня наконец появилось чувство, что английский не где-то в сохраненках, а в нормальном маршруте.</p><div class="review-meta"><strong>павел</strong><span>b1</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">очень зашел формат маленьких шагов. сделал тему, закрепил, отметил прогресс, пошел дальше.</p><div class="review-meta"><strong>настя</strong><span>ритм</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">помощник не главный вау, но полезно спросить проще, когда правило не зашло с первого раза.</p><div class="review-meta"><strong>евгений</strong><span>помощь</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">закрытый чат добавляет ощущение движения. видишь, что другие тоже проходят, спрашивают и не бросают.</p><div class="review-meta"><strong>оля</strong><span>club</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">после каждого урока понятно, что делать: тест, домашка, слова. мне именно этого не хватало.</p><div class="review-meta"><strong>артем</strong><span>a2</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">не люблю длинные курсы, где непонятно, где ты. тут прогресс видно сразу, и мозг цепляется.</p><div class="review-meta"><strong>юля</strong><span>трекер</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">словари и шаблоны фраз спасают перед speaking. не сидишь пустой, уже есть опора.</p><div class="review-meta"><strong>денис</strong><span>speaking</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я занимаюсь не каждый день, но возвращаться легко. кабинет не ругает, а просто показывает маршрут.</p><div class="review-meta"><strong>маша</strong><span>темп</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">сертификат после уровня выглядит как нормальная точка, а не просто картинка ради картинки.</p><div class="review-meta"><strong>илья</strong><span>сертификат</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">для меня плюс, что курс не пытается быть всем на свете. он просто ведет по английскому.</p><div class="review-meta"><strong>ксения</strong><span>маршрут</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">в b1 стало легче говорить длиннее. не идеально, но уже не отдельными словами.</p><div class="review-meta"><strong>стас</strong><span>b1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">очень нравится, что темы идут по уровню. раньше хватала слишком сложное и бросала.</p><div class="review-meta"><strong>лариса</strong><span>a1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">таблица лидеров не давит, но прикольно видеть себя рядом с другими. появляется азарт.</p><div class="review-meta"><strong>тимур</strong><span>xp</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">мне понравился календарь на 30 дней. наконец не думала, как войти обратно в режим.</p><div class="review-meta"><strong>света</strong><span>бонус</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">после урока есть ощущение сделанной работы, а не просто просмотренного ролика.</p><div class="review-meta"><strong>егор</strong><span>домашка</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">понравилось, что можно спросить в поддержке, если что-то с доступом или уроком непонятно.</p><div class="review-meta"><strong>таня</strong><span>поддержка</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">все выглядит спокойно и понятно. без лишней мотивационной воды, просто учишься.</p><div class="review-meta"><strong>миша</strong><span>платформа</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">я покупала ради грамматики, а осталась из-за понятного ритма и speaking-встреч.</p><div class="review-meta"><strong>полина</strong><span>b2</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Партнёр по практике помог не откладывать speaking. Договорились на 15 минут и реально созвонились.</p><div class="review-meta"><strong>Никита</strong><span>Партнёр</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Я люблю, когда видно следующий шаг. Тут его видно всегда, и это сильно снижает тревогу.</p><div class="review-meta"><strong>Вика</strong><span>План</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">У меня наконец появилось чувство, что английский не где-то в сохранёнках, а в нормальном маршруте.</p><div class="review-meta"><strong>Павел</strong><span>B1</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Очень зашёл формат маленьких шагов. Сделал тему, закрепил, отметил прогресс, пошел дальше.</p><div class="review-meta"><strong>Настя</strong><span>Ритм</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Помощник не главный вау, но полезно спросить проще, когда правило не зашло с первого раза.</p><div class="review-meta"><strong>Евгений</strong><span>Помощь</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Закрытый чат добавляет ощущение движения. Видишь, что другие тоже проходят, спрашивают и не бросают.</p><div class="review-meta"><strong>Оля</strong><span>Club</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">После каждого урока понятно, что делать: тест, домашка, слова. Мне именно этого не хватало.</p><div class="review-meta"><strong>Артем</strong><span>A2</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Не люблю длинные курсы, где непонятно, где ты. Тут прогресс видно сразу, и мозг цепляется.</p><div class="review-meta"><strong>Юля</strong><span>Трекер</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Словари и шаблоны фраз спасают перед speaking. Не сидишь пустой, уже есть опора.</p><div class="review-meta"><strong>Денис</strong><span>Speaking</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Я занимаюсь не каждый день, но возвращаться легко. Кабинет не ругает, а просто показывает маршрут.</p><div class="review-meta"><strong>Маша</strong><span>Темп</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Сертификат после уровня выглядит как нормальная точка, а не просто картинка ради картинки.</p><div class="review-meta"><strong>Илья</strong><span>Сертификат</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Для меня плюс, что курс не пытается быть всем на свете. Он просто ведёт по английскому.</p><div class="review-meta"><strong>Ксения</strong><span>Маршрут</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">В B1 стало легче говорить длиннее. Не идеально, но уже не отдельными словами.</p><div class="review-meta"><strong>Стас</strong><span>B1</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Очень нравится, что темы идут по уровню. Раньше хватала слишком сложное и бросала.</p><div class="review-meta"><strong>Лариса</strong><span>A1</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Таблица лидеров не давит, но прикольно видеть себя рядом с другими. Появляется азарт.</p><div class="review-meta"><strong>Тимур</strong><span>XP</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Мне понравился календарь на 30 дней. Наконец не думала, как войти обратно в режим.</p><div class="review-meta"><strong>Света</strong><span>Бонус</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">После урока есть ощущение сделанной работы, а не просто просмотренного ролика.</p><div class="review-meta"><strong>Егор</strong><span>Домашка</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Понравилось, что можно спросить в поддержке, если что-то с доступом или уроком непонятно.</p><div class="review-meta"><strong>Таня</strong><span>Поддержка</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Все выглядит спокойно и понятно. Без лишней мотивационной воды, просто учишься.</p><div class="review-meta"><strong>Миша</strong><span>Платформа</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Я покупала ради грамматики, а осталась из-за понятного ритма и speaking-встреч.</p><div class="review-meta"><strong>Полина</strong><span>B2</span></div></article>
 
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">раньше открывала видео, сохраняла и пропадала. тут просто вижу урок дня и делаю его без долгих раздумий.</p><div class="review-meta"><strong>аня</strong><span>a1 - a2</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">трекер неожиданно мотивирует. когда уже есть серия, не хочется ломать ее из-за одного ленивого вечера.</p><div class="review-meta"><strong>максим</strong><span>b1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">speaking стал менее страшным, потому что перед встречей есть тема, фразы и понимание, что говорить.</p><div class="review-meta"><strong>лиза</strong><span>speaking club</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">мне нравится, что слова не теряются. прошла урок, добавила примеры, потом вернулась и повторила.</p><div class="review-meta"><strong>саша</strong><span>словарь</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">после перерыва не было чувства, что все заново. платформа показала, где я остановилась, и я продолжила.</p><div class="review-meta"><strong>ирина</strong><span>a2</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">самое ценное - нет хаоса. не надо искать тему, тест, слова и домашку в разных местах.</p><div class="review-meta"><strong>даниил</strong><span>маршрут</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">понравилось, что можно заниматься с телефона. утром открыла тему, вечером добила домашку.</p><div class="review-meta"><strong>марина</strong><span>mobile</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я наконец перестала прыгать между уровнями. сначала закрываю базу, потом спокойно иду дальше.</p><div class="review-meta"><strong>катя</strong><span>a1</span></div></article>
-            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">домашки короткие, но после них тема реально садится. без ощущения школы и перегруза.</p><div class="review-meta"><strong>рома</strong><span>домашки</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 белорусских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Раньше открывала видео, сохраняла и пропадала. Тут просто вижу урок дня и делаю его без долгих раздумий.</p><div class="review-meta"><strong>Аня</strong><span>A1–A2</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Трекер неожиданно мотивирует. Когда уже есть серия, не хочется ломать ее из-за одного ленивого вечера.</p><div class="review-meta"><strong>Максим</strong><span>B1</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Speaking стал менее страшным, потому что перед встречей есть тема, фразы и понимание, что говорить.</p><div class="review-meta"><strong>Лиза</strong><span>Speaking club</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Мне нравится, что слова не теряются. Прошла урок, добавила примеры, потом вернулась и повторила.</p><div class="review-meta"><strong>Саша</strong><span>Словарь</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">После перерыва не было чувства, что все заново. Платформа показала, где я остановилась, и я продолжила.</p><div class="review-meta"><strong>Ирина</strong><span>A2</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Самое ценное - нет хаоса. Не надо искать тему, тест, слова и домашку в разных местах.</p><div class="review-meta"><strong>Даниил</strong><span>Маршрут</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Понравилось, что можно заниматься с телефона. Утром открыла тему, вечером добила домашку.</p><div class="review-meta"><strong>Марина</strong><span>Mobile</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Я наконец перестала прыгать между уровнями. Сначала закрываю базу, потом спокойно иду дальше.</p><div class="review-meta"><strong>Катя</strong><span>A1</span></div></article>
+            <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">Домашки короткие, но после них тема реально садится. Без ощущения школы и перегруза.</p><div class="review-meta"><strong>Рома</strong><span>Домашки</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">Цена приятная. За 75 белорусских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>Алина</strong><span>75 BYN</span></div></article>
           </div>
         </div>
       </div>
@@ -7604,15 +7704,15 @@
     <section class="final-section" id="bonuses">
       <div class="wrap">
         <div class="section-heading reveal">
-          <h2>бонусы и доп материалы</h2>
-          <p>собрал сюда все, что усиливает основной курс: от speaking-фраз до чек-листов, ресурсов и маленького помощника по теме.</p>
+          <h2>Бонусы и доп. материалы</h2>
+          <p>Собрал сюда все, что усиливает основной курс: от speaking-фраз до чек-листов, ресурсов и маленького помощника по теме.</p>
         </div>
         <div class="bonus-grid">
-          <article class="bonus-card reveal"><span class="bonus-number">bonus 01</span><div><h3>30 дней без хаоса</h3><p>готовый календарь занятий, чтобы спокойно войти в режим.</p></div></article>
-          <article class="bonus-card reveal"><span class="bonus-number">bonus 02</span><div><h3>100 фраз для speaking</h3><p>фразы для знакомства, мнения, вопросов и поддержки разговора.</p></div></article>
-          <article class="bonus-card reveal"><span class="bonus-number">bonus 03</span><div><h3>чек-лист повторения</h3><p>простая система, которая подсказывает, когда возвращаться к теме.</p></div></article>
-          <article class="bonus-card reveal"><span class="bonus-number">bonus 04</span><div><h3>подборка ресурсов</h3><p>словари, каналы и сайты, отобранные по уровням и задачам.</p></div></article>
-          <article class="bonus-card reveal"><span class="bonus-number">bonus 05</span><div><h3>помощник по теме</h3><p>можно попросить объяснить проще, дать пример, мини-тест или доп задание.</p></div></article>
+          <article class="bonus-card reveal"><span class="bonus-number">Bonus 01</span><div><h3>30 дней без хаоса</h3><p>Готовый календарь занятий, чтобы спокойно войти в режим.</p></div></article>
+          <article class="bonus-card reveal"><span class="bonus-number">Bonus 02</span><div><h3>100 фраз для speaking</h3><p>Фразы для знакомства, мнения, вопросов и поддержки разговора.</p></div></article>
+          <article class="bonus-card reveal"><span class="bonus-number">Bonus 03</span><div><h3>Чек-лист повторения</h3><p>Простая система, которая подсказывает, когда возвращаться к теме.</p></div></article>
+          <article class="bonus-card reveal"><span class="bonus-number">Bonus 04</span><div><h3>Подборка ресурсов</h3><p>Словари, каналы и сайты, отобранные по уровням и задачам.</p></div></article>
+          <article class="bonus-card reveal"><span class="bonus-number">Bonus 05</span><div><h3>Помощник по теме</h3><p>Можно попросить объяснить проще, дать пример, мини-тест или доп задание.</p></div></article>
         </div>
       </div>
     </section>
@@ -7620,8 +7720,8 @@
     <section class="final-section" id="price">
       <div class="wrap">
         <div class="price-stage reveal">
-          <div><p class="eyebrow">скидка 70% сегодня</p><h2>Английский, который наконец идёт по плану</h2><p>уроки от A0 до C1, домашки, словарь, прогресс, материалы, бонусы и закрытое сообщество внутри одного доступа.</p></div>
-          <div class="price-box"><span class="discount">скидка 70%</span><div class="price-line"><strong>75 BYN</strong><s>250 BYN</s></div><small>75 белорусских рублей<br>примерно $26 вместо $87</small><button class="arrow-button" type="button" data-payment>оставить заявку</button></div>
+          <div><p class="eyebrow">Скидка 75% сегодня</p><h2>Английский, который наконец идёт по плану</h2><p>Уроки от A0 до C1, домашки, словарь, прогресс, материалы, бонусы и закрытое сообщество внутри одного доступа.</p></div>
+          <div class="price-box"><span class="discount">Скидка 75%</span><div class="price-line"><strong>75 BYN</strong><s>300 BYN</s></div><small>75 белорусских рублей<br>Примерно $26 вместо $104</small><button class="arrow-button" type="button" data-payment>Оставить заявку</button></div>
         </div>
       </div>
     </section>
@@ -7629,20 +7729,20 @@
     <section class="final-section" id="faq">
       <div class="wrap">
         <div class="faq-layout">
-          <div class="faq-copy reveal"><h2>ответы на вопросы</h2><p>не нашел свой вопрос? напиши в поддержку, ответим и поможем разобраться.</p><div class="actions"><a class="ghost-button" href="https://t.me/mag_english" target="_blank" rel="noopener">написать в поддержку</a></div></div>
+          <div class="faq-copy reveal"><h2>Ответы на вопросы</h2><p>Не нашёл свой вопрос? Напиши в поддержку, ответим и поможем разобраться.</p><div class="actions"><a class="ghost-button" href="https://t.me/mag_english" target="_blank" rel="noopener">Написать в поддержку</a></div></div>
           <div class="faq-list reveal">
-            <div class="faq-item is-open"><button class="faq-question" type="button" aria-expanded="true">подойдет ли платформа новичку?</button><div class="faq-panel"><div class="faq-answer">да. маршрут начинается с a0-a1 и ведет дальше по уровням. если английский уже есть, можно начать с подходящего модуля.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">что именно я получу после оплаты?</button><div class="faq-panel"><div class="faq-answer">доступ к платформе, урокам, домашкам, словарю, трекеру прогресса, бонусам, материалам и закрытому сообществу.</div></div></div>
+            <div class="faq-item is-open"><button class="faq-question" type="button" aria-expanded="true">Подойдёт ли платформа новичку?</button><div class="faq-panel"><div class="faq-answer">Да. Маршрут начинается с A0–A1 и ведёт дальше по уровням. Если английский уже есть, можно начать с подходящего модуля.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Что именно я получу после оплаты?</button><div class="faq-panel"><div class="faq-answer">Доступ к платформе, урокам, домашкам, словарю, трекеру прогресса, бонусам, материалам и закрытому сообществу.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">75 BYN — это белорусские рубли?</button><div class="faq-panel"><div class="faq-answer">Да, цена указана в белорусских рублях. Это примерно $26, точная сумма в валюте карты зависит от курса банка в момент оплаты.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">почему стоит 75 BYN, если раньше было 250 BYN?</button><div class="faq-panel"><div class="faq-answer">Сейчас доступ идёт по акции со скидкой 70%. На сайте отдельно показываем обычную цену 250 BYN и актуальную цену 75 BYN.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">это разовая оплата или подписка?</button><div class="faq-panel"><div class="faq-answer">75 BYN оплачиваются один раз. минимальный гарантированный срок доступа к курсу составляет 4 месяца в соответствии с договором-офертой.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">сколько времени нужно на занятия?</button><div class="faq-panel"><div class="faq-answer">оптимально 30-40 минут в день. если времени меньше, можно пройти короткую часть урока и продолжить позже. прогресс сохраняется.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">можно ли заниматься с телефона?</button><div class="faq-panel"><div class="faq-answer">да. уроки, задания и основные функции адаптированы для телефона, планшета и компьютера.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">что приходит после оплаты?</button><div class="faq-panel"><div class="faq-answer">на указанный email придут данные для входа в личный кабинет. доступ обычно активируется автоматически или в течение 24 часов.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">есть ли speaking-практика?</button><div class="faq-panel"><div class="faq-answer">да. speaking club, партнеры по уровню и темы встреч идут как дополнительная среда к основному маршруту.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">можно ли написать в поддержку?</button><div class="faq-panel"><div class="faq-answer">да. можно написать в telegram: @mag_english. поможем с доступом, оплатой и работой платформы.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">если я давно не учил английский, с чего начать?</button><div class="faq-panel"><div class="faq-answer">начни с диагностики уровня или с первого модуля. идея plan в том, чтобы не угадывать, а идти по понятному маршруту.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">можно ли оплатить картой другой страны?</button><div class="faq-panel"><div class="faq-answer">в форме оплаты можно указать свои контакты. доступность конкретной карты зависит от платежного провайдера и банка.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Почему стоит 75 BYN, если раньше было 300 BYN?</button><div class="faq-panel"><div class="faq-answer">Сейчас доступ идёт по акции со скидкой 75%. На сайте отдельно показываем обычную цену 300 BYN и актуальную цену 75 BYN.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Это разовая оплата или подписка?</button><div class="faq-panel"><div class="faq-answer">75 BYN оплачиваются один раз. Минимальный гарантированный срок доступа к курсу составляет 4 месяца в соответствии с договором-офертой.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Сколько времени нужно на занятия?</button><div class="faq-panel"><div class="faq-answer">Оптимально 30-40 минут в день. Если времени меньше, можно пройти короткую часть урока и продолжить позже. Прогресс сохраняется.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Можно ли заниматься с телефона?</button><div class="faq-panel"><div class="faq-answer">Да. Уроки, задания и основные функции адаптированы для телефона, планшета и компьютера.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Что приходит после оплаты?</button><div class="faq-panel"><div class="faq-answer">На указанный email придут данные для входа в личный кабинет. Доступ обычно активируется автоматически или в течение 24 часов.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Есть ли speaking-практика?</button><div class="faq-panel"><div class="faq-answer">Да. Speaking club, партнёры по уровню и темы встреч идут как дополнительная среда к основному маршруту.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Можно ли написать в поддержку?</button><div class="faq-panel"><div class="faq-answer">Да. Можно написать в Telegram: @mag_english. Поможем с доступом, оплатой и работой платформы.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Если я давно не учил английский, с чего начать?</button><div class="faq-panel"><div class="faq-answer">Начни с диагностики уровня или с первого модуля. Идея plan в том, чтобы не угадывать, а идти по понятному маршруту.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Можно ли оплатить картой другой страны?</button><div class="faq-panel"><div class="faq-answer">В форме оплаты можно указать свои контакты. Доступность конкретной карты зависит от платежного провайдера и банка.</div></div></div>
           </div>
         </div>
       </div>
@@ -7651,25 +7751,25 @@
     <section class="why-variant why-diagnosis" id="why-03">
       <div class="wrap">
         <div class="variant-head reveal">
-          <div class="label">блок 02 / вариант 03</div>
-          <p class="eyebrow">интерактивный выбор ситуации</p>
+          <div class="label">Блок 02 / вариант 03</div>
+          <p class="eyebrow">Интерактивный выбор ситуации</p>
         </div>
         <div class="diagnosis-shell reveal" data-purpose-switcher>
           <div class="diagnosis-menu">
-            <h2>что сейчас мешает тебе двигаться?</h2>
+            <h2>Что сейчас мешает тебе двигаться?</h2>
             <div class="purpose-tabs" role="tablist" aria-label="выбрать ситуацию">
-              <button class="purpose-tab is-active" type="button" role="tab" aria-selected="true" data-purpose="0"><span class="tab-dot">1</span><span>не знаю, что учить</span></button>
-              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="1"><span class="tab-dot">2</span><span>быстро бросаю</span></button>
-              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="2"><span class="tab-dot">3</span><span>боюсь говорить</span></button>
-              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="3"><span class="tab-dot">4</span><span>не вижу прогресс</span></button>
+              <button class="purpose-tab is-active" type="button" role="tab" aria-selected="true" data-purpose="0"><span class="tab-dot">1</span><span>Не знаю, что учить</span></button>
+              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="1"><span class="tab-dot">2</span><span>Быстро бросаю</span></button>
+              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="2"><span class="tab-dot">3</span><span>Боюсь говорить</span></button>
+              <button class="purpose-tab" type="button" role="tab" aria-selected="false" data-purpose="3"><span class="tab-dot">4</span><span>Не вижу прогресс</span></button>
             </div>
           </div>
           <div class="diagnosis-result" aria-live="polite">
-            <span class="diagnosis-index" data-purpose-index>ситуация 01 / 04</span>
-            <h3 data-purpose-title>тебе нужен не новый материал, а порядок</h3>
-            <p data-purpose-copy>уроки уже выстроены по уровням. ты не решаешь каждый день, за что взяться, а просто продолжаешь свой маршрут.</p>
+            <span class="diagnosis-index" data-purpose-index>Ситуация 01 / 04</span>
+            <h3 data-purpose-title>Тебе нужен не новый материал, а порядок</h3>
+            <p data-purpose-copy>Уроки уже выстроены по уровням. Ты не решаешь каждый день, за что взяться, а просто продолжаешь свой маршрут.</p>
             <div class="actions">
-              <button class="arrow-button" type="button" data-payment data-purpose-action>собрать свой маршрут</button>
+              <button class="arrow-button" type="button" data-payment data-purpose-action>Собрать свой маршрут</button>
               <span class="micro-price"><strong>75 BYN</strong> ≈ $26</span>
             </div>
           </div>
@@ -7680,22 +7780,22 @@
     <section class="why-variant why-manifesto" id="why-04">
       <div class="wrap">
         <div class="variant-head reveal">
-          <div class="label">блок 02 / вариант 04</div>
-          <p class="eyebrow">типографический манифест</p>
+          <div class="label">Блок 02 / вариант 04</div>
+          <p class="eyebrow">Типографический манифест</p>
         </div>
         <div class="manifesto-top reveal">
-          <p class="manifesto-note">тебе не нужен еще один красивый список тем. нужен формат, который каждый раз отвечает на один простой вопрос: что делать дальше?</p>
-          <h2 class="why-title">magic english plan нужен, чтобы...</h2>
+          <p class="manifesto-note">Тебе не нужен ещё один красивый список тем. Нужен формат, который каждый раз отвечает на один простой вопрос: что делать дальше?</p>
+          <h2 class="why-title">Magic English Plan нужен, чтобы...</h2>
         </div>
         <div class="manifesto-lines">
-          <div class="manifesto-line reveal"><small>вместо бесконечного поиска</small><strong>не выбирать урок, а <em>открыть и пройти</em></strong></div>
-          <div class="manifesto-line reveal"><small>вместо старта с понедельника</small><strong>не ждать мотивацию, а <em>держать ритм</em></strong></div>
-          <div class="manifesto-line reveal"><small>вместо знаний в голове</small><strong>не только понимать, а <em>начать говорить</em></strong></div>
-          <div class="manifesto-line reveal"><small>вместо ощущения на глаз</small><strong>не гадать, а <em>видеть рост</em></strong></div>
+          <div class="manifesto-line reveal"><small>Вместо бесконечного поиска</small><strong>Не выбирать урок, а <em>Открыть и пройти</em></strong></div>
+          <div class="manifesto-line reveal"><small>Вместо старта с понедельника</small><strong>Не ждать мотивацию, а <em>Держать ритм</em></strong></div>
+          <div class="manifesto-line reveal"><small>Вместо знаний в голове</small><strong>Не только понимать, а <em>Начать говорить</em></strong></div>
+          <div class="manifesto-line reveal"><small>Вместо ощущения на глаз</small><strong>Не гадать, а <em>Видеть рост</em></strong></div>
         </div>
         <div class="manifesto-footer reveal">
-          <span class="micro-price"><s>250 BYN</s><strong>75 BYN</strong> по скидке</span>
-          <button class="arrow-button" type="button" data-payment>перестать откладывать</button>
+          <span class="micro-price"><s>300 BYN</s><strong>75 BYN</strong> по скидке</span>
+          <button class="arrow-button" type="button" data-payment>Перестать откладывать</button>
         </div>
       </div>
     </section>
@@ -7703,23 +7803,23 @@
     <section class="why-variant why-route" id="why-05">
       <div class="wrap">
         <div class="variant-head reveal">
-          <div class="label">блок 02 / вариант 05</div>
-          <p class="eyebrow">один учебный маршрут</p>
+          <div class="label">Блок 02 / вариант 05</div>
+          <p class="eyebrow">Один учебный маршрут</p>
         </div>
         <div class="route-heading reveal">
-          <h2 class="why-title">чтобы за одно занятие не просто посмотреть, а <span class="script">сделать шаг</span></h2>
-          <p class="why-lead">каждая тема ведет к действию. поэтому после занятия остается не чувство `я что-то посмотрел`, а понятный результат.</p>
+          <h2 class="why-title">Чтобы за одно занятие не просто посмотреть, а <span class="script">сделать шаг</span></h2>
+          <p class="why-lead">Каждая тема ведёт к действию. Поэтому после занятия остается не чувство `я что-то посмотрел`, а понятный результат.</p>
         </div>
         <div class="session-route reveal">
-          <article class="route-step"><span class="route-dot">01</span><h3>разобраться</h3><p>короткая теория, живые примеры и объяснение без перегруза.</p></article>
-          <article class="route-step"><span class="route-dot">02</span><h3>закрепить</h3><p>тест и домашка показывают, где тема уже понятна, а где стоит вернуться.</p></article>
-          <article class="route-step"><span class="route-dot">03</span><h3>сохранить</h3><p>слова и заметки остаются в одном кабинете и возвращаются в повторении.</p></article>
-          <article class="route-step"><span class="route-dot">04</span><h3>использовать</h3><p>разговорное задание, speaking club или практика с партнером по уровню.</p></article>
+          <article class="route-step"><span class="route-dot">01</span><h3>Разобраться</h3><p>Короткая теория, живые примеры и объяснение без перегруза.</p></article>
+          <article class="route-step"><span class="route-dot">02</span><h3>Закрепить</h3><p>Тест и домашка показывают, где тема уже понятна, а где стоит вернуться.</p></article>
+          <article class="route-step"><span class="route-dot">03</span><h3>Сохранить</h3><p>Слова и заметки остаются в одном кабинете и возвращаются в повторении.</p></article>
+          <article class="route-step"><span class="route-dot">04</span><h3>Использовать</h3><p>Разговорное задание, speaking club или практика с партнёром по уровню.</p></article>
         </div>
         <div class="route-result reveal">
-          <strong>вот зачем нужен plan: чтобы английский двигался вместе с тобой</strong>
-          <span class="micro-price"><strong>75 BYN</strong><s>250 BYN</s></span>
-          <button class="arrow-button" type="button" data-payment>открыть первый урок</button>
+          <strong>Вот зачем нужен plan: чтобы английский двигался вместе с тобой</strong>
+          <span class="micro-price"><strong>75 BYN</strong><s>300 BYN</s></span>
+          <button class="arrow-button" type="button" data-payment>Открыть первый урок</button>
         </div>
       </div>
     </section>
@@ -7729,25 +7829,25 @@
     <div class="wrap">
       <div class="footer-main">
         <div class="footer-about">
-          <div class="footer-brand"><img src="assets/magic-star-logo.png" alt=""><span>magic english</span></div>
-          <p>платформа для самостоятельного английского от a0 до c1: уроки, практика, прогресс и поддержка в одном понятном маршруте.</p>
+          <div class="footer-brand"><img src="assets/magic-star-logo.png" alt="" width="640" height="640" loading="lazy"><span>Magic English</span></div>
+          <p>Платформа для самостоятельного английского от A0 до C1: уроки, практика, прогресс и поддержка в одном понятном маршруте.</p>
         </div>
         <div class="footer-column">
-          <strong>документы</strong>
-          <a href="https://magic-english-plan.by/page-magic-english-1" target="_blank" rel="noopener">публичная оферта</a>
-          <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">политика конфиденциальности</a>
-          <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">обработка персональных данных</a>
+          <strong>Документы</strong>
+          <a href="https://magic-english-plan.by/page-magic-english-1" target="_blank" rel="noopener">Публичная оферта</a>
+          <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">Политика конфиденциальности</a>
+          <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">Обработка персональных данных</a>
         </div>
         <div class="footer-column">
-          <strong>контакты</strong>
-          <a href="https://t.me/mag_english" target="_blank" rel="noopener">служба заботы</a>
-          <a href="mailto:ilariumeng@gmail.com">ilariumeng@gmail.com</a>
+          <strong>Контакты</strong>
+          <a href="https://t.me/mag_english" target="_blank" rel="noopener">Служба заботы</a>
+          <a href="mailto:ilariumeng@gmail.com">Ilariumeng@gmail.com</a>
           <a href="tel:+375255365117">+375 25 536-51-17</a>
-          <span class="footer-group-title">ип</span>
-          <p>юшкевич илья сергеевич<br>унп 693397154</p>
+          <span class="footer-group-title">ИП</span>
+          <p>Юшкевич Илья Сергеевич<br>УНП 693397154</p>
         </div>
         <div class="footer-column">
-          <strong>magic english в соцсетях</strong>
+          <strong>Magic English в соцсетях</strong>
           <div class="social-icons">
             <a href="https://t.me/ziz_english" target="_blank" rel="noopener" aria-label="telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 4.1 18.3 20c-.2 1-.8 1.2-1.6.7l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6 13.5 1.2 12c-1-.3-1-1 .2-1.4L20.1 3.4c.9-.3 1.7.2 1.5.7z"/></svg></a>
             <a href="https://www.youtube.com/@ziz_english" target="_blank" rel="noopener" aria-label="youtube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 8.1s-.2-1.6-.8-2.3c-.8-.8-1.7-.8-2.1-.9C16.2 4.7 12 4.7 12 4.7s-4.2 0-7.1.2c-.4 0-1.3.1-2.1.9C2.2 6.5 2 8.1 2 8.1s-.2 1.9-.2 3.9.2 3.9.2 3.9.2 1.6.8 2.3c.8.8 1.9.8 2.4.9 1.7.2 6.8.2 6.8.2s4.2 0 7.1-.2c.4 0 1.3-.1 2.1-.9.6-.7.8-2.3.8-2.3s.2-1.9.2-3.9-.2-3.9-.2-3.9zM10 15.2V8.4l5.6 3.4-5.6 3.4z"/></svg></a>
@@ -7757,77 +7857,77 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>223610, г. слуцк, ул. 11 июля, д. 23</span>
-        <span>свидетельство №0903395 от 16.01.2026 · слуцкий рик</span>
+        <span>223610, г. Слуцк, ул. 11 июля, д. 23</span>
+        <span>Свидетельство №0903395 от 16.01.2026 · Слуцкий РИК</span>
       </div>
     </div>
   </footer>
 
   <div class="modal" id="videoModal" aria-hidden="true">
     <div class="modal-panel" role="dialog" aria-modal="true" aria-label="видео magic english">
-      <button class="modal-close" type="button" aria-label="закрыть видео">x</button>
-      <div class="modal-media"><span data-modal-media>место под видео или картинку курса</span></div>
+      <button class="modal-close" type="button" aria-label="закрыть видео">X</button>
+      <div class="modal-media"><span data-modal-media>Место под видео или картинку курса</span></div>
       <div class="modal-copy">
-        <strong data-modal-title>сюда встанет видео magic english</strong>
-        <p class="tiny" data-modal-copy>после утверждения блока можно заменить этот плейсхолдер на реальный ролик, скрин платформы или фотографию.</p>
+        <strong data-modal-title>Сюда встанет видео Magic English</strong>
+        <p class="tiny" data-modal-copy>После утверждения блока можно заменить этот плейсхолдер на реальный ролик, скрин платформы или фотографию.</p>
       </div>
     </div>
   </div>
 
   <div class="modal" id="paymentModal" aria-hidden="true">
     <div class="payment-panel" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
-      <button class="modal-close payment-close" type="button" aria-label="закрыть форму">x</button>
+      <button class="modal-close payment-close" type="button" aria-label="закрыть форму">X</button>
       <div class="payment-top">
-        <button class="back-link payment-close" type="button">назад на сайт</button>
-        <span class="payment-brand"><img src="assets/magic-star-logo.png" alt="">magic english</span>
+        <button class="back-link payment-close" type="button">Назад на сайт</button>
+        <span class="payment-brand"><img src="assets/magic-star-logo.png" alt="" width="640" height="640">Magic English</span>
       </div>
       <div class="payment-content">
-        <h2 id="paymentTitle">получить доступ</h2>
+        <h2 id="paymentTitle">Получить доступ</h2>
         <p class="payment-subtitle">Оставь контакт — служба заботы уточнит детали и поможет оформить доступ. Онлайн-оплату добавим позже.</p>
         <div class="order-card">
           <div>
-            <strong>magic english plan</strong>
-            <span>доступ к платформе, бонусам и закрытому club</span>
+            <strong>Magic English Plan</strong>
+            <span>Доступ к платформе, бонусам и закрытому клубу</span>
           </div>
           <div class="order-total">
             <strong>75 BYN</strong>
-            <s>250 BYN</s>
+            <s>300 BYN</s>
           </div>
         </div>
-        <span class="payment-discount">скидка 70% · 75 белорусских рублей · примерно $26 вместо $87</span>
+        <span class="payment-discount">Скидка 75% · 75 белорусских рублей · примерно $26 вместо $104</span>
         <form class="payment-form">
           <div class="payment-field">
-            <label for="payEmail">электронный адрес</label>
+            <label for="payEmail">Электронный адрес</label>
             <input id="payEmail" name="email" type="email" placeholder="example@mail.com" autocomplete="email">
           </div>
           <div class="payment-field">
-            <label for="payName">имя</label>
-            <input id="payName" name="name" type="text" placeholder="как вас зовут" autocomplete="name" required>
+            <label for="payName">Имя</label>
+            <input id="payName" name="name" type="text" placeholder="Как вас зовут" autocomplete="name" required>
           </div>
           <div class="payment-field">
-            <label for="payPhone">номер телефона</label>
+            <label for="payPhone">Номер телефона</label>
             <input id="payPhone" name="phone" type="tel" placeholder="+ код страны и номер" autocomplete="tel" inputmode="tel">
           </div>
           <details class="social-field">
-            <summary>+ добавить соц сеть или мессенджер</summary>
+            <summary>+ Добавить соцсеть или мессенджер</summary>
             <div class="social-field-body">
               <input id="paySocial" name="social" type="text" placeholder="@username или ссылка">
             </div>
           </details>
           <div class="payment-checks">
-            <label class="payment-check"><input name="privacy" type="checkbox" required><span>я принимаю <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">политику обработки персональных данных</a></span></label>
+            <label class="payment-check"><input name="privacy" type="checkbox" required><span>Я принимаю <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">Политику обработки персональных данных</a></span></label>
           </div>
-          <button class="arrow-button" type="submit">продолжить в telegram</button>
+          <button class="arrow-button" type="submit">Продолжить в Telegram</button>
           <p class="contact-status" data-contact-status aria-live="polite"></p>
         </form>
         <div class="payment-placeholder" aria-label="плейсхолдер будущей оплаты">
-          <span>следующий этап</span>
-          <strong>безопасная онлайн-оплата</strong>
-          <button type="button" disabled>платёжная форма скоро</button>
+          <span>Следующий этап</span>
+          <strong>Безопасная онлайн-оплата</strong>
+          <button type="button" disabled>Платёжная форма скоро</button>
         </div>
         <div class="support-row">
-          <span>сначала свяжемся и подтвердим детали</span>
-          <button type="button" onclick="window.open('https://t.me/mag_english','_blank')">написать в поддержку</button>
+          <span>Сначала свяжемся и подтвердим детали</span>
+          <button type="button" onclick="window.open('https://t.me/mag_english','_blank')">Написать в поддержку</button>
         </div>
         <p class="payment-note">Сейчас заявка открывает диалог со службой заботы в Telegram. Платёжные данные на сайте не запрашиваются и не сохраняются.</p>
       </div>
@@ -7848,6 +7948,14 @@
     const modalCopy = modal.querySelector("[data-modal-copy]");
     const modalMedia = modal.querySelector("[data-modal-media]");
     const cursorGlow = document.querySelector(".cursor-glow");
+    let videoDialogTrigger = null;
+    let paymentDialogTrigger = null;
+    const capitalizeFirst = (value) => value.replace(/^(\s*)([a-zа-яё])/iu, (_, space, letter) => `${space}${letter.toUpperCase()}`);
+    const releasePageScroll = () => {
+      if (!modal.classList.contains("is-open") && !paymentModal.classList.contains("is-open")) {
+        document.body.style.overflow = "";
+      }
+    };
     const whyAnchors = {
       editorial: "#why-01",
       compare: "#why-02",
@@ -7953,17 +8061,23 @@
 
     document.querySelectorAll(".video-trigger").forEach((button) => {
       button.addEventListener("click", () => {
-        modalTitle.textContent = button.dataset.modalTitle || "сюда встанет видео magic english";
-        modalCopy.textContent = button.dataset.modalCopy || "после утверждения блока можно заменить этот плейсхолдер на реальный ролик, скрин платформы или фотографию.";
-        modalMedia.textContent = button.dataset.modalMedia || "место под видео или картинку курса";
+        videoDialogTrigger = button;
+        modalTitle.textContent = capitalizeFirst(button.dataset.modalTitle || "Сюда встанет видео Magic English");
+        modalCopy.textContent = capitalizeFirst(button.dataset.modalCopy || "После утверждения блока можно заменить этот плейсхолдер на реальный ролик, скрин платформы или фотографию.");
+        modalMedia.textContent = capitalizeFirst(button.dataset.modalMedia || "Место под видео или картинку курса");
         modal.classList.add("is-open");
         modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        videoClose.focus();
       });
     });
 
     const closeModal = () => {
+      const wasOpen = modal.classList.contains("is-open");
       modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
+      releasePageScroll();
+      if (wasOpen) videoDialogTrigger?.focus();
     };
 
     videoClose.addEventListener("click", closeModal);
@@ -7977,22 +8091,26 @@
       }
     });
 
-    const openPayment = () => {
+    const openPayment = (trigger) => {
+      paymentDialogTrigger = trigger;
       paymentModal.classList.add("is-open");
       paymentModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      paymentModal.querySelector(".back-link").focus();
     };
 
     const closePayment = () => {
+      const wasOpen = paymentModal.classList.contains("is-open");
       paymentModal.classList.remove("is-open");
       paymentModal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
+      releasePageScroll();
+      if (wasOpen) paymentDialogTrigger?.focus();
     };
 
     document.querySelectorAll("[data-payment]").forEach((trigger) => {
       trigger.addEventListener("click", (event) => {
         event.preventDefault();
-        openPayment();
+        openPayment(trigger);
       });
     });
 
@@ -8043,6 +8161,16 @@
     tickDiscountTimer();
     window.setInterval(tickDiscountTimer, 1000);
 
+    const reviewsTrack = document.querySelector(".reviews-track");
+    if (reviewsTrack) {
+      Array.from(reviewsTrack.children).forEach((card) => {
+        const clone = card.cloneNode(true);
+        clone.setAttribute("aria-hidden", "true");
+        clone.inert = true;
+        reviewsTrack.appendChild(clone);
+      });
+    }
+
     paymentModal.addEventListener("click", (event) => {
       if (event.target === paymentModal) closePayment();
     });
@@ -8063,24 +8191,24 @@
 
     const purposeContent = [
       {
-        title: "тебе нужен не новый материал, а порядок",
-        copy: "уроки уже выстроены по уровням. ты не решаешь каждый день, за что взяться, а просто продолжаешь свой маршрут.",
-        action: "собрать свой маршрут"
+        title: "Тебе нужен не новый материал, а порядок",
+        copy: "Уроки уже выстроены по уровням. Ты не решаешь каждый день, за что взяться, а просто продолжаешь свой маршрут.",
+        action: "Собрать свой маршрут"
       },
       {
-        title: "тебе нужен ритм, который переживет мотивацию",
-        copy: "короткие понятные шаги, домашки и трекер возвращают в обучение без чувства, что после паузы надо начинать сначала.",
-        action: "начать без перегруза"
+        title: "Тебе нужен ритм, который переживёт мотивацию",
+        copy: "Короткие понятные шаги, домашки и трекер возвращают в обучение без чувства, что после паузы надо начинать сначала.",
+        action: "Начать без перегруза"
       },
       {
-        title: "тебе нужна среда, где можно начать говорить",
-        copy: "speaking club, задания и партнеры по уровню помогают перенести знакомые слова из головы в живую речь.",
-        action: "перейти к практике"
+        title: "Тебе нужна среда, где можно начать говорить",
+        copy: "Speaking club, задания и партнёры по уровню помогают перенести знакомые слова из головы в живую речь.",
+        action: "Перейти к практике"
       },
       {
-        title: "тебе нужны доказательства собственного роста",
-        copy: "уровень, выполненные темы, домашки и достижения показывают, сколько уже сделано и куда двигаться дальше.",
-        action: "увидеть свой прогресс"
+        title: "Тебе нужны доказательства собственного роста",
+        copy: "Уровень, выполненные темы, домашки и достижения показывают, сколько уже сделано и куда двигаться дальше.",
+        action: "Увидеть свой прогресс"
       }
     ];
 
@@ -8100,7 +8228,7 @@
           title.textContent = purposeContent[next].title;
           copy.textContent = purposeContent[next].copy;
           action.textContent = purposeContent[next].action;
-          index.textContent = `ситуация ${String(next + 1).padStart(2, "0")} / 04`;
+          index.textContent = `Ситуация ${String(next + 1).padStart(2, "0")} / 04`;
         });
       });
     });
