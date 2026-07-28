@@ -28,6 +28,38 @@
     })();
   </script>
   <style>
+    @font-face {
+      font-family: "Montserrat";
+      src: url("/fonts/Montserrat-Regular.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Montserrat";
+      src: url("/fonts/Montserrat-SemiBold.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 600;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Montserrat";
+      src: url("/fonts/Montserrat-Bold.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Montserrat";
+      src: url("/fonts/Montserrat-Black.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 900;
+      font-display: swap;
+    }
+
     :root {
       --ink: #17140f;
       --muted: #6b655d;
@@ -39,7 +71,12 @@
       --orange-deep: #d87706;
       --gold: #d3a646;
       --shadow: 0 24px 80px rgba(91, 65, 16, .11);
-      font-family: Montserrat, Inter, Manrope, "Segoe UI", Arial, sans-serif;
+      --radius-xl: 40px;
+      --radius-lg: 30px;
+      --radius-md: 22px;
+      --radius-sm: 16px;
+      --section-space: clamp(84px, 9vw, 132px);
+      font-family: Montserrat, "Segoe UI", Arial, sans-serif;
     }
 
     * {
@@ -6563,6 +6600,385 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Unified landing system: one rounded, warm visual language from hero to footer. */
+    body,
+    button,
+    input,
+    summary {
+      font-family: Montserrat, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .variant,
+    .why-variant,
+    .inside-block,
+    .learning-block,
+    .levels-block,
+    .club-block,
+    .final-section {
+      padding-block: var(--section-space);
+    }
+
+    .variant + .why-variant,
+    .why-variant + .inside-block,
+    .inside-block + .learning-block,
+    .learning-block + .levels-block,
+    .levels-block + .club-block,
+    .club-block + .final-section,
+    .final-section + .final-section {
+      border-top: 0;
+    }
+
+    .hero-positioned h1,
+    .why-title,
+    .inside-heading h2,
+    .learning-copy h2,
+    .levels-head h2,
+    .club-copy h2,
+    .section-heading h2,
+    .price-stage h2,
+    .faq-copy h2 {
+      text-transform: none;
+      letter-spacing: -.045em;
+    }
+
+    .hero-positioned h1 {
+      max-width: 820px;
+      font-size: clamp(54px, 6.5vw, 94px);
+      line-height: .98;
+    }
+
+    .why-title,
+    .inside-heading h2,
+    .learning-copy h2,
+    .levels-head h2,
+    .club-copy h2,
+    .section-heading h2,
+    .price-stage h2,
+    .faq-copy h2 {
+      font-size: clamp(40px, 4.5vw, 66px);
+      line-height: 1.02;
+    }
+
+    .copy,
+    .why-lead,
+    .inside-heading p,
+    .learning-copy p,
+    .levels-head p,
+    .gift-intro p,
+    .section-heading p,
+    .price-stage p,
+    .faq-copy p {
+      font-size: clamp(16px, 1.25vw, 19px);
+      line-height: 1.65;
+    }
+
+    .primary,
+    .secondary,
+    .arrow-button,
+    .ghost-button,
+    .buy {
+      min-height: 50px;
+      border-radius: 999px;
+      padding-inline: 22px;
+    }
+
+    .photo-tile,
+    .wide-video,
+    .soft-card,
+    .compare-board,
+    .inside-card,
+    .inside-price-row,
+    .learning-step,
+    .level-card,
+    .gift-card,
+    .tool-item,
+    .certificate-card,
+    .achievement-card,
+    .review-card,
+    .bonus-card,
+    .price-stage,
+    .faq-item,
+    .modal-panel,
+    .payment-panel {
+      border-radius: var(--radius-lg);
+    }
+
+    .photo-tile,
+    .soft-card,
+    .inside-card,
+    .learning-step,
+    .gift-card,
+    .certificate-card,
+    .achievement-card,
+    .review-card,
+    .bonus-card,
+    .faq-item {
+      box-shadow: 0 18px 54px rgba(72, 52, 19, .07);
+    }
+
+    .compare-board {
+      overflow: hidden;
+      border: 1px solid rgba(23, 20, 15, .1);
+      background: rgba(255, 255, 255, .8);
+      box-shadow: 0 24px 70px rgba(72, 52, 19, .08);
+    }
+
+    .compare-row {
+      min-height: 96px;
+      padding: 22px 26px;
+    }
+
+    .compare-row:last-child {
+      border-bottom: 0;
+    }
+
+    .compare-footer {
+      margin-top: 18px;
+      padding: 22px 24px;
+      border: 1px solid rgba(211, 166, 70, .22);
+      border-radius: var(--radius-md);
+      background: rgba(255, 251, 241, .78);
+    }
+
+    .inside-options,
+    .gift-board,
+    .tool-grid,
+    .achievement-layout,
+    .bonus-grid {
+      gap: 16px;
+    }
+
+    .inside-card,
+    .gift-card,
+    .tool-item,
+    .certificate-card,
+    .achievement-card,
+    .review-card,
+    .bonus-card {
+      padding: clamp(24px, 2.4vw, 36px);
+    }
+
+    .inside-mock,
+    .mock-level,
+    .lesson-list,
+    .tracker-mock,
+    .file-library,
+    .ai-chat-demo,
+    .certificate-sheet {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .inside-price-row {
+      padding: 24px 28px;
+      border: 1px solid rgba(211, 166, 70, .22);
+      background: linear-gradient(135deg, #fffaf0, #fff);
+    }
+
+    .learning-step {
+      border: 1px solid rgba(23, 20, 15, .08);
+      background: rgba(255, 255, 255, .92);
+    }
+
+    .levels-block,
+    .tools-section {
+      width: min(1500px, calc(100% - 32px));
+      margin-inline: auto;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .level-list {
+      gap: 14px;
+    }
+
+    .level-card,
+    .level-card:nth-child(3),
+    .level-card:last-child {
+      min-height: 164px;
+      padding: 28px 30px;
+      border-radius: var(--radius-md);
+    }
+
+    .gift-card::before,
+    .level-card::before {
+      border-radius: inherit;
+    }
+
+    .final-section {
+      border-bottom: 0;
+    }
+
+    .reviews-rail {
+      padding-block: 6px 18px;
+    }
+
+    .review-card {
+      border-color: rgba(23, 20, 15, .08);
+    }
+
+    .price-stage {
+      padding: clamp(34px, 4.2vw, 62px);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: var(--radius-xl);
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 10px;
+      border-top: 0;
+    }
+
+    .faq-item {
+      border: 1px solid rgba(23, 20, 15, .09);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      min-height: 76px;
+      padding-inline: 22px;
+    }
+
+    .faq-answer {
+      padding: 0 74px 24px 22px;
+    }
+
+    .site-footer {
+      width: min(1500px, calc(100% - 32px));
+      margin: 24px auto 16px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .payment-panel {
+      width: min(920px, calc(100% - 32px));
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, .5);
+      box-shadow: 0 30px 100px rgba(23, 20, 15, .22);
+    }
+
+    .payment-field input,
+    .social-field input {
+      min-height: 54px;
+      border-radius: var(--radius-sm);
+    }
+
+    .contact-status {
+      min-height: 22px;
+      margin: 0;
+      color: #3f7a43;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .contact-status.is-error {
+      color: #b44a32;
+    }
+
+    .payment-placeholder {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px 20px;
+      border: 1px dashed rgba(23, 20, 15, .18);
+      border-radius: var(--radius-md);
+      background: rgba(247, 246, 242, .72);
+    }
+
+    .payment-placeholder span {
+      color: var(--orange-deep);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .payment-placeholder strong {
+      font-size: 14px;
+    }
+
+    .payment-placeholder button {
+      min-height: 38px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(23, 20, 15, .08);
+      color: rgba(23, 20, 15, .5);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --radius-xl: 28px;
+        --radius-lg: 24px;
+        --radius-md: 20px;
+        --section-space: 74px;
+      }
+
+      .hero-positioned h1 {
+        font-size: clamp(42px, 12.2vw, 58px);
+        line-height: 1;
+      }
+
+      .why-title,
+      .inside-heading h2,
+      .learning-copy h2,
+      .levels-head h2,
+      .club-copy h2,
+      .section-heading h2,
+      .price-stage h2,
+      .faq-copy h2 {
+        font-size: clamp(34px, 9.8vw, 46px);
+      }
+
+      .levels-block,
+      .tools-section,
+      .site-footer {
+        width: calc(100% - 16px);
+      }
+
+      .level-card,
+      .level-card:nth-child(3),
+      .level-card:last-child,
+      .inside-card,
+      .gift-card,
+      .tool-item,
+      .certificate-card,
+      .achievement-card,
+      .review-card,
+      .bonus-card {
+        padding: 22px;
+      }
+
+      .compare-row {
+        min-height: 0;
+        padding: 20px;
+      }
+
+      .compare-footer,
+      .inside-price-row {
+        padding: 20px;
+      }
+
+      .payment-panel {
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 16px);
+      }
+
+      .payment-placeholder {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Only the selected product option is visible in production. Alternatives remain
        available through ?preview=1&hero=wide&headline=2&why=route. */
     .hero-wide,
@@ -6633,8 +7049,8 @@
       <circle cx="1322" cy="22" r="3" fill="#f29a16" opacity=".36"/>
     </svg>
     <div class="promo-inner">
-      <button class="promo-pill" type="button" data-payment>скидка 75%</button>
-      <span>доступ за 75 BYN вместо <s>300 BYN</s></span>
+      <button class="promo-pill" type="button" data-payment>скидка 70%</button>
+      <span>доступ за 75 BYN вместо <s>250 BYN</s></span>
       <span class="promo-time" data-countdown>23:59:59</span>
       <button class="promo-link" type="button" data-payment>забрать</button>
     </div>
@@ -6656,7 +7072,7 @@
     </div>
     <div class="nav-actions">
       <a class="platform-login" href="/login">войти</a>
-      <a class="buy" href="#payment" data-payment>купить за 75 BYN</a>
+      <a class="buy" href="#contact" data-payment>получить доступ</a>
     </div>
     <button class="menu" type="button" aria-label="меню">☰</button>
   </nav>
@@ -6670,11 +7086,11 @@
         </div>
         <div class="layout">
           <div class="text-area" data-deck>
-            <h1 data-title>учись сам, но <span class="script">не оставайся один</span></h1>
-            <p class="copy" data-copy>уроки можно проходить в своем темпе, а вопросы, разговорная практика и поддержка остаются рядом: закрытое сообщество, speaking club и партнеры по уровню.</p>
-            <div class="hero-offer"><span class="sale">скидка 75%</span><strong>75 BYN</strong><s>300 BYN</s><span>примерно $26 вместо $104</span></div>
+            <h1 data-title>Английский, который наконец <span class="script">идёт по плану</span></h1>
+            <p class="copy" data-copy>Magic English Plan собирает уроки, практику, словарь, прогресс и поддержку в один маршрут от A0 до C1. Открываешь кабинет и сразу видишь следующий шаг.</p>
+            <div class="hero-offer"><span class="sale">скидка 70%</span><strong>75 BYN</strong><s>250 BYN</s><span>примерно $26 вместо $87</span></div>
             <div class="actions">
-              <a class="primary" href="#payment" data-payment>открыть доступ за 75 BYN</a>
+              <a class="primary" href="#contact" data-payment>получить доступ за 75 BYN</a>
               <a class="secondary" href="#inside">посмотреть что внутри</a>
             </div>
             <div class="text-switcher" aria-label="переключить текст">
@@ -6705,9 +7121,9 @@
         </div>
         <div class="layout">
           <div class="text-area" data-deck>
-            <h1 data-title>английский, который наконец <span class="script">идет по плану</span></h1>
+            <h1 data-title>Английский, который наконец <span class="script">идёт по плану</span></h1>
             <p class="copy" data-copy>magic english plan собирает уроки, домашки, прогресс, словарь и speaking-практику в один маршрут. ты каждый день видишь не “надо учить английский”, а конкретный следующий шаг.</p>
-            <div class="hero-offer"><span class="sale">скидка 75%</span><strong>75 BYN</strong><s>300 BYN</s><span>примерно $26 вместо $104</span></div>
+            <div class="hero-offer"><span class="sale">скидка 70%</span><strong>75 BYN</strong><s>250 BYN</s><span>примерно $26 вместо $87</span></div>
             <div class="actions">
               <a class="primary" href="#payment" data-payment>открыть доступ за 75 BYN</a>
               <a class="secondary" href="#inside">посмотреть что внутри</a>
@@ -6738,11 +7154,11 @@
         </div>
         <div class="editorial-layout">
           <div class="editorial-copy reveal">
-            <h2 class="why-title">для чего тебе <span class="script">magic english plan</span></h2>
+            <h2 class="why-title">Перестань собирать английский <span class="script">по кусочкам</span></h2>
             <p class="why-lead">не чтобы снова начать английский. чтобы продолжить его завтра, через неделю и дойти до результата, который можно увидеть.</p>
             <div class="actions">
               <button class="arrow-button" type="button" data-payment>начать по плану</button>
-              <span class="micro-price"><strong>75 BYN</strong><s>300 BYN</s></span>
+              <span class="micro-price"><strong>75 BYN</strong><s>250 BYN</s></span>
             </div>
           </div>
           <div class="purpose-list">
@@ -6775,7 +7191,7 @@
         </div>
         <div class="compare-heading reveal">
           <div>
-            <h2 class="why-title">для чего тебе <span class="brand-title">magic english plan</span></h2>
+            <h2 class="why-title">Перестань собирать английский <span class="brand-title">по кусочкам</span></h2>
           </div>
           <div class="compare-summary">
             <strong>чтобы перестать начинать английский и наконец продолжить</strong>
@@ -6814,7 +7230,7 @@
         </div>
         <div class="compare-footer reveal">
           <p>один кабинет вместо десятка вкладок. уроки, практика и прогресс уже связаны между собой.</p>
-          <span class="compare-price"><small>сейчас</small><strong>75 BYN</strong><s>300 BYN</s></span>
+          <span class="compare-price"><small>сейчас</small><strong>75 BYN</strong><s>250 BYN</s></span>
           <button class="arrow-button" type="button" data-payment>начать по плану</button>
         </div>
       </div>
@@ -6823,13 +7239,13 @@
     <section class="inside-block" id="inside">
       <div class="wrap">
         <div class="inside-heading reveal">
-          <h2>что получаешь внутри magic english plan</h2>
+          <h2>Один кабинет вместо десятка вкладок</h2>
           <p>это не склад уроков и не очередная папка с сохраненками. внутри собран маршрут, который каждый день подсказывает: что открыть, что закрепить, где повторить и когда перенести тему в речь.</p>
         </div>
         <div class="inside-options">
           <article class="inside-card main reveal">
             <small>/ 01</small>
-            <h3>маршрут от a1 до c1</h3>
+            <h3>маршрут от A0 до C1</h3>
             <p>темы идут по уровням и не расползаются по вкладкам. открыл урок, разобрал правило, закрепил тестом и получил понятное следующее действие.</p>
             <div class="inside-mock">
               <div class="mock-level">
@@ -6920,8 +7336,8 @@
           </article>
         </div>
         <div class="inside-price-row reveal">
-          <div class="inside-price"><small>цена сегодня</small><strong>75 BYN</strong><s>300 BYN</s><span class="discount">-75%</span></div>
-          <button class="arrow-button" type="button" data-payment>купить доступ</button>
+          <div class="inside-price"><small>цена сегодня</small><strong>75 BYN</strong><s>250 BYN</s><span class="discount">-70%</span></div>
+          <button class="arrow-button" type="button" data-payment>получить доступ</button>
         </div>
       </div>
     </section>
@@ -6930,7 +7346,7 @@
       <div class="wrap">
         <div class="learning-layout">
           <div class="learning-copy reveal">
-            <h2>как проходит обучение внутри</h2>
+            <h2>Открой урок. Сделай шаг. Увидь прогресс.</h2>
             <p>каждый заход в платформу должен заканчиваться действием, а не ощущением “я просто посмотрел еще один урок”.</p>
             <div class="actions">
               <button class="arrow-button" type="button" data-payment>начать за 75 BYN</button>
@@ -7009,7 +7425,7 @@
           <div class="club-copy reveal">
             <div>
               <p class="eyebrow">бонусы уже входят в доступ</p>
-              <h2>мы подготовили бонусы, с которыми английский идет легче</h2>
+              <h2>Учись самостоятельно, но не оставайся один</h2>
             </div>
             <div class="gift-intro">
               <p>ты получаешь не просто курс. внутри уже есть закрытое сообщество, speaking club, ребята твоего уровня, календарь занятий, подборка ресурсов, методики запоминания слов и большая библиотека учебников и материалов.</p>
@@ -7134,7 +7550,7 @@
           <div class="rating-summary reveal">
             <strong>4.9</strong>
             <div><div class="rating-stars">★★★★★</div><span>из 5 · 1020+ отзывов</span></div>
-            <button class="arrow-button" type="button" data-payment>купить за 75 BYN</button>
+            <button class="arrow-button" type="button" data-payment>получить доступ</button>
           </div>
         </div>
         <div class="reviews-rail reveal" aria-label="отзывы учеников">
@@ -7148,7 +7564,7 @@
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">понравилось, что можно заниматься с телефона. утром открыла тему, вечером добила домашку.</p><div class="review-meta"><strong>марина</strong><span>mobile</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я наконец перестала прыгать между уровнями. сначала закрываю базу, потом спокойно иду дальше.</p><div class="review-meta"><strong>катя</strong><span>a1</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">домашки короткие, но после них тема реально садится. без ощущения школы и перегруза.</p><div class="review-meta"><strong>рома</strong><span>домашки</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 беларуских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 белорусских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">партнер по практике помог не откладывать speaking. договорились на 15 минут и реально созвонились.</p><div class="review-meta"><strong>никита</strong><span>партнер</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я люблю, когда видно следующий шаг. тут его видно всегда, и это сильно снижает тревогу.</p><div class="review-meta"><strong>вика</strong><span>план</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">у меня наконец появилось чувство, что английский не где-то в сохраненках, а в нормальном маршруте.</p><div class="review-meta"><strong>павел</strong><span>b1</span></div></article>
@@ -7179,7 +7595,7 @@
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">понравилось, что можно заниматься с телефона. утром открыла тему, вечером добила домашку.</p><div class="review-meta"><strong>марина</strong><span>mobile</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">я наконец перестала прыгать между уровнями. сначала закрываю базу, потом спокойно иду дальше.</p><div class="review-meta"><strong>катя</strong><span>a1</span></div></article>
             <article class="review-card"><div class="review-stars">★★★★★</div><p class="review-quote">домашки короткие, но после них тема реально садится. без ощущения школы и перегруза.</p><div class="review-meta"><strong>рома</strong><span>домашки</span></div></article>
-            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 беларуских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
+            <article class="review-card is-dark"><div class="review-stars">★★★★★</div><p class="review-quote">цена приятная. за 75 белорусских рублей я ожидала просто материалы, а получила систему.</p><div class="review-meta"><strong>алина</strong><span>75 BYN</span></div></article>
           </div>
         </div>
       </div>
@@ -7204,8 +7620,8 @@
     <section class="final-section" id="price">
       <div class="wrap">
         <div class="price-stage reveal">
-          <div><p class="eyebrow">скидка 75% сегодня</p><h2>английский наконец идет по плану</h2><p>уроки от a0 до c1, домашки, словарь, прогресс, материалы, бонусы и закрытое сообщество внутри одного доступа.</p></div>
-          <div class="price-box"><span class="discount">скидка 75%</span><div class="price-line"><strong>75 BYN</strong><s>300 BYN</s></div><small>75 беларуских рублей<br>примерно $26 вместо $104</small><button class="arrow-button" type="button" data-payment>открыть доступ</button></div>
+          <div><p class="eyebrow">скидка 70% сегодня</p><h2>Английский, который наконец идёт по плану</h2><p>уроки от A0 до C1, домашки, словарь, прогресс, материалы, бонусы и закрытое сообщество внутри одного доступа.</p></div>
+          <div class="price-box"><span class="discount">скидка 70%</span><div class="price-line"><strong>75 BYN</strong><s>250 BYN</s></div><small>75 белорусских рублей<br>примерно $26 вместо $87</small><button class="arrow-button" type="button" data-payment>оставить заявку</button></div>
         </div>
       </div>
     </section>
@@ -7217,8 +7633,8 @@
           <div class="faq-list reveal">
             <div class="faq-item is-open"><button class="faq-question" type="button" aria-expanded="true">подойдет ли платформа новичку?</button><div class="faq-panel"><div class="faq-answer">да. маршрут начинается с a0-a1 и ведет дальше по уровням. если английский уже есть, можно начать с подходящего модуля.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">что именно я получу после оплаты?</button><div class="faq-panel"><div class="faq-answer">доступ к платформе, урокам, домашкам, словарю, трекеру прогресса, бонусам, материалам и закрытому сообществу.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">75 BYN - это беларуские рубли?</button><div class="faq-panel"><div class="faq-answer">да, цена указана в беларуских рублях. это примерно $26, точная сумма в валюте карты зависит от курса банка в момент оплаты.</div></div></div>
-            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">почему стоит 75 BYN, если раньше было 300 BYN?</button><div class="faq-panel"><div class="faq-answer">сейчас доступ идет по акции со скидкой 75%. на сайте отдельно показываем старую цену 300 BYN и актуальную цену 75 BYN.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">75 BYN — это белорусские рубли?</button><div class="faq-panel"><div class="faq-answer">Да, цена указана в белорусских рублях. Это примерно $26, точная сумма в валюте карты зависит от курса банка в момент оплаты.</div></div></div>
+            <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">почему стоит 75 BYN, если раньше было 250 BYN?</button><div class="faq-panel"><div class="faq-answer">Сейчас доступ идёт по акции со скидкой 70%. На сайте отдельно показываем обычную цену 250 BYN и актуальную цену 75 BYN.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">это разовая оплата или подписка?</button><div class="faq-panel"><div class="faq-answer">75 BYN оплачиваются один раз. минимальный гарантированный срок доступа к курсу составляет 4 месяца в соответствии с договором-офертой.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">сколько времени нужно на занятия?</button><div class="faq-panel"><div class="faq-answer">оптимально 30-40 минут в день. если времени меньше, можно пройти короткую часть урока и продолжить позже. прогресс сохраняется.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">можно ли заниматься с телефона?</button><div class="faq-panel"><div class="faq-answer">да. уроки, задания и основные функции адаптированы для телефона, планшета и компьютера.</div></div></div>
@@ -7278,7 +7694,7 @@
           <div class="manifesto-line reveal"><small>вместо ощущения на глаз</small><strong>не гадать, а <em>видеть рост</em></strong></div>
         </div>
         <div class="manifesto-footer reveal">
-          <span class="micro-price"><s>300 BYN</s><strong>75 BYN</strong> по скидке</span>
+          <span class="micro-price"><s>250 BYN</s><strong>75 BYN</strong> по скидке</span>
           <button class="arrow-button" type="button" data-payment>перестать откладывать</button>
         </div>
       </div>
@@ -7302,7 +7718,7 @@
         </div>
         <div class="route-result reveal">
           <strong>вот зачем нужен plan: чтобы английский двигался вместе с тобой</strong>
-          <span class="micro-price"><strong>75 BYN</strong><s>300 BYN</s></span>
+          <span class="micro-price"><strong>75 BYN</strong><s>250 BYN</s></span>
           <button class="arrow-button" type="button" data-payment>открыть первый урок</button>
         </div>
       </div>
@@ -7360,14 +7776,14 @@
 
   <div class="modal" id="paymentModal" aria-hidden="true">
     <div class="payment-panel" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
-      <button class="modal-close payment-close" type="button" aria-label="закрыть оплату">x</button>
+      <button class="modal-close payment-close" type="button" aria-label="закрыть форму">x</button>
       <div class="payment-top">
         <button class="back-link payment-close" type="button">назад на сайт</button>
         <span class="payment-brand"><img src="assets/magic-star-logo.png" alt="">magic english</span>
       </div>
       <div class="payment-content">
-        <h2 id="paymentTitle">оформление заказа</h2>
-        <p class="payment-subtitle">онлайн-оплата готовится. пока доступ оформляется вручную через службу заботы.</p>
+        <h2 id="paymentTitle">получить доступ</h2>
+        <p class="payment-subtitle">Оставь контакт — служба заботы уточнит детали и поможет оформить доступ. Онлайн-оплату добавим позже.</p>
         <div class="order-card">
           <div>
             <strong>magic english plan</strong>
@@ -7375,40 +7791,45 @@
           </div>
           <div class="order-total">
             <strong>75 BYN</strong>
-            <s>300 BYN</s>
+            <s>250 BYN</s>
           </div>
         </div>
-        <span class="payment-discount">скидка 75%, 75 беларуских рублей, примерно $26 вместо $104</span>
+        <span class="payment-discount">скидка 70% · 75 белорусских рублей · примерно $26 вместо $87</span>
         <form class="payment-form">
           <div class="payment-field">
             <label for="payEmail">электронный адрес</label>
-            <input id="payEmail" type="email" placeholder="example@mail.com" autocomplete="email">
+            <input id="payEmail" name="email" type="email" placeholder="example@mail.com" autocomplete="email">
           </div>
           <div class="payment-field">
             <label for="payName">имя</label>
-            <input id="payName" type="text" placeholder="как вас зовут" autocomplete="name">
+            <input id="payName" name="name" type="text" placeholder="как вас зовут" autocomplete="name" required>
           </div>
           <div class="payment-field">
             <label for="payPhone">номер телефона</label>
-            <input id="payPhone" type="tel" placeholder="+ код страны и номер" autocomplete="tel" inputmode="tel">
+            <input id="payPhone" name="phone" type="tel" placeholder="+ код страны и номер" autocomplete="tel" inputmode="tel">
           </div>
           <details class="social-field">
             <summary>+ добавить соц сеть или мессенджер</summary>
             <div class="social-field-body">
-              <input id="paySocial" type="text" placeholder="@username или ссылка">
+              <input id="paySocial" name="social" type="text" placeholder="@username или ссылка">
             </div>
           </details>
           <div class="payment-checks">
-            <label class="payment-check"><input type="checkbox"><span>я согласен с <a href="https://magic-english-plan.by/page-magic-english-1" target="_blank" rel="noopener">договором-офертой</a></span></label>
-            <label class="payment-check"><input type="checkbox"><span>я принимаю <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">политику обработки персональных данных</a></span></label>
+            <label class="payment-check"><input name="privacy" type="checkbox" required><span>я принимаю <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">политику обработки персональных данных</a></span></label>
           </div>
-          <button class="arrow-button" type="submit" disabled>онлайн-оплата скоро</button>
+          <button class="arrow-button" type="submit">продолжить в telegram</button>
+          <p class="contact-status" data-contact-status aria-live="polite"></p>
         </form>
+        <div class="payment-placeholder" aria-label="плейсхолдер будущей оплаты">
+          <span>следующий этап</span>
+          <strong>безопасная онлайн-оплата</strong>
+          <button type="button" disabled>платёжная форма скоро</button>
+        </div>
         <div class="support-row">
-          <span>после оплаты доступ придет на email</span>
+          <span>сначала свяжемся и подтвердим детали</span>
           <button type="button" onclick="window.open('https://t.me/mag_english','_blank')">написать в поддержку</button>
         </div>
-        <p class="payment-note">нажимая оплатить, вы будете перенаправлены на защищенную страницу оплаты. оплачивая, вы принимаете <a href="https://magic-english-plan.by/page-magic-english-1" target="_blank" rel="noopener">договор-оферту</a> и <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">политику конфиденциальности</a>.</p>
+        <p class="payment-note">Сейчас заявка открывает диалог со службой заботы в Telegram. Платёжные данные на сайте не запрашиваются и не сохраняются.</p>
       </div>
     </div>
   </div>
@@ -7444,24 +7865,24 @@
     );
     const textOptions = [
       {
-        title: 'учись сам, но <span class="script">не оставайся один</span>',
-        copy: 'уроки можно проходить в своем темпе, а вопросы, разговорная практика и поддержка остаются рядом: закрытое сообщество, speaking club и партнеры по уровню.'
+        title: 'Английский, который наконец <span class="script">идёт по плану</span>',
+        copy: 'Magic English Plan собирает уроки, практику, словарь, прогресс и поддержку в один маршрут от A0 до C1. Открываешь кабинет и сразу видишь следующий шаг.'
       },
       {
-        title: 'английский, который наконец <span class="script">идет по плану</span>',
-        copy: 'magic english plan собирает уроки, домашки, прогресс, словарь и speaking-практику в один маршрут. ты каждый день видишь не “надо учить английский”, а конкретный следующий шаг.'
+        title: 'Перестань собирать английский <span class="script">по кусочкам</span>',
+        copy: 'Вместо папки с сохранёнками появляется маршрут: урок дня, домашка, словарь, прогресс и помощь, когда тема не заходит с первого раза.'
       },
       {
-        title: 'перестань собирать английский <span class="script">по кусочкам</span>',
-        copy: 'вместо папки с сохраненками у тебя появляется маршрут: урок дня, домашка, словарь, прогресс и помощь, когда тема не заходит с первого раза.'
+        title: 'Один кабинет вместо <span class="script">десятка вкладок</span>',
+        copy: 'Уроки, домашки, словарь, заметки, поддержка, достижения и прогресс собраны в одном спокойном интерфейсе.'
       },
       {
-        title: 'один кабинет вместо <span class="script">десятка вкладок</span>',
-        copy: 'внутри не просто список тем. это личный кабинет с уроками, домашками, словарем, заметками, поддержкой, достижениями и понятным прогрессом.'
+        title: 'Открой урок. Сделай шаг. <span class="script">Увидь прогресс.</span>',
+        copy: 'Каждый блок ведёт к действию: пройти тему, закрепить её, задать вопрос и перенести знания в речь.'
       },
       {
-        title: 'открой урок, сделай шаг, <span class="script">увидь прогресс</span>',
-        copy: 'формат сделан для тех, кто не хочет начинать с понедельника в пятый раз. каждый блок ведет к действию: пройти тему, закрепить, спросить, поговорить.'
+        title: 'Учись самостоятельно, но <span class="script">не оставайся один</span>',
+        copy: 'Проходи уроки в своём темпе. Поддержка, разговорная практика, сообщество и партнёры по уровню остаются рядом.'
       }
     ];
 
@@ -7579,8 +8000,33 @@
       button.addEventListener("click", closePayment);
     });
 
-    paymentModal.querySelector("form").addEventListener("submit", (event) => {
+    const contactForm = paymentModal.querySelector("form");
+    const contactStatus = paymentModal.querySelector("[data-contact-status]");
+
+    contactForm.addEventListener("submit", (event) => {
       event.preventDefault();
+      const formData = new FormData(contactForm);
+      const name = String(formData.get("name") || "").trim();
+      const email = String(formData.get("email") || "").trim();
+      const phone = String(formData.get("phone") || "").trim();
+      const social = String(formData.get("social") || "").trim();
+
+      if (!email && !phone && !social) {
+        contactStatus.textContent = "Укажи email, телефон или мессенджер.";
+        contactStatus.classList.add("is-error");
+        return;
+      }
+
+      contactStatus.classList.remove("is-error");
+      contactStatus.textContent = "Открываем диалог со службой заботы…";
+      const message = [
+        "Здравствуйте! Хочу получить доступ к Magic English Plan.",
+        `Имя: ${name}`,
+        email ? `Email: ${email}` : "",
+        phone ? `Телефон: ${phone}` : "",
+        social ? `Мессенджер: ${social}` : ""
+      ].filter(Boolean).join("\n");
+      window.open(`https://t.me/mag_english?text=${encodeURIComponent(message)}`, "_blank", "noopener");
     });
 
     const tickDiscountTimer = () => {
