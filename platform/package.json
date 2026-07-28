@@ -22,6 +22,9 @@
     "db:demo": "npm run db:demo -w @magic-english/api",
     "db:studio": "npm run db:studio -w @magic-english/api"
   },
+  "dependencies": {
+    "sharp": "0.35.3"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
@@ -32,7 +35,8 @@
   },
   "overrides": {
     "multer": "2.2.0",
-    "postcss": "8.5.24"
+    "postcss": "8.5.24",
+    "sharp": "0.35.3"
   },
   "engines": {
     "node": ">=22.0.0",
