@@ -16,12 +16,21 @@ const achievementDefinitions = [
     description: "Правильно выполните первое итоговое задание урока.",
     rule: { type: "checkpoint_attempts", target: 1 }
   },
+  { code: "LESSON_FIVE", title: "Ритм найден", description: "Завершите пять уроков.", rule: { type: "completed_lessons", target: 5 } },
+  { code: "LESSON_TEN", title: "Шаг за шагом", description: "Завершите десять уроков.", rule: { type: "completed_lessons", target: 10 } },
+  { code: "LESSON_TWENTY_FIVE", title: "Серьёзный маршрут", description: "Завершите 25 уроков.", rule: { type: "completed_lessons", target: 25 } },
+  { code: "CHECKPOINT_FIVE", title: "Точно в цель", description: "Выполните пять проверочных заданий.", rule: { type: "checkpoint_attempts", target: 5 } },
+  { code: "CHECKPOINT_TWENTY", title: "Практика решает", description: "Выполните 20 проверочных заданий.", rule: { type: "checkpoint_attempts", target: 20 } },
   {
     code: "THREE_DAY_STREAK",
     title: "Отличный темп",
     description: "Занимайтесь три дня подряд.",
     rule: { type: "active_days", target: 3 }
   },
+  { code: "SEVEN_DAY_STREAK", title: "Неделя в ритме", description: "Занимайтесь семь дней подряд.", rule: { type: "active_days", target: 7 } },
+  { code: "FOURTEEN_DAY_STREAK", title: "Огонёк вырос", description: "Занимайтесь 14 дней подряд.", rule: { type: "active_days", target: 14 } },
+  { code: "THIRTY_DAY_STREAK", title: "Не остановить", description: "Занимайтесь 30 дней подряд.", rule: { type: "active_days", target: 30 } },
+  { code: "HALF_COURSE", title: "Половина пути", description: "Завершите половину курса.", rule: { type: "course_completion", target: 50 } },
   {
     code: "COURSE_COMPLETE",
     title: "Выпускник Magic English",
@@ -54,13 +63,13 @@ export class GamificationService {
         this.prisma.taskAttempt.count({
           where: { userId: user.id, isCorrect: true, task: { isCheckpoint: true } }
         }),
-        this.prisma.activityEvent.findMany({
+        this.prisma.userDailyActivity.findMany({
           where: { userId: user.id },
-          select: { createdAt: true }
+          select: { date: true }
         })
       ]);
     const earnedMap = new Map(earned.map((item) => [item.achievementId, item.earnedAt]));
-    const activeDates = activity.map((event) => event.createdAt);
+    const activeDates = activity.map((event) => event.date);
     const activeDays = new Set(
       activeDates.map((date) => date.toISOString().slice(0, 10))
     ).size;
@@ -185,20 +194,16 @@ export class GamificationService {
       this.prisma.taskAttempt.count({
         where: { userId, isCorrect: true, task: { isCheckpoint: true } }
       }),
-      this.prisma.activityEvent.findMany({
+      this.prisma.userDailyActivity.findMany({
         where: { userId },
-        select: { createdAt: true }
+        select: { date: true }
       })
     ]);
-    const activeDays = this.currentStreak(events.map((event) => event.createdAt));
-    const earnedCodes: AchievementCode[] = [];
-
-    if (completedLessons >= 1) earnedCodes.push("FIRST_LESSON");
-    if (homeworkCount >= 1) earnedCodes.push("FIRST_HOMEWORK");
-    if (activeDays >= 3) earnedCodes.push("THREE_DAY_STREAK");
-    if (totalLessons > 0 && completedLessons >= totalLessons) {
-      earnedCodes.push("COURSE_COMPLETE");
-    }
+    const activeDays = this.currentStreak(events.map((event) => event.date));
+    const earnedCodes = achievementDefinitions.filter((definition) => {
+      const progress = this.getRuleProgress(definition.rule.type, totalLessons, completedLessons, homeworkCount, activeDays);
+      return progress >= definition.rule.target;
+    }).map((definition) => definition.code);
 
     for (const code of earnedCodes) {
       await this.award(userId, code);

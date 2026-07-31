@@ -41,6 +41,9 @@ export type AssistantActionPayload = {
   action?: unknown;
   text?: unknown;
   lessonSlug?: unknown;
+  sessionId?: unknown;
+  noteIds?: unknown;
+  attachmentText?: unknown;
 };
 
 export type AssistantTestPayload = {
@@ -95,6 +98,7 @@ export class AssistantService {
     const action = this.parseAction(payload.action);
     const text = this.parseText(payload.text);
     const lessonSlug = this.parseLessonSlug(payload.lessonSlug);
+    const sessionId = this.optionalId(payload.sessionId);
     const config = await this.getConfig();
 
     if (!config.apiKey) {
@@ -124,17 +128,19 @@ export class AssistantService {
     }
 
     const lesson = await this.resolveContext(user.id, lessonSlug);
-    const session =
-      (await this.prisma.assistantSession.findFirst({
-        where: { userId: user.id, lessonId: lesson?.id ?? null },
-        orderBy: { updatedAt: "desc" }
-      })) ??
-      (await this.prisma.assistantSession.create({
-        data: {
-          userId: user.id,
-          lessonId: lesson?.id ?? null
-        }
-      }));
+    const session = sessionId
+      ? await this.prisma.assistantSession.findFirst({ where: { id: sessionId, userId: user.id, archivedAt: null } })
+      : await this.prisma.assistantSession.create({
+          data: { userId: user.id, lessonId: lesson?.id ?? null, title: text.slice(0, 60) || "Новый чат" }
+        });
+    if (!session) throw new BadRequestException("Чат не найден");
+    const noteIds = Array.isArray(payload.noteIds)
+      ? payload.noteIds.filter((id): id is string => typeof id === "string").slice(0, 5)
+      : [];
+    const notes = noteIds.length
+      ? await this.prisma.userNote.findMany({ where: { userId: user.id, id: { in: noteIds } }, select: { title: true, text: true } })
+      : [];
+    const attachmentText = typeof payload.attachmentText === "string" ? payload.attachmentText.trim().slice(0, 20_000) : "";
     const recentMessages = await this.prisma.assistantMessage.findMany({
       where: { sessionId: session.id, role: { in: ["user", "assistant"] } },
       orderBy: { createdAt: "desc" },
@@ -151,7 +157,9 @@ export class AssistantService {
     const modelInput = [
       `Действие: ${assistantActions[action].label}`,
       `Сообщение ученика: ${text || "Предложи короткое полезное упражнение."}`,
-      `Контекст урока: ${lessonContext}`
+      `Контекст урока: ${lessonContext}`,
+      notes.length ? `Заметки ученика: ${JSON.stringify(notes).slice(0, 6_000)}` : "",
+      attachmentText ? `Текстовый файл ученика: ${attachmentText}` : ""
     ].join("\n\n");
 
     const client = this.createClient(config.provider, config.apiKey);
@@ -202,7 +210,7 @@ export class AssistantService {
       }),
       this.prisma.assistantSession.update({
         where: { id: session.id },
-        data: { updatedAt: new Date() }
+        data: { updatedAt: new Date(), lessonId: lesson?.id ?? session.lessonId }
       }),
       this.prisma.activityEvent.create({
         data: {
@@ -220,12 +228,44 @@ export class AssistantService {
     return {
       action,
       output,
+      sessionId: session.id,
       context: this.serializeContext(lesson),
       usage: {
         used: used + 1,
         remaining: Math.max(config.dailyQuota - used - 1, 0)
       }
     };
+  }
+
+  listSessions(user: ApiSessionUser) {
+    return this.prisma.assistantSession.findMany({
+      where: { userId: user.id, archivedAt: null },
+      orderBy: { updatedAt: "desc" },
+      take: 80,
+      include: { lesson: { select: { slug: true, title: true } }, messages: { orderBy: { createdAt: "desc" }, take: 1, select: { content: true } } }
+    });
+  }
+
+  async createSession(user: ApiSessionUser, payload: { title?: unknown; lessonSlug?: unknown }) {
+    const lessonSlug = this.parseLessonSlug(payload.lessonSlug);
+    const lesson = lessonSlug ? await this.resolveContext(user.id, lessonSlug) : null;
+    const title = typeof payload.title === "string" && payload.title.trim() ? payload.title.trim().slice(0, 80) : "Новый чат";
+    return this.prisma.assistantSession.create({ data: { userId: user.id, lessonId: lesson?.id, title } });
+  }
+
+  async getSession(user: ApiSessionUser, sessionId: string) {
+    const session = await this.prisma.assistantSession.findFirst({
+      where: { id: sessionId, userId: user.id, archivedAt: null },
+      include: { lesson: { select: { slug: true, title: true, summary: true } }, messages: { orderBy: { createdAt: "asc" } } }
+    });
+    if (!session) throw new BadRequestException("Чат не найден");
+    return session;
+  }
+
+  async archiveSession(user: ApiSessionUser, sessionId: string) {
+    const result = await this.prisma.assistantSession.updateMany({ where: { id: sessionId, userId: user.id }, data: { archivedAt: new Date() } });
+    if (!result.count) throw new BadRequestException("Чат не найден");
+    return { archived: true };
   }
 
   async getHistory(user: ApiSessionUser, lessonSlug?: string) {
@@ -297,6 +337,12 @@ export class AssistantService {
           title: "Общая практика",
           summary: null
         };
+  }
+
+  private optionalId(value: unknown) {
+    if (value === undefined || value === null || value === "") return null;
+    if (typeof value !== "string" || value.length > 100) throw new BadRequestException("Некорректный идентификатор чата");
+    return value;
   }
 
   async testConnection(payload: AssistantTestPayload) {

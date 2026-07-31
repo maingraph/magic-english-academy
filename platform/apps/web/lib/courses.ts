@@ -67,6 +67,13 @@ const apiBaseUrl =
 
 const fallbackLevels: CourseLevel[] = [
   {
+    code: "A0",
+    title: "С нуля",
+    lessonCount: 12,
+    status: "native",
+    sampleTopics: ["Алфавит", "Базовые звуки", "Как произнести имя по буквам", "Фразы на уроке"]
+  },
+  {
     code: "A1",
     title: "Начальный",
     lessonCount: 41,
@@ -129,6 +136,7 @@ const fallbackLevels: CourseLevel[] = [
 ];
 
 const levelEmoji: Record<string, string> = {
+  A0: "✨",
   A1: "🇺🇸",
   A2: "🔥",
   B1: "😎",

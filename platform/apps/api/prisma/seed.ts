@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/auth/password";
 import { courseLevels } from "../src/courses/course-seed";
+import { seedA0 } from "./seed-a0";
 
 const prisma = new PrismaClient();
 
@@ -306,6 +307,11 @@ async function main() {
         orderIndex: levelIndex + 1
       }
     });
+
+    if (level.code === "A0") {
+      await seedA0(prisma, course.id, levelIndex + 1);
+      continue;
+    }
 
     await prisma.module.deleteMany({
       where: { levelId: courseLevel.id }

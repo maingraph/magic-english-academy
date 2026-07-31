@@ -1,0 +1,16 @@
+"use client";
+
+import { Bookmark, Focus, Minus, StickyNote, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+
+export function LessonToolbar({ slug, estimatedMinutes = 15 }: { slug: string; estimatedMinutes?: number }) {
+  const [bookmarked, setBookmarked] = useState(false); const [focus, setFocus] = useState(false); const [noteOpen, setNoteOpen] = useState(false); const [minimized, setMinimized] = useState(false); const [noteId, setNoteId] = useState<string | null>(null); const [text, setText] = useState(""); const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [reaction, setReaction] = useState("");
+  useEffect(() => () => document.body.classList.remove("lesson-focus-mode"), []);
+  async function toggleBookmark() { const response = await fetch(`${apiBaseUrl}/lessons/${slug}/bookmark`, { method: bookmarked ? "DELETE" : "POST", credentials: "include" }); if (response.ok) setBookmarked(!bookmarked); }
+  function toggleFocus() { const next = !focus; setFocus(next); document.body.classList.toggle("lesson-focus-mode", next); }
+  function autosave(value: string) { setText(value); if (timer.current) clearTimeout(timer.current); timer.current = setTimeout(async () => { if (!value.trim()) return; const response = await fetch(noteId ? `${apiBaseUrl}/notes/${noteId}` : `${apiBaseUrl}/notes`, { method: noteId ? "PATCH" : "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: "Заметка к уроку", text: value, lessonSlug: slug, color: "cream" }) }); if (response.ok && !noteId) setNoteId((await response.json() as { id: string }).id); }, 650); }
+  async function react(value: string) { const response = await fetch(`${apiBaseUrl}/lessons/${slug}/reaction`, { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ reaction: value }) }); if (response.ok) setReaction(value); }
+  return <><div className="lesson-toolbar"><span>Урок · {estimatedMinutes} минут</span><div className="lesson-reactions" aria-label="Оценить урок">{[["useful","👍"],["clear","💡"],["hard","🤔"],["love","🧡"]].map(([value, emoji]) => <button className={reaction === value ? "active" : ""} type="button" onClick={() => void react(value)} key={value} aria-label={value}>{emoji}</button>)}</div><button className={bookmarked ? "active" : ""} type="button" onClick={toggleBookmark}><Bookmark size={16} />Закладка</button><button className={focus ? "active" : ""} type="button" onClick={toggleFocus}><Focus size={16} />Фокус</button><button type="button" onClick={() => { setNoteOpen(true); setMinimized(false); }}><StickyNote size={16} />Заметка</button></div>{noteOpen ? <aside className={`floating-lesson-note ${minimized ? "minimized" : ""}`}><header><strong>Заметка к уроку</strong><div><button type="button" onClick={() => setMinimized(!minimized)}><Minus size={16} /></button><button type="button" onClick={() => setNoteOpen(false)}><X size={16} /></button></div></header>{!minimized ? <><textarea value={text} onChange={(event) => autosave(event.target.value)} placeholder="Пиши здесь — сохраняется автоматически" /><small>{noteId ? "Сохранено" : "Автосохранение после ввода"}</small></> : null}</aside> : null}</>;
+}

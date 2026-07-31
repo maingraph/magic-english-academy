@@ -25,6 +25,7 @@ export type CreateFeedPostPayload = {
   isPinned?: unknown;
   scheduledAt?: unknown;
   attachments?: unknown;
+  poll?: unknown;
 };
 
 export type UpdateFeedPostPayload = Partial<CreateFeedPostPayload>;
@@ -58,6 +59,15 @@ const postInclude = (userId: string) =>
     },
     likes: { where: { userId }, select: { userId: true } },
     bookmarks: { where: { userId }, select: { userId: true } },
+    poll: {
+      include: {
+        options: {
+          orderBy: { position: "asc" },
+          include: { _count: { select: { votes: true } } }
+        },
+        votes: { where: { userId }, select: { optionId: true } }
+      }
+    },
     _count: { select: { likes: true, comments: true, views: true } }
   }) satisfies Prisma.FeedPostInclude;
 
@@ -106,6 +116,7 @@ export class FeedService {
     const status = this.parseStatus(payload.status);
     const scheduledAt = this.optionalDate(payload.scheduledAt);
     const attachments = await this.parseAttachments(payload.attachments);
+    const poll = this.parsePoll(payload.poll);
     const post = await this.prisma.feedPost.create({
       data: {
         authorId: user.id,
@@ -115,7 +126,8 @@ export class FeedService {
         isPinned: this.optionalBoolean(payload.isPinned) ?? false,
         scheduledAt,
         publishedAt: status === "PUBLISHED" ? scheduledAt ?? new Date() : null,
-        attachments: attachments.length ? { create: attachments } : undefined
+        attachments: attachments.length ? { create: attachments } : undefined,
+        poll: poll ? { create: poll } : undefined
       },
       include: postInclude(user.id)
     });
@@ -132,6 +144,10 @@ export class FeedService {
       payload.status === undefined ? undefined : this.parseStatus(payload.status);
     const scheduledAt =
       payload.scheduledAt === undefined ? undefined : this.optionalDate(payload.scheduledAt);
+    const poll = payload.poll === undefined ? undefined : this.parsePoll(payload.poll);
+    if (payload.poll !== undefined) {
+      await this.prisma.feedPoll.deleteMany({ where: { postId } });
+    }
     const post = await this.prisma.feedPost.update({
       where: { id: postId },
       data: {
@@ -148,7 +164,8 @@ export class FeedService {
         ...(scheduledAt !== undefined ? { scheduledAt } : {}),
         ...(status === "PUBLISHED" && existing.status !== "PUBLISHED"
           ? { publishedAt: scheduledAt ?? new Date() }
-          : {})
+          : {}),
+        ...(poll ? { poll: { create: poll } } : {})
       },
       include: postInclude(user.id)
     });
@@ -306,7 +323,7 @@ export class FeedService {
       return {
         name: this.requiredText(attachment.name, "attachment.name", 180),
         mimeType: this.requiredText(attachment.mimeType, "attachment.mimeType", 120),
-        size: this.requiredInteger(attachment.size, "attachment.size", 10 * 1024 * 1024),
+        size: this.requiredInteger(attachment.size, "attachment.size", attachment.mimeType?.toString().startsWith("video/") ? 250 * 1024 * 1024 : 25 * 1024 * 1024),
         storageKey: this.requiredText(attachment.storageKey, "attachment.storageKey", 80),
         url: this.requiredText(attachment.url, "attachment.url", 500)
       };
@@ -318,6 +335,26 @@ export class FeedService {
       throw new BadRequestException("Один или несколько файлов не найдены");
     }
     return parsed;
+  }
+
+  private parsePoll(value: unknown) {
+    if (value === undefined || value === null) return null;
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new BadRequestException("poll must be an object");
+    }
+    const source = value as { question?: unknown; options?: unknown; closesAt?: unknown };
+    if (!Array.isArray(source.options) || source.options.length < 2 || source.options.length > 8) {
+      throw new BadRequestException("poll options must contain 2 to 8 values");
+    }
+    const options = source.options.map((option, position) => ({
+      label: this.requiredText(option, `poll.options.${position}`, 160),
+      position
+    }));
+    return {
+      question: this.requiredText(source.question, "poll.question", 300),
+      closesAt: this.optionalDate(source.closesAt),
+      options: { create: options }
+    };
   }
 
   private requiredText(value: unknown, field: string, maxLength: number) {
@@ -373,6 +410,19 @@ export class FeedService {
       comments: post.comments.map((comment) => this.serializeComment(comment)),
       liked: post.likes.length > 0,
       saved: post.bookmarks.length > 0,
+      poll: post.poll
+        ? {
+            id: post.poll.id,
+            question: post.poll.question,
+            closesAt: post.poll.closesAt,
+            selectedOptionId: post.poll.votes[0]?.optionId ?? null,
+            options: post.poll.options.map((option) => ({
+              id: option.id,
+              label: option.label,
+              votes: option._count.votes
+            }))
+          }
+        : null,
       counts: post._count
     };
   }

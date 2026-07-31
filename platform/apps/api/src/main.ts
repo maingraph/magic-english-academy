@@ -17,7 +17,9 @@ for (const envPath of [
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true
+  });
   const webOrigins = (process.env.WEB_ORIGIN ?? "http://localhost:3000")
     .split(",")
     .map((origin) => origin.trim())

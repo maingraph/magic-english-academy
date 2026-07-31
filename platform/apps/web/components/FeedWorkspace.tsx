@@ -40,6 +40,7 @@ type Post = {
   attachments: Attachment[];
   comments: Comment[];
   counts: { likes: number; comments: number; views: number };
+  poll: null | { id: string; question: string; selectedOptionId: string | null; options: Array<{ id: string; label: string; votes: number }> };
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
@@ -69,7 +70,12 @@ export function FeedWorkspace() {
   const [canPublish, setCanPublish] = useState(false);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  const [draftFile, setDraftFile] = useState<File | null>(null);
+  const [draftFiles, setDraftFiles] = useState<File[]>([]);
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [isPinned, setIsPinned] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<"PUBLISHED" | "DRAFT">("PUBLISHED");
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [state, setState] = useState<"loading" | "idle" | "saving" | "error">("loading");
   const [error, setError] = useState("");
@@ -123,17 +129,12 @@ export function FeedWorkspace() {
 
     try {
       let attachments: Attachment[] = [];
-      if (draftFile) {
-        const body = new FormData();
-        body.append("file", draftFile);
-        const upload = await fetch(`${apiBaseUrl}/feed/uploads`, {
-          method: "POST",
-          credentials: "include",
-          body
-        });
+      attachments = await Promise.all(draftFiles.map(async (file) => {
+        const body = new FormData(); body.append("file", file);
+        const upload = await fetch(`${apiBaseUrl}/feed/uploads`, { method: "POST", credentials: "include", body });
         if (!upload.ok) throw new Error(await readError(upload));
-        attachments = [(await upload.json()) as Attachment];
-      }
+        return await upload.json() as Attachment;
+      }));
 
       const response = await fetch(`${apiBaseUrl}/feed`, {
         method: "POST",
@@ -142,20 +143,29 @@ export function FeedWorkspace() {
         body: JSON.stringify({
           title: text.split("\n")[0].slice(0, 180),
           text,
-          attachments
+          attachments,
+          status: publishStatus,
+          isPinned,
+          scheduledAt: scheduledAt || null,
+          poll: pollQuestion.trim() ? { question: pollQuestion, options: pollOptions.split("\n").map((value) => value.trim()).filter(Boolean) } : undefined
         })
       });
       if (!response.ok) throw new Error(await readError(response));
       const post = (await response.json()) as Post;
       setPosts((current) => [post, ...current]);
       setDraft("");
-      setDraftFile(null);
+      setDraftFiles([]); setPollQuestion(""); setPollOptions(""); setScheduledAt(""); setIsPinned(false);
       if (fileInput.current) fileInput.current.value = "";
       setState("idle");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Публикация не сохранена");
       setState("error");
     }
+  }
+
+  async function vote(postId: string, pollId: string, optionId: string) {
+    const response = await fetch(`${apiBaseUrl}/feed/polls/${pollId}/vote`, { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ optionId }) });
+    if (response.ok) await load(); else setError(await readError(response));
   }
 
   async function toggle(post: Post, kind: "like" | "bookmark") {
@@ -232,13 +242,14 @@ export function FeedWorkspace() {
             <span className="composer-footer">
               <button className="composer-attach" onClick={() => fileInput.current?.click()} type="button">
                 <Paperclip size={17} />
-                {draftFile ? draftFile.name : "Прикрепить файл"}
+                {draftFiles.length ? `${draftFiles.length} файл(а)` : "Прикрепить файлы"}
               </button>
               <input
                 ref={fileInput}
                 type="file"
                 accept=".pdf,.txt,.csv,.jpg,.jpeg,.png,.webp,.mp3,.ogg,.mp4,.webm"
-                onChange={(event) => setDraftFile(event.target.files?.[0] ?? null)}
+                multiple
+                onChange={(event) => setDraftFiles(Array.from(event.target.files ?? []).slice(0, 8))}
                 hidden
               />
               <button className="composer-send" disabled={!draft.trim() || state === "saving"} type="submit">
@@ -246,6 +257,7 @@ export function FeedWorkspace() {
                 {state === "saving" ? "Сохраняем…" : "Опубликовать"}
               </button>
             </span>
+            <details className="composer-advanced"><summary>Опрос, расписание и публикация</summary><div><input value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Вопрос опроса" /><textarea value={pollOptions} onChange={(event) => setPollOptions(event.target.value)} placeholder={'Варианты — каждый с новой строки'} rows={3} /><label>Опубликовать<input type="datetime-local" value={scheduledAt} onChange={(event) => setScheduledAt(event.target.value)} /></label><label><input type="checkbox" checked={isPinned} onChange={(event) => setIsPinned(event.target.checked)} />Закрепить</label><select value={publishStatus} onChange={(event) => setPublishStatus(event.target.value as "PUBLISHED" | "DRAFT")}><option value="PUBLISHED">Публикация</option><option value="DRAFT">Черновик</option></select></div></details>
           </label>
         </form>
       ) : null}
@@ -284,6 +296,7 @@ export function FeedWorkspace() {
                   ))}
                 </div>
               ) : null}
+              {post.poll ? <section className="feed-poll"><strong>{post.poll.question}</strong>{post.poll.options.map((option) => { const total = post.poll!.options.reduce((sum, item) => sum + item.votes, 0); const percent = total ? Math.round(option.votes / total * 100) : 0; return <button className={post.poll!.selectedOptionId === option.id ? "selected" : ""} type="button" key={option.id} onClick={() => void vote(post.id, post.poll!.id, option.id)}><span style={{ width: `${percent}%` }} /><em>{option.label}</em><small>{percent}%</small></button>; })}</section> : null}
               <div className="post-actions">
                 <button className={post.liked ? "active" : ""} onClick={() => void toggle(post, "like")} type="button">
                   <Heart size={18} fill={post.liked ? "currentColor" : "none"} />{post.counts.likes}

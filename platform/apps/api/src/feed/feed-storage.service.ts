@@ -31,8 +31,9 @@ export class FeedStorageService {
   );
 
   async store(file: UploadedFeedFile) {
-    if (!file?.buffer || file.size < 1 || file.size > 10 * 1024 * 1024) {
-      throw new BadRequestException("Файл должен быть размером от 1 байта до 10 МБ");
+    const maximum = file?.mimetype?.startsWith("video/") ? 250 * 1024 * 1024 : 25 * 1024 * 1024;
+    if (!file?.buffer || file.size < 1 || file.size > maximum) {
+      throw new BadRequestException(`Файл превышает лимит ${maximum / 1024 / 1024} МБ`);
     }
     if (!allowedMimeTypes.has(file.mimetype)) {
       throw new BadRequestException("Этот тип файла не поддерживается");

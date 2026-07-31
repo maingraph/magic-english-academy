@@ -30,7 +30,7 @@ export class ProfileService {
       where: { id: user.id },
       include: {
         profile: true,
-        lessonProgress: true,
+        lessonProgress: { include: { lesson: { select: { skill: true, module: { select: { skill: true } } } } } },
         taskAttempts: {
           include: {
             task: {
@@ -51,6 +51,12 @@ export class ProfileService {
         }
       }
     });
+    const skillNames = ["grammar", "vocabulary", "listening", "speaking"];
+    const skills = Object.fromEntries(skillNames.map((skill) => {
+      const rows = account.lessonProgress.filter((progress) => (progress.lesson.skill ?? progress.lesson.module.skill ?? "grammar") === skill);
+      const completed = rows.filter((progress) => progress.status === "COMPLETED").length;
+      return [skill, rows.length ? Math.round(completed / rows.length * 100) : 0];
+    }));
 
     return {
       id: account.id,
@@ -75,7 +81,8 @@ export class ProfileService {
         ),
         checkpointCount: account.taskAttempts.filter(
           (attempt) => attempt.isCorrect && attempt.task.isCheckpoint
-        ).length
+        ).length,
+        skills
       },
       achievements: account.userAchievements.map((earned) => ({
         code: earned.achievement.code,

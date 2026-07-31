@@ -1,0 +1,2 @@
+import { AppShell } from "../../../components/AppShell"; import { AuthGate } from "../../../components/AuthGate"; import { AdminExperienceWorkspace } from "../../../components/AdminExperienceWorkspace";
+export default function Page() { return <AppShell><main className="page-main"><div className="container"><section className="section-copy"><h1>АНАЛИТИКА</h1><p>Активность, прохождение, попытки и доставка.</p></section><AuthGate role="admin"><AdminExperienceWorkspace kind="analytics" /></AuthGate></div></main></AppShell>; }

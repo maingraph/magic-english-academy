@@ -7,6 +7,8 @@ import {
   FilePlus2,
   Lightbulb,
   ListChecks,
+  MessageSquare,
+  Plus,
   Sparkles
 } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
@@ -19,6 +21,7 @@ type AssistantContext = {
   title: string;
   summary: string | null;
 };
+type AssistantSession = { id: string; title: string; updatedAt: string; lesson?: { title: string } | null; messages?: Array<{ content: string }> };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 const suggestions: Array<{ id: ActionId; label: string; icon: typeof Bot }> = [
@@ -35,6 +38,9 @@ export function AssistantWorkspace() {
   const [status, setStatus] = useState<"loading" | "idle" | "error">("loading");
   const [remaining, setRemaining] = useState<number | null>(null);
   const [configured, setConfigured] = useState(true);
+  const [sessions, setSessions] = useState<AssistantSession[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [attachmentText, setAttachmentText] = useState("");
   const [context, setContext] = useState<AssistantContext>({
     mode: "general",
     lessonSlug: null,
@@ -46,7 +52,7 @@ export function AssistantWorkspace() {
   useEffect(() => {
     Promise.all([
       fetch(`${apiBaseUrl}/assistant/status`, { credentials: "include" }),
-      fetch(`${apiBaseUrl}/assistant/history`, { credentials: "include" })
+      fetch(`${apiBaseUrl}/assistant/sessions`, { credentials: "include" })
     ])
       .then(async ([statusResponse, historyResponse]) => {
         const statusData = statusResponse.ok
@@ -56,38 +62,36 @@ export function AssistantWorkspace() {
               context: AssistantContext;
             })
           : null;
-        const historyData = historyResponse.ok
-          ? ((await historyResponse.json()) as {
-              context: AssistantContext;
-              messages: Array<{
-                id: string;
-                role: "assistant" | "user";
-                content: string;
-              }>;
-            })
-          : null;
+        const sessionData = historyResponse.ok ? await historyResponse.json() as AssistantSession[] : [];
         setRemaining(statusData?.remaining ?? null);
         setConfigured(statusData?.configured ?? false);
         setContext(
-          historyData?.context ??
-            statusData?.context ?? {
+          statusData?.context ?? {
               mode: "general",
               lessonSlug: null,
               title: "Общая практика",
               summary: null
             }
         );
-        setMessages(
-          historyData?.messages.map((message) => ({
-            id: message.id,
-            role: message.role,
-            content: message.content
-          })) ?? []
-        );
+        setSessions(sessionData);
+        if (sessionData[0]) void selectSession(sessionData[0].id);
         setStatus("idle");
       })
       .catch(() => setStatus("error"));
   }, []);
+
+  async function selectSession(id: string) {
+    const response = await fetch(`${apiBaseUrl}/assistant/sessions/${id}`, { credentials: "include" });
+    if (!response.ok) return;
+    const data = await response.json() as { id: string; lesson?: AssistantContext; messages: Message[] };
+    setSessionId(data.id); setMessages(data.messages); if (data.lesson) setContext({ mode: "lesson", lessonSlug: (data.lesson as unknown as { slug: string }).slug, title: data.lesson.title, summary: data.lesson.summary });
+  }
+
+  async function newChat() {
+    const response = await fetch(`${apiBaseUrl}/assistant/sessions`, { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: "Новый чат", lessonSlug: context.lessonSlug }) });
+    if (!response.ok) return;
+    const created = await response.json() as AssistantSession; setSessions((current) => [created, ...current]); setSessionId(created.id); setMessages([]);
+  }
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -112,6 +116,8 @@ export function AssistantWorkspace() {
           action,
           text: prompt,
           lessonSlug: context.lessonSlug
+          ,sessionId,
+          attachmentText
         })
       });
       const data = (await response.json().catch(() => null)) as {
@@ -133,6 +139,7 @@ export function AssistantWorkspace() {
       setRemaining(data?.usage?.remaining ?? remaining);
       if (data?.context) setContext(data.context);
       setStatus("idle");
+      setAttachmentText("");
     } catch (error) {
       setMessages((current) => [
         ...current,
@@ -150,14 +157,14 @@ export function AssistantWorkspace() {
     const file = event.target.files?.[0];
     if (!file) return;
     const content = await file.text();
-    setText((current) =>
-      [current, `Файл ${file.name}:\n${content.slice(0, 2500)}`].filter(Boolean).join("\n\n")
-    );
+    setAttachmentText(`Файл ${file.name}:\n${content.slice(0, 20_000)}`);
     event.target.value = "";
   }
 
   return (
-    <div className="ai-workspace">
+    <div className="ai-workspace ai-workspace-with-sessions">
+      <aside className="ai-session-sidebar"><button type="button" onClick={newChat}><Plus size={17} />Новый чат</button><div>{sessions.map((session) => <button className={session.id === sessionId ? "active" : ""} type="button" onClick={() => void selectSession(session.id)} key={session.id}><MessageSquare size={15} /><span><strong>{session.title}</strong><small>{session.lesson?.title ?? session.messages?.[0]?.content ?? "Общая практика"}</small></span></button>)}</div></aside>
+      <div className="ai-chat-column">
       <header className="ai-workspace-header">
         <span className="ai-orb"><Sparkles size={22} /></span>
         <div>
@@ -264,6 +271,7 @@ export function AssistantWorkspace() {
               hidden
             />
             <span>Ответы помогают учиться, но не заменяют преподавателя</span>
+            {attachmentText ? <small className="ai-file-ready">Файл добавлен</small> : null}
             <button
               className="ai-send"
               disabled={!text.trim() || status === "loading" || !configured}
@@ -274,6 +282,7 @@ export function AssistantWorkspace() {
             </button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );

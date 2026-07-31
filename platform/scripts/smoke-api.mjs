@@ -65,12 +65,13 @@ assert(session.body.user?.email === email, "Session user mismatch");
 const forbidden = await request("/admin/overview");
 assert(forbidden.response.status === 403, "Student accessed admin endpoint");
 
-const lesson = await request("/courses/lessons/a1-001");
+const starterLessonSlug = "a0-001";
+const lesson = await request(`/courses/lessons/${starterLessonSlug}`);
 assert(lesson.response.ok && lesson.body.blocks.length > 0, "Lesson unavailable");
 
-const answer = await request("/learning/lessons/a1-001/answer", {
+const answer = await request(`/learning/lessons/${starterLessonSlug}/answer`, {
   method: "POST",
-  body: JSON.stringify({ blockOrder: 3, answer: "is" })
+  body: JSON.stringify({ blockOrder: 4, answer: "B" })
 });
 assert(answer.response.ok && answer.body.correct === true, "Task scoring failed");
 
@@ -79,12 +80,12 @@ const dictionary = await request("/dictionary/quick-save", {
   body: JSON.stringify({
     term: "smoke test",
     translation: "проверка",
-    lessonSlug: "a1-001"
+    lessonSlug: starterLessonSlug
   })
 });
 assert(dictionary.response.ok && dictionary.body.saved, "Dictionary save failed");
 
-const complete = await request("/progress/lessons/a1-001/complete", {
+const complete = await request(`/progress/lessons/${starterLessonSlug}/complete`, {
   method: "POST"
 });
 assert(complete.body.status === "COMPLETED", "Lesson completion failed");

@@ -118,6 +118,7 @@ export function LessonBlockRenderer({
     const mediaType = getString(content, "mediaType");
     const embedUrl = getVideoEmbedUrl(url);
     const isVideoFile = mediaType === "video" || /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+    const isAudioFile = mediaType === "audio" || /\.(mp3|wav|m4a|aac)(\?.*)?$/i.test(url);
 
     return (
       <section className="lesson-block media-block">
@@ -137,9 +138,13 @@ export function LessonBlockRenderer({
           <video className="lesson-video-file" controls preload="metadata">
             <source src={url} />
           </video>
+        ) : isAudioFile ? (
+          <audio controls preload="metadata">
+            <source src={url} />
+          </audio>
         ) : (
-          <a href={url} rel="noreferrer" target="_blank">
-            Открыть материал
+          <a href={url} download={getString(content, "downloadName") || undefined} rel="noreferrer" target="_blank">
+            {getString(content, "downloadName") ? "Скачать материал" : "Открыть материал"}
           </a>
         )}
       </section>

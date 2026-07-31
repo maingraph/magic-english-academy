@@ -49,6 +49,8 @@ jobs:
       - run: npm ci
       - run: npm run db:generate
       - run: npm exec -w @magic-english/api -- prisma validate --schema prisma/schema.prisma
+      - run: npm exec -w @magic-english/api -- prisma migrate deploy --schema prisma/schema.prisma
+      - run: npm run db:seed
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test
@@ -56,8 +58,6 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: npm audit --omit=dev --audit-level=high
-      - run: npm exec -w @magic-english/api -- prisma migrate deploy --schema prisma/schema.prisma
-      - run: npm run db:seed
       - name: Start API
         run: |
           node apps/api/dist/main.js > /tmp/magic-api.log 2>&1 &

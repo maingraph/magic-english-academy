@@ -3,6 +3,7 @@ import { Prisma, ProgressStatus, UserRole } from "@prisma/client";
 import type { ApiRole, ApiSessionUser } from "../auth/auth.types";
 import { GamificationService } from "../gamification/gamification.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { canUnlockLevel } from "./unlock.utils";
 
 const roleMap: Record<ApiRole, UserRole> = {
   student: UserRole.STUDENT,
@@ -239,7 +240,7 @@ export class ProgressService {
         slug: true,
         module: {
           select: {
-            level: { select: { id: true, orderIndex: true } }
+            level: { select: { id: true, code: true, orderIndex: true } }
           }
         }
       }
@@ -463,7 +464,7 @@ export class ProgressService {
       select: {
         module: {
           select: {
-            level: { select: { id: true, orderIndex: true } }
+            level: { select: { id: true, code: true, orderIndex: true } }
           }
         }
       }
@@ -480,7 +481,7 @@ export class ProgressService {
       })
     ]);
 
-    if (total === 0 || completed / total < 0.8) return;
+    if (!canUnlockLevel(level.code, completed, total)) return;
     const nextLevel = await this.prisma.courseLevel.findFirst({
       where: { orderIndex: { gt: level.orderIndex } },
       orderBy: { orderIndex: "asc" },

@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure"
   },
@@ -21,10 +21,18 @@ export default defineConfig({
       use: { ...devices["Pixel 7"] }
     }
   ],
-  webServer: {
-    command: "npm run dev:web",
-    url: "http://127.0.0.1:3000/login",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000
-  }
+  webServer: [
+    {
+      command: "npm run dev:api",
+      url: "http://localhost:4000/api/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000
+    },
+    {
+      command: "npm run dev:web",
+      url: "http://localhost:3000/login",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000
+    }
+  ]
 });

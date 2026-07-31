@@ -20,6 +20,7 @@ type ProfileResponse = {
     completedLessons: number;
     taskPoints: number;
     checkpointCount: number;
+    skills: Record<string, number>;
   };
   achievements: Array<{
     code: string;
@@ -170,6 +171,10 @@ export function ProfilePanel() {
 
       <ProfileActivity />
 
+      <section className="workspace-panel profile-skill-map"><div className="panel-heading"><div><span>Карта навыков</span><h2>Что уже получается</h2></div></div><div>{Object.entries(profile.course.skills).map(([skill, value]) => <article key={skill}><span><strong>{skill}</strong><em>{value}%</em></span><div><i style={{ width: `${value}%` }} /></div></article>)}</div></section>
+
+      <section className="workspace-panel profile-recent-achievements"><div className="panel-heading"><div><span>Маленькие победы</span><h2>Последние достижения</h2></div></div><div>{profile.achievements.length ? profile.achievements.slice(0, 4).map((item) => <article key={item.code}><Award size={18} /><span><strong>{item.title}</strong><small>{new Intl.DateTimeFormat("ru", { dateStyle: "medium" }).format(new Date(item.earnedAt))}</small></span></article>) : <p>Первое достижение появится после завершения урока.</p>}</div></section>
+
       <form className="workspace-panel profile-form" onSubmit={saveProfile}>
         <div className="panel-heading">
           <div>
@@ -210,13 +215,6 @@ export function ProfilePanel() {
               value={timezone}
               onChange={(event) => setTimezone(event.target.value)}
             />
-          </label>
-          <label>
-            Язык
-            <select defaultValue={profile.profile.locale}>
-              <option value="ru">Русский</option>
-              <option value="en">Английский</option>
-            </select>
           </label>
         </div>
         {message ? <p className={`form-message ${status}`}>{message}</p> : null}

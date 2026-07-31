@@ -19,6 +19,7 @@
     "db:generate": "npm run db:generate -w @magic-english/api",
     "db:migrate": "npm run db:migrate -w @magic-english/api",
     "db:seed": "npm run db:seed -w @magic-english/api",
+    "db:a0": "npm run db:a0 -w @magic-english/api",
     "db:demo": "npm run db:demo -w @magic-english/api",
     "db:studio": "npm run db:studio -w @magic-english/api"
   },

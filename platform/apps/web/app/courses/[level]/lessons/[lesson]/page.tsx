@@ -4,6 +4,7 @@ import { AppShell } from "../../../../../components/AppShell";
 import { AuthGate } from "../../../../../components/AuthGate";
 import { LessonBlockRenderer } from "../../../../../components/LessonBlockRenderer";
 import { LessonProgressPanel } from "../../../../../components/LessonProgressPanel";
+import { LessonToolbar } from "../../../../../components/LessonToolbar";
 import { MagicButton } from "../../../../../components/MagicButton";
 import { TextSelectionTools } from "../../../../../components/TextSelectionTools";
 import { getNativeLesson } from "../../../../../lib/courses";
@@ -46,6 +47,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </MagicButton>
             </div>
           </section>
+          <LessonToolbar slug={data.slug} />
 
           <div className="lesson-layout">
             <article className="lesson-content">

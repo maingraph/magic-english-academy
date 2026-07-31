@@ -7,14 +7,6 @@ export default function DashboardPage() {
     <AppShell>
       <main className="page-main">
         <div className="container">
-          <section className="section-copy">
-            <h1>ОБЗОР ОБУЧЕНИЯ</h1>
-            <p>
-              Здесь видно, где вы остановились, какие уровни открыты, кто впереди
-              в рейтинге и какие достижения уже получены.
-            </p>
-          </section>
-
           <AuthGate>
             <DashboardProgressPanel />
           </AuthGate>

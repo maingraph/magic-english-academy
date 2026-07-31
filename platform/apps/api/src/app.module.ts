@@ -9,6 +9,7 @@ import { CoursesModule } from "./courses/courses.module";
 import { HealthModule } from "./health/health.module";
 import { DictionaryModule } from "./dictionary/dictionary.module";
 import { FeedModule } from "./feed/feed.module";
+import { ExperienceModule } from "./experience/experience.module";
 import { GamificationModule } from "./gamification/gamification.module";
 import { LearningModule } from "./learning/learning.module";
 import { NotesModule } from "./notes/notes.module";
@@ -36,6 +37,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     ProfileModule,
     DictionaryModule,
     FeedModule,
+    ExperienceModule,
     GamificationModule,
     LearningModule,
     NotesModule

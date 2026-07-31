@@ -34,6 +34,7 @@ enum TaskType {
   FILL_BLANK
   MATCHING
   WRITING
+  LISTENING
 }
 
 enum ProgressStatus {
@@ -66,14 +67,103 @@ enum NoteColor {
   ORANGE
 }
 
+enum CalendarEventType {
+  LESSON
+  REVIEW
+  SPEAKING_CLUB
+  PERSONAL
+}
+
+enum CalendarEventStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+enum SpeakingClubBookingStatus {
+  BOOKED
+  WAITLISTED
+  CANCELLED
+  ATTENDED
+  MISSED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  DELAYED
+  BOUNCED
+  FAILED
+  COMPLAINED
+  SUPPRESSED
+}
+
+enum LibraryMaterialType {
+  LINK
+  VIDEO
+  AUDIO
+  FILE
+  GUIDE
+  CHECKLIST
+  TEMPLATE
+  COLLECTION
+}
+
+enum LibraryMaterialStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TrainingMode {
+  CHOICE
+  LETTERS
+  MATCHING
+  CONTEXT
+  IRREGULAR_VERBS
+  PERSONAL_SET
+}
+
+enum TrainingSessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum CertificateStatus {
+  ISSUED
+  REVOKED
+}
+
+enum StorageProvider {
+  LOCAL
+  VERCEL_BLOB
+}
+
+enum OutboxStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model User {
-  id                  String               @id @default(cuid())
-  email               String               @unique
+  id                  String                  @id @default(cuid())
+  email               String                  @unique
   passwordHash        String?
-  role                UserRole             @default(STUDENT)
-  status              UserStatus           @default(ACTIVE)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  role                UserRole                @default(STUDENT)
+  status              UserStatus              @default(ACTIVE)
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
   profile             Profile?
   enrollments         Enrollment[]
   lessonProgress      LessonProgress[]
@@ -87,13 +177,28 @@ model User {
   authoredArticles    Article[]
   abuseSignals        AbuseSignal[]
   passwordResetTokens PasswordResetToken[]
-  feedPosts           FeedPost[]           @relation("FeedPostAuthor")
+  feedPosts           FeedPost[]              @relation("FeedPostAuthor")
   feedComments        FeedComment[]
   feedLikes           FeedLike[]
   feedBookmarks       FeedBookmark[]
   feedViews           FeedView[]
   notes               UserNote[]
   dailyActivity       UserDailyActivity[]
+  studyPlan           UserStudyPlan?
+  calendarEvents      CalendarEvent[]
+  clubBookings        SpeakingClubBooking[]
+  notifications       Notification[]
+  notificationPrefs   NotificationPreference?
+  createdCampaigns    NotificationCampaign[]  @relation("CampaignCreator")
+  emailDeliveries     EmailDelivery[]
+  libraryMaterials    LibraryMaterial[]       @relation("MaterialCreator")
+  librarySaves        LibrarySave[]
+  storageAssets       StorageAsset[]
+  trainingSessions    TrainingSession[]
+  dictionaryReviews   DictionaryReviewLog[]
+  lessonBookmarks     LessonBookmark[]
+  lessonReactions     LessonReaction[]
+  pollVotes           FeedPollVote[]
 }
 
 model Profile {
@@ -103,6 +208,7 @@ model Profile {
   avatarUrl   String?
   locale      String  @default("ru")
   timezone    String  @default("Europe/Warsaw")
+  theme       String  @default("system")
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -121,6 +227,7 @@ model CourseLevel {
   courseId    String
   code        String
   title       String
+  description String?
   orderIndex  Int
   course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
   modules     Module[]
@@ -135,6 +242,7 @@ model Module {
   title       String
   description String?
   orderIndex  Int
+  skill       String?
   level       CourseLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
   lessons     Lesson[]
 }
@@ -146,6 +254,8 @@ model Lesson {
   title             String
   summary           String?
   orderIndex        Int
+  estimatedMinutes  Int                    @default(15)
+  skill             String?
   module            Module                 @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   blocks            LessonBlock[]
   progress          LessonProgress[]
@@ -153,6 +263,8 @@ model Lesson {
   dictionaryTerms   LessonDictionaryTerm[]
   notes             UserNote[]
   assistantSessions AssistantSession[]
+  bookmarks         LessonBookmark[]
+  reactions         LessonReaction[]
 }
 
 model LessonBlock {
@@ -256,12 +368,18 @@ model UserAchievement {
 }
 
 model Certificate {
-  id          String   @id @default(cuid())
-  userId      String
-  courseLevel String
-  fileUrl     String?
-  issuedAt    DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String            @id @default(cuid())
+  userId            String
+  courseLevel       String
+  score             Int               @default(100)
+  status            CertificateStatus @default(ISSUED)
+  verificationToken String            @unique @default(cuid())
+  fileUrl           String?
+  issuedAt          DateTime          @default(now())
+  revokedAt         DateTime?
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, courseLevel])
 }
 
 model DictionaryTerm {
@@ -284,13 +402,27 @@ model LessonDictionaryTerm {
 }
 
 model UserDictionaryTerm {
-  userId  String
-  termId  String
-  savedAt DateTime       @default(now())
-  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  term    DictionaryTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  userId         String
+  termId         String
+  savedAt        DateTime              @default(now())
+  dueAt          DateTime              @default(now())
+  stability      Float                 @default(0)
+  difficulty     Float                 @default(0)
+  scheduledDays  Int                   @default(0)
+  learningSteps  Int                   @default(0)
+  repetitions    Int                   @default(0)
+  lapses         Int                   @default(0)
+  fsrsState      Int                   @default(0)
+  lastReviewedAt DateTime?
+  setName        String?
+  confidence     String                @default("NEW")
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  term           DictionaryTerm        @relation(fields: [termId], references: [id], onDelete: Cascade)
+  reviews        DictionaryReviewLog[]
 
   @@id([userId, termId])
+  @@index([userId, dueAt])
+  @@index([userId, setName])
 }
 
 model ActivityEvent {
@@ -318,14 +450,16 @@ model UserDailyActivity {
 }
 
 model AssistantSession {
-  id        String             @id @default(cuid())
-  userId    String
-  lessonId  String?
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @default(now()) @updatedAt
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson    Lesson?            @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  messages  AssistantMessage[]
+  id         String             @id @default(cuid())
+  userId     String
+  lessonId   String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @default(now()) @updatedAt
+  title      String             @default("Новый чат")
+  archivedAt DateTime?
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson     Lesson?            @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  messages   AssistantMessage[]
 
   @@index([userId, lessonId, updatedAt])
 }
@@ -360,6 +494,7 @@ model FeedPost {
   likes       FeedLike[]
   bookmarks   FeedBookmark[]
   views       FeedView[]
+  poll        FeedPoll?
 
   @@index([status, isPinned, publishedAt])
   @@index([authorId, createdAt])
@@ -499,4 +634,322 @@ model PasswordResetToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+}
+
+model UserStudyPlan {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  sessionsPerWeek Int       @default(4)
+  sessionMinutes  Int       @default(30)
+  preferredDays   Json      @default("[]")
+  preferredTime   String    @default("19:00")
+  targetDate      DateTime?
+  reminderEnabled Boolean   @default(true)
+  reminderMinutes Int       @default(30)
+  autoReschedule  Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CalendarEvent {
+  id             String              @id @default(cuid())
+  userId         String
+  type           CalendarEventType
+  status         CalendarEventStatus @default(SCHEDULED)
+  title          String
+  startsAt       DateTime
+  endsAt         DateTime?
+  sourceId       String?
+  metadata       Json?
+  reminderSentAt DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startsAt])
+  @@index([status, startsAt])
+}
+
+model SpeakingClub {
+  id              String                @id @default(cuid())
+  title           String
+  description     String?
+  levelCodes      Json                  @default("[]")
+  startsAt        DateTime
+  durationMinutes Int                   @default(45)
+  capacity        Int                   @default(16)
+  meetingUrl      String?
+  materials       Json                  @default("[]")
+  status          String                @default("SCHEDULED")
+  reminderSentAt  DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  bookings        SpeakingClubBooking[]
+
+  @@index([status, startsAt])
+}
+
+model SpeakingClubBooking {
+  id        String                    @id @default(cuid())
+  clubId    String
+  userId    String
+  status    SpeakingClubBookingStatus @default(BOOKED)
+  createdAt DateTime                  @default(now())
+  updatedAt DateTime                  @updatedAt
+  club      SpeakingClub              @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  user      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([clubId, userId])
+  @@index([clubId, status, createdAt])
+}
+
+model NotificationCampaign {
+  id              String          @id @default(cuid())
+  createdById     String
+  title           String
+  body            String
+  href            String?
+  channels        Json            @default("[\"IN_APP\"]")
+  audience        Json            @default("{\"type\":\"ALL\"}")
+  status          String          @default("DRAFT")
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createdBy       User            @relation("CampaignCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  notifications   Notification[]
+  emailDeliveries EmailDelivery[]
+
+  @@index([status, scheduledAt])
+}
+
+model Notification {
+  id         String                @id @default(cuid())
+  userId     String
+  campaignId String?
+  title      String
+  body       String
+  href       String?
+  readAt     DateTime?
+  createdAt  DateTime              @default(now())
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign   NotificationCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([userId, readAt, createdAt])
+}
+
+model NotificationPreference {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  courseUpdatesEmail Boolean @default(true)
+  remindersEmail     Boolean @default(true)
+  achievementsEmail  Boolean @default(true)
+  communityEmail     Boolean @default(true)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailDelivery {
+  id             String                     @id @default(cuid())
+  userId         String
+  campaignId     String?
+  providerId     String?                    @unique
+  idempotencyKey String                     @unique
+  recipient      String
+  subject        String
+  body           String
+  status         NotificationDeliveryStatus @default(PENDING)
+  lastEventAt    DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  user           User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign       NotificationCampaign?      @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  events         EmailEvent[]
+
+  @@index([campaignId, status])
+}
+
+model EmailEvent {
+  id         String        @id @default(cuid())
+  deliveryId String
+  webhookId  String        @unique
+  type       String
+  payload    Json
+  occurredAt DateTime
+  delivery   EmailDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId, occurredAt])
+}
+
+model StorageAsset {
+  id        String            @id @default(cuid())
+  ownerId   String
+  provider  StorageProvider
+  pathname  String            @unique
+  url       String
+  name      String
+  mimeType  String
+  size      Int
+  createdAt DateTime          @default(now())
+  owner     User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  materials LibraryMaterial[]
+
+  @@index([ownerId, createdAt])
+}
+
+model LibraryMaterial {
+  id          String                @id @default(cuid())
+  createdById String
+  assetId     String?
+  type        LibraryMaterialType
+  status      LibraryMaterialStatus @default(DRAFT)
+  title       String
+  description String?
+  url         String?
+  levels      Json                  @default("[]")
+  skills      Json                  @default("[]")
+  tags        Json                  @default("[]")
+  publishedAt DateTime?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  createdBy   User                  @relation("MaterialCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  asset       StorageAsset?         @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  saves       LibrarySave[]
+
+  @@index([status, publishedAt])
+}
+
+model LibrarySave {
+  materialId String
+  userId     String
+  createdAt  DateTime        @default(now())
+  material   LibraryMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, userId])
+  @@index([userId, createdAt])
+}
+
+model TrainingSession {
+  id          String                @id @default(cuid())
+  userId      String
+  mode        TrainingMode
+  status      TrainingSessionStatus @default(ACTIVE)
+  total       Int                   @default(0)
+  correct     Int                   @default(0)
+  combo       Int                   @default(0)
+  maxCombo    Int                   @default(0)
+  xpEarned    Int                   @default(0)
+  startedAt   DateTime              @default(now())
+  completedAt DateTime?
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers     TrainingAnswer[]
+
+  @@index([userId, startedAt])
+}
+
+model TrainingAnswer {
+  id        String          @id @default(cuid())
+  sessionId String
+  termId    String?
+  prompt    Json
+  answer    Json
+  isCorrect Boolean
+  rating    Int?
+  xpEarned  Int             @default(0)
+  createdAt DateTime        @default(now())
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+model DictionaryReviewLog {
+  id            String             @id @default(cuid())
+  userId        String
+  termId        String
+  rating        Int
+  state         Int
+  dueAt         DateTime
+  stability     Float
+  difficulty    Float
+  scheduledDays Int
+  reviewedAt    DateTime           @default(now())
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedTerm     UserDictionaryTerm @relation(fields: [userId, termId], references: [userId, termId], onDelete: Cascade)
+
+  @@index([userId, reviewedAt])
+  @@index([userId, termId, reviewedAt])
+}
+
+model LessonBookmark {
+  userId    String
+  lessonId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+}
+
+model LessonReaction {
+  userId    String
+  lessonId  String
+  reaction  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+}
+
+model FeedPoll {
+  id       String           @id @default(cuid())
+  postId   String           @unique
+  question String
+  closesAt DateTime?
+  post     FeedPost         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  options  FeedPollOption[]
+  votes    FeedPollVote[]
+}
+
+model FeedPollOption {
+  id       String         @id @default(cuid())
+  pollId   String
+  label    String
+  position Int
+  poll     FeedPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes    FeedPollVote[]
+
+  @@unique([pollId, position])
+}
+
+model FeedPollVote {
+  pollId    String
+  optionId  String
+  userId    String
+  createdAt DateTime       @default(now())
+  poll      FeedPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option    FeedPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([pollId, userId])
+  @@index([optionId])
+}
+
+model OutboxJob {
+  id          String       @id @default(cuid())
+  type        String
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  runAt       DateTime     @default(now())
+  attempts    Int          @default(0)
+  maxAttempts Int          @default(5)
+  lastError   String?
+  lockedAt    DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([status, runAt])
 }

@@ -2,15 +2,19 @@
 
 import {
   Award,
+  BadgeCheck,
   BarChart3,
   BookOpen,
   Bot,
   ChevronRight,
   CircleUserRound,
+  CalendarDays,
+  Dumbbell,
   FileText,
   GraduationCap,
   LayoutDashboard,
   Library,
+  FolderOpen,
   LogOut,
   Menu,
   MessagesSquare,
@@ -30,14 +34,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AssistantDrawer } from "./AssistantDrawer";
 import { useSession } from "./SessionProvider";
+import { ShellTools } from "./ShellTools";
 
 const studentNav = [
   { href: "/dashboard", label: "Обзор", icon: LayoutDashboard },
   { href: "/courses", label: "Курс", icon: GraduationCap },
+  { href: "/training", label: "Тренировки", icon: Dumbbell },
+  { href: "/calendar", label: "Календарь", icon: CalendarDays },
+  { href: "/certificates", label: "Сертификаты", icon: BadgeCheck },
   { href: "/feed", label: "Лента", icon: Newspaper },
   { href: "/notes", label: "Заметки", icon: StickyNote },
   { href: "/assistant", label: "Magic AI", icon: Bot },
   { href: "/dictionary", label: "Словарь", icon: Library },
+  { href: "/library", label: "Библиотека", icon: FolderOpen },
   { href: "/leaderboard", label: "Рейтинг", icon: Trophy },
   { href: "/achievements", label: "Достижения", icon: Award },
   { href: "/profile", label: "Профиль", icon: CircleUserRound }
@@ -47,6 +56,11 @@ const adminNav = [
   { href: "/admin", label: "Обзор", icon: BarChart3 },
   { href: "/admin/course", label: "Конструктор курса", icon: BookOpen },
   { href: "/admin/articles", label: "Статьи", icon: FileText },
+  { href: "/admin/feed", label: "Лента", icon: Newspaper },
+  { href: "/admin/notifications", label: "Рассылки", icon: MessagesSquare },
+  { href: "/admin/speaking-clubs", label: "Speaking clubs", icon: CalendarDays },
+  { href: "/admin/library", label: "Библиотека", icon: FolderOpen },
+  { href: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/security", label: "Безопасность", icon: ShieldCheck },
   { href: "/admin/settings", label: "Настройки", icon: Settings }
@@ -58,6 +72,10 @@ const workspacePrefixes = [
   "/notes",
   "/assistant",
   "/dictionary",
+  "/training",
+  "/calendar",
+  "/library",
+  "/certificates",
   "/leaderboard",
   "/achievements",
   "/profile",
@@ -219,6 +237,7 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
             <Link className="mobile-app-brand" href="/dashboard">
               MAGIC ENGLISH
             </Link>
+            <ShellTools />
             <div className="app-topbar-actions">
               {isLesson ? (
                 <button

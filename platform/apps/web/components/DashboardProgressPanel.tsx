@@ -1,267 +1,88 @@
 "use client";
 
-import { Award, BookOpenCheck, Flame, Trophy } from "lucide-react";
+import { BookOpen, CalendarDays, Flame, MessageCircle, Play, RotateCcw, StickyNote, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-type LessonStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
-
-type ProgressSummary = {
-  currentLevel: string;
-  totals: {
-    lessons: number;
-    completedLessons: number;
-    inProgressLessons: number;
-    percent: number;
-  };
-  levelProgress: Array<{
-    code: string;
-    title: string;
-    totalLessons: number;
-    completedLessons: number;
-    inProgressLessons: number;
-    percent: number;
-    isUnlocked?: boolean;
-  }>;
-  nextLessons: Array<{
-    slug: string;
-    title: string;
-    levelCode: string;
-    moduleTitle: string;
-    orderIndex: number;
-    status: LessonStatus;
-  }>;
-};
-
-type AchievementSummary = {
-  earnedCount: number;
-  totalCount: number;
-  achievements: Array<{
-    code: string;
-    title: string;
-    description: string;
-    earned: boolean;
-    progress: number;
-    target: number;
-  }>;
-};
-
-type LeaderboardEntry = {
-  userId: string;
-  rank: number;
-  displayName: string;
-  points: number;
-  accuracy: number;
-  activeDays: number;
-  isCurrentUser: boolean;
-};
-
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
-function statusLabel(status: LessonStatus) {
-  if (status === "COMPLETED") {
-    return "Готово";
-  }
-
-  if (status === "IN_PROGRESS") {
-    return "В процессе";
-  }
-
-  return "Не начато";
-}
+type Dashboard = {
+  user: { displayName: string };
+  nextLesson: null | { slug: string; title: string; summary?: string; estimatedMinutes: number; skill?: string; levelCode: string; moduleTitle: string; status: string };
+  weeklyGoal: { target: number; completed: number };
+  levels: Array<{ code: string; title: string; total: number; completed: number; percent: number }>;
+  schedule: Array<{ id: string; title: string; startsAt: string; type: string }>;
+  recommendations: { dueReviews: number; newFeedPosts: number };
+  streak: { days: number; weeks: number; petStage: number };
+  unreadNotifications: number;
+  achievements: Array<{ id: string; achievement: { title: string } }>;
+  activity: string[];
+};
 
 export function DashboardProgressPanel() {
-  const [summary, setSummary] = useState<ProgressSummary | null>(null);
-  const [achievements, setAchievements] = useState<AchievementSummary | null>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [data, setData] = useState<Dashboard | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadSummary() {
-      try {
-        const [progressResponse, achievementsResponse, leaderboardResponse] =
-          await Promise.all([
-            fetch(`${apiBaseUrl}/progress/summary`, {
-              credentials: "include",
-              signal: controller.signal
-            }),
-            fetch(`${apiBaseUrl}/gamification/achievements`, {
-              credentials: "include",
-              signal: controller.signal
-            }),
-            fetch(`${apiBaseUrl}/gamification/leaderboard?period=week`, {
-              credentials: "include",
-              signal: controller.signal
-            })
-          ]);
-
-        if (!progressResponse.ok) {
-          throw new Error(`Progress summary failed: ${progressResponse.status}`);
-        }
-
-        setSummary((await progressResponse.json()) as ProgressSummary);
-        if (achievementsResponse.ok) {
-          setAchievements((await achievementsResponse.json()) as AchievementSummary);
-        }
-        if (leaderboardResponse.ok) {
-          const data = (await leaderboardResponse.json()) as { entries: LeaderboardEntry[] };
-          setLeaderboard(data.entries);
-        }
-        setStatus("ready");
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error(error);
-          setStatus("error");
-        }
-      }
-    }
-
-    void loadSummary();
-
-    return () => controller.abort();
+    fetch(`${apiBaseUrl}/dashboard`, { credentials: "include" })
+      .then((response) => {
+        if (!response.ok) throw new Error("dashboard");
+        return response.json();
+      })
+      .then((value) => setData(value as Dashboard))
+      .catch(() => setError(true));
   }, []);
 
-  if (status === "loading") {
-    return (
-      <section className="soft-card api-status">
-        <h2>Прогресс</h2>
-        <p>Загружаем прогресс...</p>
-      </section>
-    );
-  }
+  if (error) return <section className="soft-card api-status warning"><h2>Обзор недоступен</h2><p>Проверьте соединение с API.</p></section>;
+  if (!data) return <section className="dashboard-loading"><span /><span /><span /><p>Собираем твой маршрут…</p></section>;
 
-  if (status === "error" || !summary) {
-    return (
-      <section className="soft-card api-status warning">
-        <h2>Прогресс</h2>
-        <p>Прогресс сейчас недоступен. Проверьте API и базу данных.</p>
-      </section>
-    );
-  }
-
-  const nextLesson = summary.nextLessons[0];
-  const currentRank = leaderboard.find((entry) => entry.isCurrentUser);
-  const earnedPreview = achievements?.achievements.filter((achievement) => achievement.earned).slice(0, 3) ?? [];
+  const goalPercent = Math.min(100, Math.round((data.weeklyGoal.completed / Math.max(data.weeklyGoal.target, 1)) * 100));
+  const active = new Set(data.activity);
+  const heatmap = Array.from({ length: 112 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (111 - index));
+    const key = date.toISOString().slice(0, 10);
+    return { key, active: active.has(key) };
+  });
 
   return (
-    <>
-      <section className="daily-overview">
-        <article className="overview-main-card">
-          <span className="admin-kicker">Сегодня</span>
-          <h2>Продолжить обучение</h2>
-          {nextLesson ? (
-            <>
-              <p>
-                Следующий шаг: {nextLesson.levelCode} · {nextLesson.moduleTitle}
-              </p>
-              <Link
-                href={`/courses/${nextLesson.levelCode.toLowerCase()}/lessons/${nextLesson.slug}`}
-              >
-                <BookOpenCheck size={18} />
-                {nextLesson.title}
-              </Link>
-            </>
-          ) : (
-            <p>Все доступные уроки завершены. Можно пройти входной тест или открыть следующий уровень.</p>
-          )}
+    <div className="experience-dashboard">
+      <section className="dashboard-welcome">
+        <div><span>Обзор обучения</span><h1>Добрый день, {data.user.displayName.split(" ")[0]}</h1><p>Открой урок. Сделай шаг. Увидь прогресс.</p></div>
+        <time>{new Intl.DateTimeFormat("ru", { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</time>
+      </section>
+
+      <section className="dashboard-hero-grid">
+        <article className="next-lesson-hero">
+          <div className="lesson-hero-glow" />
+          <header><span>Следующий шаг · {data.nextLesson?.levelCode ?? "маршрут завершён"}</span><strong><Flame size={16} /> серия {data.streak.days} дней</strong></header>
+          <h2>{data.nextLesson?.title ?? "Все доступные уроки пройдены"}</h2>
+          <p>{data.nextLesson?.summary ?? "Закрепи материал тренировкой или открой следующий уровень."}</p>
+          {data.nextLesson ? <div className="lesson-hero-meta"><span>{data.nextLesson.estimatedMinutes} минут</span><span>{data.nextLesson.moduleTitle}</span><span>{data.nextLesson.skill ?? "комплексный"}</span></div> : null}
+          <footer>
+            {data.nextLesson ? <Link className="hero-primary" href={`/courses/${data.nextLesson.levelCode.toLowerCase()}/lessons/${data.nextLesson.slug}`}><Play size={17} />Продолжить урок</Link> : <Link className="hero-primary" href="/training"><RotateCcw size={17} />Повторить слова</Link>}
+            <Link className="hero-secondary" href="/notes"><StickyNote size={17} />Открыть заметки</Link>
+          </footer>
         </article>
-        <article className="overview-rank-card">
-          <Trophy size={22} />
-          <strong>{currentRank ? `#${currentRank.rank}` : "—"}</strong>
-          <span>Место за неделю</span>
+        <article className="weekly-goal-card">
+          <header><span>Цель недели</span><Link href="/calendar">Изменить</Link></header>
+          <div className="goal-ring" style={{ "--progress": `${goalPercent * 3.6}deg` } as React.CSSProperties}><strong>{data.weeklyGoal.completed}/{data.weeklyGoal.target}</strong></div>
+          <h3>{goalPercent >= 100 ? "Цель закрыта" : "Почти готово"}</h3>
+          <p>{goalPercent >= 100 ? "Отличная неделя!" : `Осталось занятий: ${Math.max(data.weeklyGoal.target - data.weeklyGoal.completed, 0)}`}</p>
+          <div className="week-markers">{["пн", "вт", "ср", "чт", "пт", "сб", "вс"].map((day, index) => <span className={index < data.weeklyGoal.completed ? "done" : ""} key={day}>{index < data.weeklyGoal.completed ? "✓" : day}</span>)}</div>
         </article>
       </section>
 
-      <section className="dashboard-grid">
-        <article className="soft-card metric-card">
-          <strong>{summary.currentLevel}</strong>
-          <span>Текущий уровень</span>
-        </article>
-        <article className="soft-card metric-card">
-          <strong>
-            {summary.totals.completedLessons} / {summary.totals.lessons}
-          </strong>
-          <span>Уроки завершены</span>
-        </article>
-        <article className="soft-card metric-card">
-          <strong>{summary.totals.inProgressLessons}</strong>
-          <span>Уроки в процессе</span>
-        </article>
-        <article className="soft-card metric-card">
-          <strong>{achievements?.earnedCount ?? 0}</strong>
-          <span>Достижения</span>
-        </article>
+      <section className="dashboard-cards-grid">
+        <article className="dashboard-feature-card level-card"><header><div><span>Твой маршрут</span><h2>Прогресс по уровням</h2></div><Link href="/courses">Открыть</Link></header>{data.levels.map((level) => <div className="level-progress-row" key={level.code}><strong>{level.code}</strong><div><span style={{ width: `${level.percent}%` }} /></div><small>{level.completed}/{level.total}</small></div>)}</article>
+        <article className="dashboard-feature-card schedule-card"><header><div><span>Ближайшее</span><h2>Расписание</h2></div><Link href="/calendar"><CalendarDays size={18} /></Link></header>{data.schedule.length ? data.schedule.slice(0, 4).map((event) => <div className="schedule-row" key={event.id}><time>{new Intl.DateTimeFormat("ru", { weekday: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(event.startsAt))}</time><strong>{event.title}</strong></div>) : <p>Добавь удобные дни занятий в календаре.</p>}</article>
+        <article className="dashboard-feature-card recommendation-card"><header><div><span>Для тебя</span><h2>Следующие действия</h2></div><Trophy size={20} /></header><Link href="/training"><RotateCcw size={18} /><span><strong>{data.recommendations.dueReviews} слов ждут повторения</strong><small>Умный интервал уже рассчитан</small></span></Link><Link href="/feed"><MessageCircle size={18} /><span><strong>{data.recommendations.newFeedPosts} новых публикаций</strong><small>Материалы и speaking clubs</small></span></Link><Link href="/courses"><BookOpen size={18} /><span><strong>Продолжить маршрут</strong><small>Все уровни от A0 до C1</small></span></Link></article>
       </section>
 
-      <section className="soft-card">
-        <h2>Прогресс по уровням</h2>
-        {summary.levelProgress.map((level) => (
-          <div className="progress-row" key={level.code}>
-            <div className="progress-label">
-              <span>
-                {level.code} · {level.completedLessons}/{level.totalLessons}
-                {level.isUnlocked === false ? " · закрыт" : ""}
-              </span>
-              <strong>{level.percent}%</strong>
-            </div>
-            <div className="progress-track">
-              <span style={{ width: `${level.percent}%` }} />
-            </div>
-          </div>
-        ))}
+      <section className="dashboard-bottom-grid">
+        <article className="activity-card"><header><div><span>Последние 16 недель</span><h2>Активность</h2></div><strong><Flame size={17} /> {data.streak.weeks} нед. стрика</strong></header><div className="activity-heatmap">{heatmap.map((day) => <span className={day.active ? "active" : ""} title={day.key} key={day.key} />)}</div><p>Клетка закрашивается только в день входа на платформу.</p></article>
+        <article className="fire-pet-card"><span>Твой огонёк · стадия {data.streak.petStage + 1}</span><div className={`fire-pet stage-${data.streak.petStage}`}>🔥</div><h2>{data.streak.days ? `${data.streak.days} дней вместе` : "Зажги серию"}</h2><p>Заходи и занимайся каждую неделю.</p></article>
       </section>
-
-      <section className="soft-card">
-        <h2>Ближайшие уроки</h2>
-        <div className="next-lesson-list">
-          {summary.nextLessons.map((lesson) => (
-            <Link
-              className="next-lesson-row"
-              href={`/courses/${lesson.levelCode.toLowerCase()}/lessons/${lesson.slug}`}
-              key={lesson.slug}
-            >
-              <span className={`lesson-status-dot ${lesson.status.toLowerCase()}`} />
-              <span>
-                <strong>{lesson.title}</strong>
-                <small>
-                  {lesson.levelCode} · {lesson.moduleTitle} · {statusLabel(lesson.status)}
-                </small>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="dashboard-two-column">
-        <article className="soft-card">
-          <h2>Достижения</h2>
-          <div className="achievement-mini-list">
-            {earnedPreview.length > 0 ? (
-              earnedPreview.map((achievement) => (
-                <span key={achievement.code}>
-                  <Award size={16} />
-                  {achievement.title}
-                </span>
-              ))
-            ) : (
-              <p>Первое достижение появится после завершения урока.</p>
-            )}
-          </div>
-        </article>
-        <article className="soft-card">
-          <h2>Кто впереди</h2>
-          <div className="leaderboard-mini-list">
-            {leaderboard.slice(0, 3).map((entry) => (
-              <span key={entry.userId} className={entry.isCurrentUser ? "current" : ""}>
-                <Flame size={16} />
-                #{entry.rank} {entry.displayName} · {entry.points} баллов
-              </span>
-            ))}
-          </div>
-        </article>
-      </section>
-    </>
+    </div>
   );
 }

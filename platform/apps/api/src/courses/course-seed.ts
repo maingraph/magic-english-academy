@@ -1,5 +1,12 @@
 export const courseLevels = [
   {
+    code: "A0",
+    title: "С нуля",
+    lessonCount: 12,
+    status: "native",
+    sampleTopics: ["Алфавит", "Базовые звуки", "Как произнести имя по буквам", "Фразы на уроке"]
+  },
+  {
     code: "A1",
     title: "Начальный",
     lessonCount: 41,

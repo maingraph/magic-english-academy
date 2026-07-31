@@ -12,6 +12,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:a0": "tsx prisma/seed-a0.ts",
     "db:demo": "tsx prisma/demo.ts",
     "db:studio": "prisma studio"
   },
@@ -21,11 +22,14 @@
     "@nestjs/platform-express": "11.1.24",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "6.19.3",
+    "@vercel/blob": "^2.6.1",
     "helmet": "^8.2.0",
     "multer": "2.2.0",
     "openai": "^6.44.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "resend": "^6.18.1",
+    "rxjs": "^7.8.2",
+    "ts-fsrs": "^5.4.1"
   },
   "devDependencies": {
     "@types/multer": "^2.2.0",
