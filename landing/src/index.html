@@ -147,7 +147,7 @@
     }
 
     .promo-bar {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
@@ -242,31 +242,38 @@
 
     .nav {
       position: fixed;
-      top: 60px;
+      top: 54px;
       left: 50%;
-      z-index: 20;
-      width: min(1160px, calc(100% - 56px));
-      min-height: 52px;
+      z-index: 30;
+      width: min(1160px, calc(100% - 32px));
+      min-height: 54px;
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 16px;
-      padding: 7px 10px 7px 14px;
-      border: 1px solid rgba(211, 166, 70, .72);
+      padding: 6px 10px 6px 16px;
+      border: 1px solid rgba(211, 166, 70, .4);
       border-radius: 999px;
-      background: rgba(255, 255, 255, .96);
-      box-shadow: 0 14px 44px rgba(91, 65, 16, .08);
+      background: rgba(255, 255, 255, .98);
+      box-shadow: 0 10px 36px rgba(0, 0, 0, .08);
       backdrop-filter: blur(20px);
       transform: translateX(-50%);
-      transition: width .48s cubic-bezier(.2, .8, .2, 1), min-height .48s cubic-bezier(.2, .8, .2, 1), top .48s cubic-bezier(.2, .8, .2, 1), padding .48s cubic-bezier(.2, .8, .2, 1), box-shadow .48s ease;
+      transition: all .35s cubic-bezier(.2, .8, .2, 1);
     }
 
     .nav.is-small {
-      top: 54px;
-      width: min(920px, calc(100% - 28px));
-      min-height: 44px;
-      padding: 5px 8px 5px 12px;
-      box-shadow: 0 10px 30px rgba(91, 65, 16, .1);
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 52px;
+      padding: 4px 28px 4px 28px;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+      border-top: 0;
+      border-bottom: 1px solid rgba(211, 166, 70, .26);
+      transform: none;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .08);
     }
 
     .brand {
@@ -344,35 +351,46 @@
     }
 
     .buy {
-      min-height: 32px;
+      min-height: 36px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0 13px;
+      padding: 0 16px;
       border-radius: 999px;
       background: var(--orange);
       color: #fff;
-      font-size: 12px;
-      font-weight: 750;
-      box-shadow: 0 8px 22px rgba(242, 154, 22, .16);
-      transition: transform .22s ease, box-shadow .22s ease;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(242, 154, 22, .24);
+      transition: transform .2s ease, box-shadow .2s ease;
       white-space: nowrap;
     }
 
     .buy:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 28px rgba(242, 154, 22, .22);
+      box-shadow: 0 8px 22px rgba(242, 154, 22, .35);
     }
 
     .platform-login {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 20, 15, .14);
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 650;
       white-space: nowrap;
+      transition: all .2s ease;
     }
 
     .platform-login:hover {
       color: var(--orange-deep);
+      border-color: var(--orange);
+      background: #fff;
     }
 
     .nav-actions {
@@ -1947,7 +1965,7 @@
       background: linear-gradient(135deg, #ff8d34, var(--orange));
       color: #fff;
       font-weight: 850;
-      box-shadow: 0 0 24px rgba(242, 154, 22, .45);
+      box-shadow: 0 4px 14px rgba(242, 154, 22, .25);
       animation: streak-pulse 2.4s ease-in-out infinite;
     }
 
@@ -2122,8 +2140,8 @@
     }
 
     @keyframes streak-pulse {
-      0%, 100% { transform: translateY(0); box-shadow: 0 0 22px rgba(242, 154, 22, .4); }
-      50% { transform: translateY(-2px); box-shadow: 0 0 34px rgba(242, 154, 22, .58); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
     }
 
     .inside-price-row {
@@ -2641,21 +2659,23 @@
 
     .payment-panel {
       width: min(520px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
       position: relative;
       display: grid;
-      gap: 10px;
-      padding: 8px 0 8px;
-      overflow: visible;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
+      gap: 14px;
+      padding: 32px;
+      border: 1px solid rgba(211, 166, 70, .4);
+      border-radius: 24px;
+      background: #ffffff;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, .32);
+      margin: auto;
     }
 
     .payment-top {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 16px;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
       align-items: center;
     }
 
@@ -2663,11 +2683,12 @@
       display: inline-flex;
       align-items: center;
       justify-self: end;
-      gap: 10px;
+      gap: 8px;
       color: var(--ink);
       font-size: 13px;
       font-weight: 850;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .payment-brand img {
@@ -2783,8 +2804,18 @@
       font-weight: 820;
     }
 
-    #paymentModal .payment-panel > .modal-close {
-      display: none;
+    #paymentModal .payment-panel .modal-close {
+      position: static;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(23, 20, 15, .15);
+      background: #f7f7f5;
+      color: var(--ink);
+      font-size: 14px;
+      cursor: pointer;
     }
 
     #paymentModal .payment-discount {
@@ -2950,11 +2981,11 @@
     }
 
     #paymentModal {
-      align-items: start;
+      align-items: center;
       overflow-y: auto;
-      padding: 16px 24px;
-      background: #f7f7f5;
-      backdrop-filter: none;
+      padding: 24px 16px;
+      background: rgba(23, 20, 15, .75);
+      backdrop-filter: blur(16px);
     }
 
     .modal.is-open {
@@ -3069,6 +3100,20 @@
         width: calc(100% - 22px);
         justify-content: space-between;
         top: 58px;
+      }
+
+      .nav.is-small {
+        width: 100%;
+        padding: 4px 16px;
+        top: 0;
+        left: 0;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        border-top: 0;
+        border-bottom: 1px solid rgba(211, 166, 70, .26);
+        transform: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
       }
 
       .menu {
@@ -3427,7 +3472,7 @@
     }
 
     .certificate-sheet > div {
-      transform: rotate(-4deg);
+      transform: none;
       box-shadow: 0 24px 60px rgba(23, 20, 15, .11);
     }
 
@@ -4937,11 +4982,21 @@
       }
 
       .level-name {
-        grid-template-columns: 140px minmax(0, 1fr);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+        grid-template-columns: none;
       }
 
       .level-topics {
-        grid-column: 2;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        grid-column: auto;
+        margin-top: 4px;
+        width: 100%;
       }
     }
 
@@ -5129,19 +5184,22 @@
 
     .inside-card.main {
       background:
-        linear-gradient(90deg, rgba(242, 154, 22, .08), transparent 56%),
         linear-gradient(rgba(255, 255, 255, .032) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, .032) 1px, transparent 1px),
         #191816;
-      background-size: auto, 36px 36px, 36px 36px, auto;
+      background-size: 36px 36px;
       color: #fff;
     }
 
     .inside-card.main::before {
-      background: radial-gradient(circle at 14% 16%, rgba(242, 154, 22, .15), transparent 28%);
+      display: none;
     }
 
-    .inside-card.main small,
+    .inside-card.main small {
+      color: rgba(255, 255, 255, .85);
+      font-weight: 700;
+    }
+
     .inside-card.main p,
     .inside-card.main .lesson-item {
       color: rgba(255, 255, 255, .68);
@@ -5355,7 +5413,7 @@
       --level-x: 50%;
       --level-y: 50%;
       min-height: 156px;
-      grid-template-columns: minmax(158px, .23fr) minmax(260px, .34fr) minmax(280px, .34fr) auto;
+      grid-template-columns: auto 1fr minmax(200px, .34fr) auto;
       grid-template-rows: 1fr;
       align-items: center;
       gap: 26px;
@@ -5395,7 +5453,7 @@
 
     .level-name strong {
       white-space: nowrap;
-      font-size: clamp(32px, 3vw, 48px);
+      font-size: clamp(28px, 2.6vw, 44px);
       color: #fff;
     }
 
@@ -5478,7 +5536,7 @@
       width: min(410px, 100%);
       min-height: 205px;
       margin: 0 auto;
-      transform: rotate(-3deg);
+      transform: none;
     }
 
     .certificate-copy {
@@ -5665,7 +5723,12 @@
       }
 
       .level-name {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+        grid-template-columns: none;
       }
 
       .level-topics {
@@ -5799,7 +5862,7 @@
       .certificate-sheet > div {
         width: calc(100% - 16px);
         min-height: 190px;
-        transform: rotate(-1.5deg);
+        transform: none;
       }
 
       .certificate-copy {
@@ -5810,6 +5873,15 @@
         width: calc(100% - 24px);
         max-height: calc(100vh - 24px);
         overflow-y: auto;
+        padding: 20px;
+      }
+
+      .payment-top {
+        grid-template-columns: 1fr auto;
+      }
+
+      .payment-top .back-link {
+        display: none;
       }
     }
 
@@ -6623,6 +6695,7 @@
     .club-block,
     .final-section {
       padding-block: var(--section-space);
+      border-bottom: 1px solid rgba(23, 20, 15, .08);
     }
 
     .variant + .why-variant,
@@ -7549,19 +7622,34 @@
           </div>
           <div class="gift-board reveal">
             <article class="gift-card hero" data-gift="gift 01">
-              <svg class="gift-illustration" viewBox="0 0 220 180" aria-hidden="true">
+              <svg class="gift-illustration" viewBox="0 0 280 200" aria-hidden="true">
                 <defs>
                   <linearGradient id="giftBox" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stop-color="#f7b547"/>
                     <stop offset="1" stop-color="#e67d00"/>
                   </linearGradient>
+                  <g id="giftIcon">
+                    <path d="M12 35h84v42H12z" fill="url(#giftBox)"/>
+                    <path d="M7 27h94v18H7z" fill="#ffbd51"/>
+                    <path d="M48 27h12v50H48z" fill="#fff" opacity=".92"/>
+                    <path d="M54 27c-13-1-24-5-24-13 0-5 4-8 9-8 9 0 14 11 15 21Z" fill="none" stroke="#f29a16" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M54 27c13-1 23-5 23-13 0-5-4-8-9-8-8 0-13 11-14 21Z" fill="none" stroke="#f29a16" stroke-width="5" stroke-linecap="round"/>
+                  </g>
                 </defs>
-                <path d="M26 75h168v84H26z" fill="url(#giftBox)"/>
-                <path d="M16 59h188v35H16z" fill="#ffbd51"/>
-                <path d="M98 59h25v100H98z" fill="#fff" opacity=".92"/>
-                <path d="M111 59c-26-2-47-10-47-26 0-9 7-15 17-15 17 0 27 21 30 41Z" fill="none" stroke="#f29a16" stroke-width="11" stroke-linecap="round"/>
-                <path d="M111 59c25-2 45-10 45-26 0-9-7-15-17-15-16 0-25 21-28 41Z" fill="none" stroke="#f29a16" stroke-width="11" stroke-linecap="round"/>
-                <path d="m110 4 4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#fff"/>
+                <g transform="translate(68, 55)">
+                  <path d="M26 75h140v70H26z" fill="url(#giftBox)"/>
+                  <path d="M16 59h160v28H16z" fill="#ffbd51"/>
+                  <path d="M86 59h20v86H86z" fill="#fff" opacity=".92"/>
+                  <path d="M96 59c-22-2-40-8-40-22 0-8 6-13 14-13 14 0 23 18 26 35Z" fill="none" stroke="#f29a16" stroke-width="9" stroke-linecap="round"/>
+                  <path d="M96 59c21-2 38-8 38-22 0-8-6-13-14-13-13 0-21 18-24 35Z" fill="none" stroke="#f29a16" stroke-width="9" stroke-linecap="round"/>
+                  <path d="m95 4 4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/>
+                </g>
+                <use href="#giftIcon" transform="translate(10, 15) scale(0.68) rotate(-14)"/>
+                <use href="#giftIcon" transform="translate(200, 20) scale(0.78) rotate(16)"/>
+                <use href="#giftIcon" transform="translate(15, 125) scale(0.48) rotate(12)"/>
+                <use href="#giftIcon" transform="translate(215, 115) scale(0.58) rotate(-10)"/>
+                <path d="m35 90 3 6 6 3-6 3-3 6-3-6-6-3 6-3z" fill="#f29a16" opacity=".8"/>
+                <path d="m245 80 4 8 8 4-8 4-4 8-4-8-8-4 8-4z" fill="#ffd074"/>
               </svg>
               <h3>Закрытое сообщество</h3>
               <p>Чат учеников, вопросы по урокам, мини-разборы и ощущение, что ты не один наедине с английским.</p>
@@ -7877,10 +7965,10 @@
 
   <div class="modal" id="paymentModal" aria-hidden="true">
     <div class="payment-panel" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
-      <button class="modal-close payment-close" type="button" aria-label="закрыть форму">X</button>
       <div class="payment-top">
         <button class="back-link payment-close" type="button">Назад на сайт</button>
         <span class="payment-brand"><img src="assets/magic-star-logo.png" alt="" width="640" height="640">Magic English</span>
+        <button class="modal-close payment-close" type="button" aria-label="закрыть форму">✕</button>
       </div>
       <div class="payment-content">
         <h2 id="paymentTitle">Получить доступ</h2>
