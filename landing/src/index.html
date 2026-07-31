@@ -9,6 +9,7 @@
   <meta property="og:title" content="Magic English Plan — английский по понятному маршруту">
   <meta property="og:description" content="Уроки, практика, словарь, прогресс и поддержка от A0 до C1.">
   <meta property="og:image" content="assets/magic-star-logo.png">
+  <link rel="canonical" href="__LANDING_CANONICAL_URL__">
   <title>Magic English Plan — английский по понятному маршруту</title>
   <script>
     (() => {
@@ -7178,10 +7179,10 @@
       <a href="#club">Клуб</a>
       <a href="#reviews">Отзывы</a>
       <a href="#faq">FAQ</a>
-      <a class="mobile-login" href="/login">Войти в платформу</a>
+      <a class="mobile-login" href="__PLATFORM_URL__/login">Войти в платформу</a>
     </div>
     <div class="nav-actions">
-      <a class="platform-login" href="/login">Войти</a>
+      <a class="platform-login" href="__PLATFORM_URL__/login">Войти</a>
       <a class="buy" href="#contact" data-payment>Получить доступ</a>
     </div>
     <button class="menu" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mainNavigation">☰</button>
@@ -7729,7 +7730,7 @@
     <section class="final-section" id="faq">
       <div class="wrap">
         <div class="faq-layout">
-          <div class="faq-copy reveal"><h2>Ответы на вопросы</h2><p>Не нашёл свой вопрос? Напиши в поддержку, ответим и поможем разобраться.</p><div class="actions"><a class="ghost-button" href="https://t.me/mag_english" target="_blank" rel="noopener">Написать в поддержку</a></div></div>
+          <div class="faq-copy reveal"><h2>Ответы на вопросы</h2><p>Не нашёл свой вопрос? Напиши в поддержку, ответим и поможем разобраться.</p><div class="actions"><a class="ghost-button" href="__CONTACT_URL__" target="_blank" rel="noopener">Написать в поддержку</a></div></div>
           <div class="faq-list reveal">
             <div class="faq-item is-open"><button class="faq-question" type="button" aria-expanded="true">Подойдёт ли платформа новичку?</button><div class="faq-panel"><div class="faq-answer">Да. Маршрут начинается с A0–A1 и ведёт дальше по уровням. Если английский уже есть, можно начать с подходящего модуля.</div></div></div>
             <div class="faq-item"><button class="faq-question" type="button" aria-expanded="false">Что именно я получу после оплаты?</button><div class="faq-panel"><div class="faq-answer">Доступ к платформе, урокам, домашкам, словарю, трекеру прогресса, бонусам, материалам и закрытому сообществу.</div></div></div>
@@ -7840,7 +7841,7 @@
         </div>
         <div class="footer-column">
           <strong>Контакты</strong>
-          <a href="https://t.me/mag_english" target="_blank" rel="noopener">Служба заботы</a>
+          <a href="__CONTACT_URL__" target="_blank" rel="noopener">Служба заботы</a>
           <a href="mailto:ilariumeng@gmail.com">Ilariumeng@gmail.com</a>
           <a href="tel:+375255365117">+375 25 536-51-17</a>
           <span class="footer-group-title">ИП</span>
@@ -7927,7 +7928,7 @@
         </div>
         <div class="support-row">
           <span>Сначала свяжемся и подтвердим детали</span>
-          <button type="button" onclick="window.open('https://t.me/mag_english','_blank')">Написать в поддержку</button>
+          <button type="button" onclick="window.open('__CONTACT_URL__','_blank')">Написать в поддержку</button>
         </div>
         <p class="payment-note">Сейчас заявка открывает диалог со службой заботы в Telegram. Платёжные данные на сайте не запрашиваются и не сохраняются.</p>
       </div>
@@ -8144,7 +8145,7 @@
         phone ? `Телефон: ${phone}` : "",
         social ? `Мессенджер: ${social}` : ""
       ].filter(Boolean).join("\n");
-      window.open(`https://t.me/mag_english?text=${encodeURIComponent(message)}`, "_blank", "noopener");
+      window.open(`__CONTACT_URL__?text=${encodeURIComponent(message)}`, "_blank", "noopener");
     });
 
     const tickDiscountTimer = () => {

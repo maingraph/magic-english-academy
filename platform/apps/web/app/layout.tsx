@@ -6,6 +6,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Платформа Magic English",
   description: "Интерактивная платформа для изучения английского языка",
+  robots: {
+    index: false,
+    follow: false
+  },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

@@ -9,7 +9,6 @@ import {
   CircleUserRound,
   FileText,
   GraduationCap,
-  House,
   LayoutDashboard,
   Library,
   LogOut,
@@ -279,8 +278,8 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
     );
   }
 
+  const landingUrl = process.env.NEXT_PUBLIC_LANDING_URL ?? "https://magic-english-academy.com";
   const publicNav = [
-    { href: "/", label: "Главная", icon: House },
     { href: "/courses", label: "Программа курса", icon: GraduationCap },
     { href: "/articles", label: "Статьи", icon: FileText }
   ];
@@ -290,9 +289,9 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
       <nav className="top-menu" aria-label="Основная навигация">
         <div className="menu-container">
           <div className="menu-content">
-            <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)}>
+            <a href={landingUrl} className="logo" onClick={() => setIsMenuOpen(false)}>
               MAG<span>IC ENGLISH</span>
-            </Link>
+            </a>
             <button
               className={`burger ${isMenuOpen ? "active" : ""}`}
               type="button"
@@ -305,6 +304,7 @@ export function AppShell({ children, showBanner = true }: AppShellProps) {
               <span />
             </button>
             <div className={`nav-links ${isMenuOpen ? "active" : ""}`}>
+              <a href={landingUrl}>Главная</a>
               {publicNav.map((item) => (
                 <Link
                   className={isActive(pathname, item.href) ? "active" : ""}

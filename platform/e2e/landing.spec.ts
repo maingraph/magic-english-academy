@@ -1,34 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test("production landing exposes one coherent option without prototype controls", async ({
-  page
-}) => {
-  await page.goto("/offer/index.html");
-
-  await expect(page.locator(".hero-positioned")).toBeVisible();
-  await expect(page.locator(".hero-wide")).toBeHidden();
-  await expect(page.locator(".why-compare")).toBeVisible();
-  await expect(page.locator(".why-editorial")).toBeHidden();
-  await expect(page.locator(".text-switcher").first()).toBeHidden();
-  await expect(page.getByText("вариант 01 - позиционирование")).toBeHidden();
-
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-  );
-  expect(overflow).toBeLessThanOrEqual(1);
-});
-
-test("preview query selects alternate hero, headline and problem block", async ({ page }) => {
-  await page.goto(
-    "/offer/index.html?preview=1&hero=wide&headline=2&why=route"
-  );
-
-  await expect(page.locator(".hero-wide")).toBeVisible();
-  await expect(page.locator(".hero-positioned")).toBeHidden();
-  await expect(page.locator(".why-route")).toBeVisible();
-  await expect(page.locator(".why-compare")).toBeHidden();
-  await expect(page.locator(".hero-wide .text-switcher")).toBeVisible();
-  await expect(page.locator(".hero-wide [data-count]")).toHaveText("2 / 5");
+test("platform root sends anonymous visitors to login", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Вход в аккаунт" })).toBeVisible();
 });
 
 test("manifest is installable and scoped to the platform", async ({ request }) => {

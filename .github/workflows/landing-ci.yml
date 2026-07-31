@@ -1,0 +1,36 @@
+name: Landing CI
+
+on:
+  pull_request:
+    paths:
+      - "landing/**"
+      - ".github/workflows/landing-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "landing/**"
+      - ".github/workflows/landing-ci.yml"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: landing
+    env:
+      PLATFORM_URL: https://platform.example.com
+      CONTACT_URL: https://t.me/mag_english
+      LANDING_CANONICAL_URL: https://academy.example.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm run validate
+      - run: npx playwright install --with-deps chromium
+      - run: npm test

@@ -1,8 +1,6 @@
-const CACHE_NAME = "magic-english-shell-v2";
+const CACHE_NAME = "magic-english-shell-v3";
 const APP_SHELL = [
   "/offline.html",
-  "/offer/index.html",
-  "/offer/assets/magic-star-logo.png",
   "/fonts/Montserrat-Regular.woff2",
   "/fonts/Montserrat-SemiBold.woff2",
   "/fonts/Montserrat-Bold.woff2",
