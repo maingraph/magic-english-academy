@@ -195,7 +195,6 @@ CREATE TABLE "EmailDelivery" (
     "idempotencyKey" TEXT NOT NULL,
     "recipient" TEXT NOT NULL,
     "subject" TEXT NOT NULL,
-    "body" TEXT NOT NULL,
     "status" "NotificationDeliveryStatus" NOT NULL DEFAULT 'PENDING',
     "lastEventAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
