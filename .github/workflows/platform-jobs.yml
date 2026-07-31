@@ -1,0 +1,25 @@
+name: Platform scheduled jobs
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch due platform work
+        env:
+          PLATFORM_API_URL: ${{ secrets.PLATFORM_API_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$PLATFORM_API_URL"
+          test -n "$CRON_SECRET"
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${PLATFORM_API_URL%/}/api/internal/jobs/dispatch"
