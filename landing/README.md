@@ -16,5 +16,6 @@ Open `http://127.0.0.1:4173`.
 - `PLATFORM_URL` — public learning-platform origin.
 - `CONTACT_URL` — support/contact URL used by contact actions.
 - `LANDING_CANONICAL_URL` — canonical public landing origin.
+- `PAYMENT_API_URL` — payment API base URL, for example `https://magic-english-plan.by/api`.
 
 `npm run build` writes deployable files to `dist/`. Gemini landing work should remain inside `landing/**`; platform work remains inside `platform/**`.

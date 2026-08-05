@@ -6,7 +6,9 @@ import { extname, resolve, sep } from "node:path";
 const root = resolve(import.meta.dirname, "../dist");
 const port = Number(process.env.PORT ?? 4173);
 const contentTypes = {
+  ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
   ".png": "image/png",
   ".woff2": "font/woff2"
 };
@@ -15,10 +17,20 @@ createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url ?? "/", `http://${request.headers.host}`).pathname);
     const requested = pathname === "/" ? "/index.html" : pathname;
-    const filePath = resolve(root, `.${requested}`);
-    if (filePath !== root && !filePath.startsWith(`${root}${sep}`)) throw new Error("Invalid path");
-    const details = await stat(filePath);
-    if (!details.isFile()) throw new Error("Not a file");
+    const candidates = extname(requested)
+      ? [requested]
+      : [requested, `${requested}.html`, `${requested}/index.html`];
+    let filePath;
+    for (const candidate of candidates) {
+      const resolved = resolve(root, `.${candidate}`);
+      if (resolved !== root && !resolved.startsWith(`${root}${sep}`)) throw new Error("Invalid path");
+      const isFile = await stat(resolved).then((details) => details.isFile()).catch(() => false);
+      if (isFile) {
+        filePath = resolved;
+        break;
+      }
+    }
+    if (!filePath) throw new Error("Not a file");
     response.writeHead(200, { "content-type": contentTypes[extname(filePath)] ?? "application/octet-stream" });
     createReadStream(filePath).pipe(response);
   } catch {

@@ -36,13 +36,19 @@ services:
       API_PORT: 4000
       DATABASE_URL: postgresql://magic:${POSTGRES_PASSWORD}@postgres:5432/magic_english?schema=public
       REDIS_URL: redis://redis:6379
-      WEB_ORIGIN: https://${DOMAIN}
+      WEB_ORIGIN: https://${DOMAIN},https://${LANDING_DOMAIN}
       AUTH_SECRET: ${AUTH_SECRET}
       SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY}
       ACTIVITY_HASH_SECRET: ${ACTIVITY_HASH_SECRET}
       FEED_UPLOAD_DIR: /app/uploads/feed
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-Magic English <accounts@magic-english-academy.com>}
+      ALFA_API_URL: ${ALFA_API_URL:-https://ecom.alfabank.by/payment/rest}
+      ALFA_USERNAME: ${ALFA_USERNAME:-}
+      ALFA_PASSWORD: ${ALFA_PASSWORD:-}
+      ALFA_TOKEN: ${ALFA_TOKEN:-}
+      ALFA_RETURN_URL: ${ALFA_RETURN_URL:-https://magic-english-plan.by/payment/success}
+      ALFA_FAIL_URL: ${ALFA_FAIL_URL:-https://magic-english-plan.by/payment/failed}
       ALLOW_DEV_AUTH: "false"
     volumes:
       - feed_uploads:/app/uploads/feed
@@ -70,11 +76,26 @@ services:
       api:
         condition: service_healthy
 
+  landing:
+    build:
+      context: ..
+      dockerfile: landing/Dockerfile
+      args:
+        PLATFORM_URL: https://${DOMAIN}
+        CONTACT_URL: ${CONTACT_URL:-https://t.me/mag_english}
+        LANDING_CANONICAL_URL: https://${LANDING_DOMAIN}
+        PAYMENT_API_URL: https://${LANDING_DOMAIN}/api
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
     environment:
       DOMAIN: ${DOMAIN}
+      LANDING_DOMAIN: ${LANDING_DOMAIN}
     ports:
       - "80:80"
       - "443:443"
@@ -85,6 +106,7 @@ services:
     depends_on:
       - web
       - api
+      - landing
 
 volumes:
   postgres_data:

@@ -21,3 +21,27 @@
 		format console
 	}
 }
+
+{$LANDING_DOMAIN} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		reverse_proxy landing:80
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

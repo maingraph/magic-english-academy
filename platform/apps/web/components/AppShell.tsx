@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CircleUserRound,
   CalendarDays,
+  CreditCard,
   Dumbbell,
   FileText,
   GraduationCap,
@@ -54,6 +55,7 @@ const studentNav = [
 
 const adminNav = [
   { href: "/admin", label: "Обзор", icon: BarChart3 },
+  { href: "/admin/payments", label: "Платежи", icon: CreditCard },
   { href: "/admin/course", label: "Конструктор курса", icon: BookOpen },
   { href: "/admin/articles", label: "Статьи", icon: FileText },
   { href: "/admin/feed", label: "Лента", icon: Newspaper },

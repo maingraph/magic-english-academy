@@ -156,6 +156,16 @@ enum OutboxStatus {
   FAILED
 }
 
+enum PaymentStatus {
+  CREATED
+  PENDING
+  PAID
+  DECLINED
+  CANCELLED
+  REFUNDED
+  ERROR
+}
+
 model User {
   id                  String                  @id @default(cuid())
   email               String                  @unique
@@ -952,4 +962,34 @@ model OutboxJob {
   updatedAt   DateTime     @updatedAt
 
   @@index([status, runAt])
+}
+
+model PaymentOrder {
+  id                   String        @id @default(cuid())
+  publicToken          String        @unique
+  idempotencyKey       String        @unique
+  orderNumber          String        @unique
+  providerOrderId      String?       @unique
+  status               PaymentStatus @default(CREATED)
+  providerStatus       Int?
+  providerErrorCode    String?
+  providerErrorMessage String?
+  productCode          String
+  productName          String
+  amountMinor          Int
+  currency             String        @default("BYN")
+  customerName         String
+  customerEmail        String
+  customerPhone        String?
+  customerSocial       String?
+  formUrl              String?
+  consentAt            DateTime
+  paidAt               DateTime?
+  fulfilledAt          DateTime?
+  lastCheckedAt        DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([customerEmail, createdAt])
 }

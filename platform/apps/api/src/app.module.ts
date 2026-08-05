@@ -13,6 +13,7 @@ import { ExperienceModule } from "./experience/experience.module";
 import { GamificationModule } from "./gamification/gamification.module";
 import { LearningModule } from "./learning/learning.module";
 import { NotesModule } from "./notes/notes.module";
+import { PaymentsModule } from "./payments/payments.module";
 import { ProfileModule } from "./profile/profile.module";
 import { ProgressModule } from "./progress/progress.module";
 import { PrismaModule } from "./prisma/prisma.module";
@@ -40,7 +41,8 @@ import { PrismaModule } from "./prisma/prisma.module";
     ExperienceModule,
     GamificationModule,
     LearningModule,
-    NotesModule
+    NotesModule,
+    PaymentsModule
   ],
   providers: [
     {

@@ -22,6 +22,7 @@ jobs:
       PLATFORM_URL: https://platform.example.com
       CONTACT_URL: https://t.me/mag_english
       LANDING_CANONICAL_URL: https://academy.example.com
+      PAYMENT_API_URL: https://academy.example.com/api
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

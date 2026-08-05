@@ -681,6 +681,8 @@
     }
 
     .hero-positioned .text-area {
+      position: relative;
+      z-index: 5;
       max-width: 900px;
       margin: 0 auto;
       text-align: center;
@@ -7972,7 +7974,7 @@
       </div>
       <div class="payment-content">
         <h2 id="paymentTitle">Получить доступ</h2>
-        <p class="payment-subtitle">Оставь контакт — служба заботы уточнит детали и поможет оформить доступ. Онлайн-оплату добавим позже.</p>
+        <p class="payment-subtitle">Заполни данные и перейди на защищённую страницу Альфа-Банка. Данные карты вводятся только на стороне банка.</p>
         <div class="order-card">
           <div>
             <strong>Magic English Plan</strong>
@@ -7987,7 +7989,7 @@
         <form class="payment-form">
           <div class="payment-field">
             <label for="payEmail">Электронный адрес</label>
-            <input id="payEmail" name="email" type="email" placeholder="example@mail.com" autocomplete="email">
+            <input id="payEmail" name="email" type="email" placeholder="example@mail.com" autocomplete="email" required>
           </div>
           <div class="payment-field">
             <label for="payName">Имя</label>
@@ -8006,19 +8008,19 @@
           <div class="payment-checks">
             <label class="payment-check"><input name="privacy" type="checkbox" required><span>Я принимаю <a href="https://magic-english-plan.by/page-magic-egnlish-2" target="_blank" rel="noopener">Политику обработки персональных данных</a></span></label>
           </div>
-          <button class="arrow-button" type="submit">Продолжить в Telegram</button>
+          <button class="arrow-button" type="submit">Перейти к оплате</button>
           <p class="contact-status" data-contact-status aria-live="polite"></p>
         </form>
-        <div class="payment-placeholder" aria-label="плейсхолдер будущей оплаты">
-          <span>Следующий этап</span>
-          <strong>Безопасная онлайн-оплата</strong>
-          <button type="button" disabled>Платёжная форма скоро</button>
+        <div class="payment-placeholder" aria-label="информация о безопасной оплате">
+          <span>Безопасная оплата</span>
+          <strong>75 BYN · Альфа-Банк</strong>
+          <span>Visa и Mastercard · разовый платёж</span>
         </div>
         <div class="support-row">
-          <span>Сначала свяжемся и подтвердим детали</span>
+          <span>Нужна помощь с оплатой?</span>
           <button type="button" onclick="window.open('__CONTACT_URL__','_blank')">Написать в поддержку</button>
         </div>
-        <p class="payment-note">Сейчас заявка открывает диалог со службой заботы в Telegram. Платёжные данные на сайте не запрашиваются и не сохраняются.</p>
+        <p class="payment-note">После оплаты вернись на сайт. Мы проверим статус напрямую через Альфа-Банк; доступ выдаст администратор на указанный email.</p>
       </div>
     </div>
   </div>
@@ -8028,6 +8030,7 @@
     const modal = document.querySelector("#videoModal");
     const videoClose = modal.querySelector(".modal-close");
     const paymentModal = document.querySelector("#paymentModal");
+    const paymentApiBaseUrl = "__PAYMENT_API_URL__";
     const paymentCloseButtons = paymentModal.querySelectorAll(".payment-close");
     const menuButton = document.querySelector(".menu");
     const navLinks = document.querySelector(".links");
@@ -8210,30 +8213,48 @@
     const contactForm = paymentModal.querySelector("form");
     const contactStatus = paymentModal.querySelector("[data-contact-status]");
 
-    contactForm.addEventListener("submit", (event) => {
+    contactForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const formData = new FormData(contactForm);
       const name = String(formData.get("name") || "").trim();
       const email = String(formData.get("email") || "").trim();
       const phone = String(formData.get("phone") || "").trim();
       const social = String(formData.get("social") || "").trim();
-
-      if (!email && !phone && !social) {
-        contactStatus.textContent = "Укажи email, телефон или мессенджер.";
-        contactStatus.classList.add("is-error");
-        return;
+      const submitButton = contactForm.querySelector('button[type="submit"]');
+      let idempotencyKey = sessionStorage.getItem("magic-payment-idempotency");
+      if (!idempotencyKey) {
+        idempotencyKey = crypto.randomUUID();
+        sessionStorage.setItem("magic-payment-idempotency", idempotencyKey);
       }
 
       contactStatus.classList.remove("is-error");
-      contactStatus.textContent = "Открываем диалог со службой заботы…";
-      const message = [
-        "Здравствуйте! Хочу получить доступ к Magic English Plan.",
-        `Имя: ${name}`,
-        email ? `Email: ${email}` : "",
-        phone ? `Телефон: ${phone}` : "",
-        social ? `Мессенджер: ${social}` : ""
-      ].filter(Boolean).join("\n");
-      window.open(`__CONTACT_URL__?text=${encodeURIComponent(message)}`, "_blank", "noopener");
+      contactStatus.textContent = "Создаём защищённый платёж…";
+      submitButton.disabled = true;
+      try {
+        const response = await fetch(`${paymentApiBaseUrl}/payments/orders`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            idempotencyKey,
+            name,
+            email,
+            phone,
+            social,
+            privacyAccepted: formData.get("privacy") === "on"
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || typeof data.formUrl !== "string") {
+          throw new Error(typeof data.message === "string" ? data.message : "Платёж не создан.");
+        }
+        contactStatus.textContent = "Переходим на страницу Альфа-Банка…";
+        window.location.assign(data.formUrl);
+      } catch (error) {
+        sessionStorage.removeItem("magic-payment-idempotency");
+        contactStatus.textContent = error instanceof Error ? error.message : "Платёж не создан. Попробуй ещё раз.";
+        contactStatus.classList.add("is-error");
+        submitButton.disabled = false;
+      }
     });
 
     const tickDiscountTimer = () => {

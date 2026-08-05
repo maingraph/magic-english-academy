@@ -4,6 +4,7 @@
 
 # Local Codex/dev artifacts
 .codex-audit/
+AGENTS.md
 platform/.codex-progress.md
 platform/.codex-screenshots/
 
@@ -26,3 +27,4 @@ platform/.env.*
 platform/backups/
 platform/apps/*/.env*
 platform/apps/*/.vercel/
+landing/.vercel/
